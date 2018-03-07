@@ -40,7 +40,7 @@ namespace Server
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
-        static string teststring = "Тестовое изменение";
+        static string teststring = "Тестовое изменение1";
         Thread TimerThread;
 
         public Server()
