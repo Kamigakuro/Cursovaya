@@ -616,11 +616,39 @@ namespace Server
                     Tables[tablecount] = MyDataReader.GetString(0);
                     tablecount++;
                 }
-                if (!Tables.Contains("systems")) { }
-                if (!Tables.Contains("operationsys")) { }
-                if (!Tables.Contains("cpuunit")) { }
+                MyDataReader.Close();
+                
+                if (!Tables.Contains("systems")) {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
+                if (!Tables.Contains("operationsys")) {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Version VARCHAR(30), CDVersion VARCHAR(30), InstallDate VARCHAR(30), NumberOfProcesses VARCHAR(4), NumberOfUsers VARCHAR(2), SerialNumber VARCHAR(30), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
+                if (!Tables.Contains("cpuunit")) {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS cpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), L2CacheSize VARCHAR(30), L3CacheSize VARCHAR(30), MaxClockSpeed VARCHAR(30), NumberOfCores VARCHAR(30), NumberOfLogicalProcessors VARCHAR(30), ProcessorId VARCHAR(30), ProcessorType VARCHAR(30), Revision VARCHAR(30), Role VARCHAR(30), SocketDesignation VARCHAR(30), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
+               /* if (!Tables.Contains("gpuuunit")) {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }*/
                 //if (!Tables.Contains("system")) { }
             }
+            // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать
         }
 
     }
