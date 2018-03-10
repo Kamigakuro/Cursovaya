@@ -16,8 +16,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
+
 namespace Server
 {
+
+    public struct Configuration
+    {
+        public const string DB_USER = "user10870";
+        public const string DB_PASS = "0lwHqEJe4X75";
+        public const string DB_BASE = "user10870";
+        public const string DB_HOST = "137.74.4.167";
+    }
 
     public struct IRC_QUERIES
     {
@@ -40,15 +49,16 @@ namespace Server
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
-        static string teststring = "Тестовое изменение2";
         Thread TimerThread;
-
+        
         public Server()
         {
             InitializeComponent();
-            notifyIcon1 = new NotifyIcon();
-            notifyIcon1.Icon = SystemIcons.Asterisk;
-            notifyIcon1.Visible = true;
+            notifyIcon1 = new NotifyIcon
+            {
+                Icon = SystemIcons.Asterisk,
+                Visible = true
+            };
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             listView1.FullRowSelect = true;
@@ -149,11 +159,7 @@ namespace Server
         private void InitializeMySQL()
         {
             string CommandText = "Test Connection";
-            string database = "test";
-            string host = "localhost";
-            string user = "root";
-            string password = "123123123";
-            dbHandle = new MySqlConnection("Database=" + database + ";Data Source=" +  host + ";User Id=" + user + ";Password=" + password + ";charset = utf8");
+            dbHandle = new MySqlConnection("Database=" + Configuration.DB_BASE + ";Data Source=" +  Configuration.DB_HOST + ";User Id=" + Configuration.DB_USER + ";Password=" + Configuration.DB_PASS + ";charset = utf8");
             MySqlCommand myCommand = new MySqlCommand(CommandText, dbHandle);
             try
             {
@@ -161,6 +167,7 @@ namespace Server
                 
                 dbStatusLabel.Text = "Подключено ";
                 dbStatusLabel.ForeColor = Color.Green;
+                CheckBaseIntegrity();
             }
             catch (MySqlException e)
             {
@@ -594,7 +601,31 @@ namespace Server
             cancelevent = false;
             Application.Exit();
         }
+
+        private void CheckBaseIntegrity()
+        {
+            MySqlDataReader MyDataReader;
+            int tablecount = 0;
+            MySqlCommand com = new MySqlCommand("SHOW TABLES FROM `" + Configuration.DB_USER + "`", dbHandle);
+            MyDataReader = com.ExecuteReader();
+            string[] Tables = new String[10];
+            if (MyDataReader.HasRows)
+            {
+                while (MyDataReader.Read())
+                {
+                    Tables[tablecount] = MyDataReader.GetString(0);
+                    tablecount++;
+                }
+                if (!Tables.Contains("systems")) { }
+                if (!Tables.Contains("operationsys")) { }
+                if (!Tables.Contains("cpuunit")) { }
+                //if (!Tables.Contains("system")) { }
+            }
+        }
+
     }
+
+
 
 
     public class SocketManagment
@@ -794,7 +825,7 @@ namespace Server
         {
             get
             {
-                return Extender == null ? null : Extender.Font;
+                return Extender?.Font;
             }
         }
 
@@ -802,7 +833,7 @@ namespace Server
         {
             get
             {
-                return Extender == null ? null : Extender.ListView;
+                return Extender?.ListView;
             }
         }
 
