@@ -697,15 +697,6 @@ namespace Server
             catch { }
             byte[] byReturn = new byte[nBytesRec];
             Array.Copy(m_byBuff, byReturn, nBytesRec);
-            /*
-			int nToBeRead = m_sock.Available;
-			if( nToBeRead > 0 )
-			{
-				byte [] byData = new byte[nToBeRead];
-				m_sock.Receive( byData );
-				
-			}
-			*/
             return byReturn;
         }
 
