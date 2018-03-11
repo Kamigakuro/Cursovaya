@@ -38,9 +38,41 @@ namespace Server
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             InitializeMySQL();
             IntializeSocket();
-            //TimerThread = new Thread(UpdateTimer);
-            //TimerThread.Start(); //запускаем поток
+            TimerThread = new Thread(UpdateTimer);
+            TimerThread.Start(); //запускаем поток
             
+        }
+        public delegate void UpdateTimeEx();
+        public void UpdateTime()
+        {
+            ArrayList clients = m_aryClients;
+            foreach (SocketManagment client in clients)
+            {
+                int id = client.Clientid;
+                long time = DateTime.Now.Ticks - client.time.Ticks;
+                DateTime watch = new DateTime();
+                watch = watch.AddTicks(time);
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (row.Cells[0].Value.Equals(id))
+                    {
+                        row.Cells["Time"].Value = String.Format("{0:mm:ss}", watch);
+                        break;
+                    }
+                }
+            }
+        }
+        private void UpdateTimer()
+        {
+            while (true)
+            {
+                try
+                {
+                    Invoke(new UpdateTimeEx(UpdateTime), new object[] { });
+                }
+                catch { }
+                Thread.Sleep(1000);
+            }
         }
 
         private void NotifyIcon1_Click(object sender, EventArgs e)
@@ -125,10 +157,7 @@ namespace Server
         }
 
         */
-        /*public void AddToDataGrid()
-        {
-            dataGridView1.Rows.Add("1", "Name", "00:00");
-        }*/
+        
 
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
@@ -210,18 +239,6 @@ namespace Server
             Application.Exit();
         }
 
-      /*  private void button1_Click(object sender, EventArgs e)
-        {
-            AddToDataGrid();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow collection in dataGridView1.Rows)
-            {
-                collection.Cells["Time"].Value = DateTime.Now;
-            }
-        }*/
     }
 
 }
