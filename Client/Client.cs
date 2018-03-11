@@ -129,15 +129,15 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                if (!String.IsNullOrEmpty(queryObj["Description"].ToString())) Board.Description = queryObj["Description"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["HostingBoard"].ToString())) Board.HostingBoard = queryObj["HostingBoard"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["HotSwappable"].ToString())) Board.HotSwappable = queryObj["HotSwappable"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Manufacturer"].ToString())) Board.Manufacturer = queryObj["Manufacturer"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Model"].ToString())) Board.Model = queryObj["Model"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Name"].ToString())) Board.Name = queryObj["Name"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["OtherIdentifyingInfo"].ToString())) Board.OtherIdentifyingInfo = queryObj["OtherIdentifyingInfo"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Product"].ToString())) Board.Product = queryObj["Product"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["SerialNumber"].ToString())) Board.SerialNumber = queryObj["SerialNumber"].ToString();  
+                if (queryObj["Description"] != null) Board.Description = queryObj["Description"].ToString();
+                if (queryObj["HostingBoard"] != null) Board.HostingBoard = queryObj["HostingBoard"].ToString();
+                if (queryObj["HotSwappable"] != null) Board.HotSwappable = queryObj["HotSwappable"].ToString();
+                if (queryObj["Manufacturer"] != null) Board.Manufacturer = queryObj["Manufacturer"].ToString();
+                if (queryObj["Model"] != null) Board.Model = queryObj["Model"].ToString();
+                if (queryObj["Name"] != null) Board.Name = queryObj["Name"].ToString();
+                if (queryObj["OtherIdentifyingInfo"] != null) Board.OtherIdentifyingInfo = queryObj["OtherIdentifyingInfo"].ToString();
+                if (queryObj["Product"] != null) Board.Product = queryObj["Product"].ToString();
+                if (queryObj["SerialNumber"] != null) Board.SerialNumber = queryObj["SerialNumber"].ToString();
             }
             return true;
 
@@ -149,21 +149,21 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                if (!String.IsNullOrEmpty(queryObj["Description"].ToString())) CPUUNIT.Description = queryObj["Description"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["DeviceID"].ToString())) CPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["L2CacheSize"].ToString())) CPUUNIT.L2CacheSize = Convert.ToInt32(queryObj["L2CacheSize"]);
-                if (!String.IsNullOrEmpty(queryObj["L3CacheSize"].ToString())) CPUUNIT.L3CacheSize = Convert.ToInt32(queryObj["L3CacheSize"]);
-                if (!String.IsNullOrEmpty(queryObj["MaxClockSpeed"].ToString())) CPUUNIT.MaxClockSpeed = Convert.ToInt32(queryObj["MaxClockSpeed"]);
-                if (!String.IsNullOrEmpty(queryObj["Name"].ToString())) CPUUNIT.Name = queryObj["Name"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["NumberOfCores"].ToString())) CPUUNIT.NumberOfCores = Convert.ToInt32(queryObj["NumberOfCores"]);
-                if (!String.IsNullOrEmpty(queryObj["NumberOfLogicalProcessors"].ToString())) CPUUNIT.NumberOfLogicalProcessors = Convert.ToInt32(queryObj["NumberOfLogicalProcessors"]);
-                if (!String.IsNullOrEmpty(queryObj["ProcessorId"].ToString())) CPUUNIT.ProcessorId = queryObj["ProcessorId"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["ProcessorType"].ToString())) CPUUNIT.ProcessorType = Convert.ToInt32(queryObj["ProcessorType"]);
-                if (!String.IsNullOrEmpty(queryObj["Revision"].ToString())) CPUUNIT.Revision = queryObj["Revision"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Role"].ToString())) CPUUNIT.Role = queryObj["Role"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["SocketDesignation"].ToString())) CPUUNIT.SocketDesignation = queryObj["SocketDesignation"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Status"].ToString())) CPUUNIT.Status = queryObj["Status"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["StatusInfo"].ToString())) CPUUNIT.StatusInfo = Convert.ToInt32(queryObj["StatusInfo"]);
+                if (queryObj["Description"] != null) CPUUNIT.Description = queryObj["Description"].ToString();
+                if (queryObj["DeviceID"] != null) CPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
+                if (queryObj["L2CacheSize"] != null) CPUUNIT.L2CacheSize = Convert.ToInt32(queryObj["L2CacheSize"]);
+                if (queryObj["L3CacheSize"] != null) CPUUNIT.L3CacheSize = Convert.ToInt32(queryObj["L3CacheSize"]);
+                if (queryObj["MaxClockSpeed"] != null) CPUUNIT.MaxClockSpeed = Convert.ToInt32(queryObj["MaxClockSpeed"]);
+                if (queryObj["Name"] != null) CPUUNIT.Name = queryObj["Name"].ToString();
+                if (queryObj["NumberOfCores"] != null) CPUUNIT.NumberOfCores = Convert.ToInt32(queryObj["NumberOfCores"]);
+                if (queryObj["NumberOfLogicalProcessors"] != null) CPUUNIT.NumberOfLogicalProcessors = Convert.ToInt32(queryObj["NumberOfLogicalProcessors"]);
+                if (queryObj["ProcessorId"] != null) CPUUNIT.ProcessorId = queryObj["ProcessorId"].ToString();
+                if (queryObj["ProcessorType"] != null) CPUUNIT.ProcessorType = Convert.ToInt32(queryObj["ProcessorType"]);
+                if (queryObj["Revision"] != null) CPUUNIT.Revision = queryObj["Revision"].ToString();
+                if (queryObj["Role"] != null) CPUUNIT.Role = queryObj["Role"].ToString();
+                if (queryObj["SocketDesignation"] != null) CPUUNIT.SocketDesignation = queryObj["SocketDesignation"].ToString();
+                if (queryObj["Status"] != null) CPUUNIT.Status = queryObj["Status"].ToString();
+                if (queryObj["StatusInfo"] != null) CPUUNIT.StatusInfo = Convert.ToInt32(queryObj["StatusInfo"]);
             }
             return true;
         }
@@ -214,20 +214,20 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                if (!String.IsNullOrEmpty(queryObj["AdapterRAM"].ToString())) GPUUNIT.AdapterRAM = queryObj["AdapterRAM"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Availability"].ToString())) GPUUNIT.AdapterRAM = queryObj["Availability"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Caption"].ToString())) GPUUNIT.Caption = queryObj["Caption"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["CurrentRefreshRate"].ToString())) GPUUNIT.CurrentRefreshRate = queryObj["CurrentRefreshRate"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["CurrentScanMode"].ToString())) GPUUNIT.CurrentScanMode = queryObj["CurrentScanMode"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Description"].ToString())) GPUUNIT.Description = queryObj["Description"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["DeviceID"].ToString())) GPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["DriverDate"].ToString())) GPUUNIT.DriverDate = queryObj["DriverDate"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["DriverVersion"].ToString())) GPUUNIT.DriverVersion = queryObj["DriverVersion"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["MaxRefreshRate"].ToString())) GPUUNIT.MaxRefreshRate = queryObj["MaxRefreshRate"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["MinRefreshRate"].ToString())) GPUUNIT.MinRefreshRate = queryObj["MinRefreshRate"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Monochrome"].ToString())) GPUUNIT.Monochrome = queryObj["Monochrome"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["Name"].ToString())) GPUUNIT.Name = queryObj["Name"].ToString();
-                if (!String.IsNullOrEmpty(queryObj["VideoProcessor"].ToString())) GPUUNIT.VideoProcessor = queryObj["VideoProcessor"].ToString();               
+                if (queryObj["AdapterRAM"] != null) GPUUNIT.AdapterRAM = queryObj["AdapterRAM"].ToString();
+                if (queryObj["Availability"] != null) GPUUNIT.AdapterRAM = queryObj["Availability"].ToString();
+                if (queryObj["Caption"] != null) GPUUNIT.Caption = queryObj["Caption"].ToString();
+                if (queryObj["CurrentRefreshRate"] != null) GPUUNIT.CurrentRefreshRate = queryObj["CurrentRefreshRate"].ToString();
+                if (queryObj["CurrentScanMode"] != null) GPUUNIT.CurrentScanMode = queryObj["CurrentScanMode"].ToString();
+                if (queryObj["Description"] != null) GPUUNIT.Description = queryObj["Description"].ToString();
+                if (queryObj["DeviceID"] != null) GPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
+                if (queryObj["DriverDate"] != null) GPUUNIT.DriverDate = queryObj["DriverDate"].ToString();
+                if (queryObj["DriverVersion"] != null) GPUUNIT.DriverVersion = queryObj["DriverVersion"].ToString();
+                if (queryObj["MaxRefreshRate"] != null) GPUUNIT.MaxRefreshRate = queryObj["MaxRefreshRate"].ToString();
+                if (queryObj["MinRefreshRate"] != null) GPUUNIT.MinRefreshRate = queryObj["MinRefreshRate"].ToString();
+                if (queryObj["Monochrome"] != null) GPUUNIT.Monochrome = queryObj["Monochrome"].ToString();
+                if (queryObj["Name"] != null) GPUUNIT.Name = queryObj["Name"].ToString();
+                if (queryObj["VideoProcessor"] != null) GPUUNIT.VideoProcessor = queryObj["VideoProcessor"].ToString();
             }
             return true;
         }
