@@ -19,7 +19,6 @@ using System.Windows.Forms.VisualStyles;
 
 namespace Server
 {
-
     public partial class Server : Form
     {
         Thread TimerThread;

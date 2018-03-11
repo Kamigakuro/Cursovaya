@@ -100,7 +100,6 @@ namespace Client
             public const int Board = 6;
         }
 
-
         public Client()
         {
             InitializeComponent();
@@ -108,8 +107,6 @@ namespace Client
             thread.Start();
             GetComponets();
         }
-
-
 
         private void GetComponets()
         {
@@ -123,7 +120,6 @@ namespace Client
 
         private bool GetRAM()
         {
-
             return true;
         }
 
@@ -133,52 +129,15 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                try
-                {
-                    Board.Description = queryObj["Description"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.HostingBoard = queryObj["HostingBoard"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.HotSwappable = queryObj["HotSwappable"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.Manufacturer = queryObj["Manufacturer"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.Model = queryObj["Model"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.Name = queryObj["Name"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.OtherIdentifyingInfo = queryObj["OtherIdentifyingInfo"].ToString();
-                }
-                catch { }
-                try
-                {
-                   Board.Product = queryObj["Product"].ToString();
-                }
-                catch { }
-                try
-                {
-                    Board.SerialNumber = queryObj["SerialNumber"].ToString();
-                }
-                catch { }
-                
+                if (queryObj["Description"].ToString() != String.Empty) Board.Description = queryObj["Description"].ToString();
+                if (queryObj["HostingBoard"].ToString() != String.Empty) Board.HostingBoard = queryObj["HostingBoard"].ToString();
+                if (queryObj["HotSwappable"].ToString() != String.Empty) Board.HotSwappable = queryObj["HotSwappable"].ToString();
+                if (queryObj["Manufacturer"].ToString() != String.Empty) Board.Manufacturer = queryObj["Manufacturer"].ToString();
+                if (queryObj["Model"].ToString() != String.Empty) Board.Model = queryObj["Model"].ToString();
+                if (queryObj["Name"].ToString() != String.Empty) Board.Name = queryObj["Name"].ToString();
+                if (queryObj["OtherIdentifyingInfo"].ToString() != String.Empty) Board.OtherIdentifyingInfo = queryObj["OtherIdentifyingInfo"].ToString();
+                if (queryObj["Product"].ToString() != String.Empty) Board.Product = queryObj["Product"].ToString();
+                if (queryObj["SerialNumber"].ToString() != String.Empty) Board.SerialNumber = queryObj["SerialNumber"].ToString();  
             }
             return true;
 
@@ -190,36 +149,21 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                try { CPUUNIT.Description = queryObj["Description"].ToString(); }
-                catch { }
-                try { CPUUNIT.DeviceID = queryObj["DeviceID"].ToString(); }
-                catch { }
-                try { CPUUNIT.L2CacheSize = Convert.ToInt32(queryObj["L2CacheSize"]); }
-                catch { }
-                try { CPUUNIT.L3CacheSize = Convert.ToInt32(queryObj["L3CacheSize"]); }
-                catch { }
-                try { CPUUNIT.MaxClockSpeed = Convert.ToInt32(queryObj["MaxClockSpeed"]); }
-                catch { }
-                try { CPUUNIT.Name = queryObj["Name"].ToString(); }
-                catch { }
-                try { CPUUNIT.NumberOfCores = Convert.ToInt32(queryObj["NumberOfCores"]); }
-                catch { }
-                try { CPUUNIT.NumberOfLogicalProcessors = Convert.ToInt32(queryObj["NumberOfLogicalProcessors"]); }
-                catch { }
-                try { CPUUNIT.ProcessorId = queryObj["ProcessorId"].ToString(); }
-                catch { }
-                try { CPUUNIT.ProcessorType = Convert.ToInt32(queryObj["ProcessorType"]); }
-                catch { }
-                try { CPUUNIT.Revision = queryObj["Revision"].ToString(); }
-                catch { }
-                try { CPUUNIT.Role = queryObj["Role"].ToString(); }
-                catch { }
-                try { CPUUNIT.SocketDesignation = queryObj["SocketDesignation"].ToString(); }
-                catch { }
-                try { CPUUNIT.Status = queryObj["Status"].ToString(); }
-                catch { }
-                try { CPUUNIT.StatusInfo = Convert.ToInt32(queryObj["StatusInfo"]); }
-                catch { }
+                if (queryObj["Description"].ToString() != String.Empty) CPUUNIT.Description = queryObj["Description"].ToString();
+                if (queryObj["DeviceID"].ToString() != String.Empty) CPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
+                if (queryObj["L2CacheSize"].ToString() != String.Empty) CPUUNIT.L2CacheSize = Convert.ToInt32(queryObj["L2CacheSize"]);
+                if (queryObj["L3CacheSize"].ToString() != String.Empty) CPUUNIT.L3CacheSize = Convert.ToInt32(queryObj["L3CacheSize"]);
+                if (queryObj["MaxClockSpeed"].ToString() != String.Empty) CPUUNIT.MaxClockSpeed = Convert.ToInt32(queryObj["MaxClockSpeed"]);
+                if (queryObj["Name"].ToString() != String.Empty) CPUUNIT.Name = queryObj["Name"].ToString();
+                if (queryObj["NumberOfCores"].ToString() != String.Empty) CPUUNIT.NumberOfCores = Convert.ToInt32(queryObj["NumberOfCores"]);
+                if (queryObj["NumberOfLogicalProcessors"].ToString() != String.Empty) CPUUNIT.NumberOfLogicalProcessors = Convert.ToInt32(queryObj["NumberOfLogicalProcessors"]);
+                if (queryObj["ProcessorId"].ToString() != String.Empty) CPUUNIT.ProcessorId = queryObj["ProcessorId"].ToString();
+                if (queryObj["ProcessorType"].ToString() != String.Empty) CPUUNIT.ProcessorType = Convert.ToInt32(queryObj["ProcessorType"]);
+                if (queryObj["Revision"].ToString() != String.Empty) CPUUNIT.Revision = queryObj["Revision"].ToString();
+                if (queryObj["Role"].ToString() != String.Empty) CPUUNIT.Role = queryObj["Role"].ToString();
+                if (queryObj["SocketDesignation"].ToString() != String.Empty) CPUUNIT.SocketDesignation = queryObj["SocketDesignation"].ToString();
+                if (queryObj["Status"].ToString() != String.Empty) CPUUNIT.Status = queryObj["Status"].ToString();
+                if (queryObj["StatusInfo"].ToString() != String.Empty) CPUUNIT.StatusInfo = Convert.ToInt32(queryObj["StatusInfo"]);
             }
             return true;
         }
@@ -270,76 +214,20 @@ namespace Client
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
             {
-                try
-                {
-                    GPUUNIT.AdapterRAM = queryObj["AdapterRAM"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.AdapterRAM = queryObj["Availability"].ToString();
-                }
-                catch { }
-                try
-                {
-                   GPUUNIT.Caption = queryObj["Caption"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.CurrentRefreshRate = queryObj["CurrentRefreshRate"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.CurrentScanMode = queryObj["CurrentScanMode"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.Description = queryObj["Description"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.DriverDate = queryObj["DriverDate"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.DriverVersion = queryObj["DriverVersion"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.MaxRefreshRate = queryObj["MaxRefreshRate"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.MinRefreshRate = queryObj["MinRefreshRate"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.Monochrome = queryObj["Monochrome"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.Name = queryObj["Name"].ToString();
-                }
-                catch { }
-                try
-                {
-                    GPUUNIT.VideoProcessor = queryObj["VideoProcessor"].ToString();
-                }
-                catch { }
+                if (queryObj["AdapterRAM"].ToString() != String.Empty) GPUUNIT.AdapterRAM = queryObj["AdapterRAM"].ToString();
+                if (queryObj["Availability"].ToString() != String.Empty) GPUUNIT.AdapterRAM = queryObj["Availability"].ToString();
+                if (queryObj["Caption"].ToString() != String.Empty) GPUUNIT.Caption = queryObj["Caption"].ToString();
+                if (queryObj["CurrentRefreshRate"].ToString() != String.Empty) GPUUNIT.CurrentRefreshRate = queryObj["CurrentRefreshRate"].ToString();
+                if (queryObj["CurrentScanMode"].ToString() != String.Empty) GPUUNIT.CurrentScanMode = queryObj["CurrentScanMode"].ToString();
+                if (queryObj["Description"].ToString() != String.Empty) GPUUNIT.Description = queryObj["Description"].ToString();
+                if (queryObj["DeviceID"].ToString() != String.Empty) GPUUNIT.DeviceID = queryObj["DeviceID"].ToString();
+                if (queryObj["DriverDate"].ToString() != String.Empty) GPUUNIT.DriverDate = queryObj["DriverDate"].ToString();
+                if (queryObj["DriverVersion"].ToString() != String.Empty) GPUUNIT.DriverVersion = queryObj["DriverVersion"].ToString();
+                if (queryObj["MaxRefreshRate"].ToString() != String.Empty) GPUUNIT.MaxRefreshRate = queryObj["MaxRefreshRate"].ToString();
+                if (queryObj["MinRefreshRate"].ToString() != String.Empty) GPUUNIT.MinRefreshRate = queryObj["MinRefreshRate"].ToString();
+                if (queryObj["Monochrome"].ToString() != String.Empty) GPUUNIT.Monochrome = queryObj["Monochrome"].ToString();
+                if (queryObj["Name"].ToString() != String.Empty) GPUUNIT.Name = queryObj["Name"].ToString();
+                if (queryObj["VideoProcessor"].ToString() != String.Empty) GPUUNIT.VideoProcessor = queryObj["VideoProcessor"].ToString();               
             }
             return true;
         }
