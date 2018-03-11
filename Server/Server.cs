@@ -1,16 +1,16 @@
-﻿using MySql.Data.MySqlClient;
+﻿//using MySql.Data.MySqlClient;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+//using System.ComponentModel;
+//using System.Data;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Text.RegularExpressions;
+//using System.IO;
+//using System.Linq;
+//using System.Net;
+//using System.Net.Sockets;
+//using System.Text;
+//using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,34 +20,8 @@ using System.Windows.Forms.VisualStyles;
 namespace Server
 {
 
-   /* public struct Configuration
-    {
-        public const string DB_USER = "user10870";
-        public const string DB_PASS = "0lwHqEJe4X75";
-        public const string DB_BASE = "user10870";
-        public const string DB_HOST = "137.74.4.167";
-    }*/
-
-    public struct IRC_QUERIES
-    {
-        public const int REQ_AUTH = 1;
-        const int RES_AUTH = 2;
-        const int TEST = 8888;
-        public const int ERROR_IRC = 0;
-        public const int OPSYS = 3;
-        public const int CPUUNIT = 4;
-        public const int ERRONCLIENTSIDE = 9999;
-    }
-
     public partial class Server : Form
     {
-        Socket listener;
-        private static ArrayList m_aryClients = new ArrayList();	// Список подключенных клиентов
-        static byte[] m_byBuff = new byte[1024]; // размер буфера
-        public static MemoryStream stream = new MemoryStream(m_byBuff);
-        static BinaryWriter writer = new BinaryWriter(stream);
-        static BinaryReader reader = new BinaryReader(stream);
-        static string EndofMessage = "<EOF>";
         Thread TimerThread;
         MySQLCon DB = new MySQLCon();
         
@@ -61,17 +35,11 @@ namespace Server
             };
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
-            listView1.FullRowSelect = true;
-            ListViewExtender extender = new ListViewExtender(listView1);
-            ListViewButtonColumn buttonAction = new ListViewButtonColumn(3);
-            buttonAction.Click += OnButtonActionClick;
-            buttonAction.FixedWidth = true;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
-            extender.AddColumn(buttonAction);
             InitializeMySQL();
             IntializeSocket();
-            TimerThread = new Thread(UpdateTimer);
-            TimerThread.Start(); //запускаем поток
+            //TimerThread = new Thread(UpdateTimer);
+            //TimerThread.Start(); //запускаем поток
             
         }
 
@@ -85,7 +53,7 @@ namespace Server
             }
         }
 
-        private void OnButtonActionClick(object sender, ListViewColumnMouseEventArgs e)//Кнопка в листе
+   /*     private void OnButtonActionClick(object sender, ListViewColumnMouseEventArgs e)//Кнопка в листе
         {
             SocketManagment client = null;
             foreach (SocketManagment clients in m_aryClients)
@@ -119,8 +87,8 @@ namespace Server
                 client.CPUUNIT[5] + "  " + client.CPUUNIT[0] + " " + client.CPUUNIT[1], client.CPUUNIT[6], client.CPUUNIT[7], client.CPUUNIT[2], client.CPUUNIT[3], client.CPUUNIT[12],
                 client.CPUUNIT[4], client.CPUUNIT[11], client.CPUUNIT[8], client.CPUUNIT[9], client.CPUUNIT[10]);
             MessageBox.Show(this, text, e.Item.SubItems[1].Text);
-        }
-
+        }*/
+/*
         public delegate void UpdateTimeEx();
         public  void UpdateTime()
         {
@@ -156,48 +124,16 @@ namespace Server
             }
         }
 
-        private void InitializeMySQL()
+        */
+        /*public void AddToDataGrid()
         {
-            DB.OpenConnection("user10870", "0lwHqEJe4X75", "user10870", "137.74.4.167");
-            if (DB.SqlConnection == ConnectionState.Open)
-            {   
-                dbStatusLabel.Text = "Подключено ";
-                dbStatusLabel.ForeColor = Color.Green;
-                DB.CheckBaseIntegrity("user10870");
-            }
-            else
-            {
-                dbStatusLabel.Text = "Отключено";
-                dbStatusLabel.ForeColor = Color.Red;
-            }
-        }
+            dataGridView1.Rows.Add("1", "Name", "00:00");
+        }*/
 
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
         {
-
-            ListViewItem lvi = new ListViewItem();
-            ListViewItem.ListViewSubItem lvsi = new ListViewItem.ListViewSubItem();
-            ListViewItem.ListViewSubItem lvsp = new ListViewItem.ListViewSubItem();
-            ListViewItem.ListViewSubItem lvsb = new ListViewItem.ListViewSubItem();
-            ListViewGroup lvg = new ListViewGroup
-            {
-                Header = name,
-                HeaderAlignment = HorizontalAlignment.Center
-            };
-            lvi.Text = name;
-            lvsi.Text = ip;
-            lvi.SubItems.Add(lvsi);
-            lvsp.Text = "00:00";
-            lvsb.Text = "Подробнее";
-            lvi.SubItems.Add(lvsp);
-            lvi.SubItems.Add(lvsb);
-            listView1.Items.Add(lvi);
-            listView1.Groups.Add(lvg);
-            int lid = listView1.Items.Count;
-            int gid = listView1.Groups.Count;
-            listView1.Items[lid-1].Group = listView1.Groups[gid-1];
-            label6.Text = (Convert.ToInt32(label6.Text) + 1).ToString();
+            dataGridView1.Rows.Add(id, name, ip);
             AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
 
@@ -211,320 +147,14 @@ namespace Server
         private void DeleteClient(SocketManagment client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();
-            label6.Text = (Convert.ToInt32(label6.Text) - 1).ToString();
-            ListViewGroup lvg;
-            foreach (ListViewItem item in listView1.Items)
+            int id = client.Clientid;
+            foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                foreach (ListViewItem.ListViewSubItem subitem in item.SubItems)
+                if (row.Cells[0].Value.Equals(id))
                 {
-                    if (subitem.Text == ip)
-                    {
-                        lvg = item.Group;
-                        item.Remove();
-                        listView1.Update();
-
-                        return;
-                    }
-                }
-                
-            }
-        }
-
-        private string GetExternalIp()
-        {
-            try
-            {
-                string externalIP;
-                externalIP = (new WebClient()).DownloadString("http://checkip.dyndns.org/");
-                externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"))
-                             .Matches(externalIP)[0].ToString();
-                return externalIP;
-            }
-            catch { return null; }
-        }
-
-        private void IntializeSocket()
-        {
-            const int nPortListen = 7777;
-            String strHostName = "";
-            IPAddress.TryParse(GetExternalIp(), out IPAddress aryLocalAddr);
-            if (aryLocalAddr == null || aryLocalAddr == IPAddress.None)
-            {
-                try
-                {
-                    strHostName = Dns.GetHostName();
-                    IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
-                    aryLocalAddr = ipEntry.AddressList[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при попытке получить локальный адресс: " + ex.Message);
-                }
-            }
-            if (aryLocalAddr == null)
-            {
-                MessageBox.Show("Невозможно получить локальный адрес");
-                label4.Text = "Отключено";
-                label4.ForeColor = Color.Red;
-                label10.Text = "";
-                return;
-            }
-            //MessageBox.Show("Активировано прослушивание: [" + strHostName +"] " + aryLocalAddr[0] + ":" + nPortListen);
-            label4.Text = "Подключено";
-            label4.ForeColor = Color.Green;
-            label10.Text = aryLocalAddr + ":" + nPortListen;
-            try
-            {
-                listener = new Socket(aryLocalAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                listener.Bind(new IPEndPoint(IPAddress.Any, nPortListen));
-                listener.Listen(100);
-                listener.BeginAccept(new AsyncCallback(OnConnectRequest), listener);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
-        }
-        public void OnConnectRequest(IAsyncResult ar)
-        {
-            Socket listener = (Socket)ar.AsyncState;
-            if (!listener.Blocking) return;
-            OnNewConnection(listener.EndAccept(ar));
-            listener.BeginAccept(new AsyncCallback(OnConnectRequest), listener);
-        }
-
-        public void OnNewConnection(Socket sockClient)
-        {
-            //SocketChatClient client = new SocketChatClient( listener.AcceptSocket() );
-            SocketManagment client = new SocketManagment(sockClient);
-            m_aryClients.Add(client);
-            stream.Position = 0;
-            writer.Write(IRC_QUERIES.REQ_AUTH);
-            writer.Write(EndofMessage);
-            client.Sock.Send(m_byBuff);
-            client.SetupRecieveCallback(this);
-        }
-
-        public void OnRecievedData(IAsyncResult ar)
-        {
-            SocketManagment client = (SocketManagment)ar.AsyncState;
-            byte[] cread = client.GetRecievedData(ar, out SocketError error);
-            if (error != SocketError.Success)
-            {
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Попытка получения данных от [{0}]", client.Sock.RemoteEndPoint) });
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Результат: {0}", error.ToString()) });
-            }
-            if (cread.Length < 1)
-            {
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", client.Sock.RemoteEndPoint) });
-                Invoke(new DeleteClientFromList(DeleteClient), new object[] { client });
-                client.Sock.Close();
-                m_aryClients.Remove(client);
-                //client.SetupRecieveCallback(this);
-                return;
-            }
-            MemoryStream mem = new MemoryStream(cread);
-            BinaryReader read = new BinaryReader(mem);
-            int irc = -1;
-            try
-            {
-                irc = read.ReadInt32();
-            }
-            catch { Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) }); }
-            switch (irc)
-            {
-                case IRC_QUERIES.REQ_AUTH:
-                    string clientname = read.ReadString();
-                    string key = read.ReadString();
-                    string mac = read.ReadString();
-                    if (key == "111111")
-                    {
-                        int id = CheckRegister(mac);
-                        if (id != -1 && id != 0)
-                        {
-                            client.name = clientname;
-                            client.Clientid = id;
-                            client.time = DateTime.Now;
-                            Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
-                            break;
-                        }
-                        else
-                        {
-                            RegisterNewClient(clientname, mac);
-                            id = CheckRegister(mac);
-                            client.Clientid = id;
-                            client.name = clientname;
-                            client.time = DateTime.Now;
-                            Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
-                            break;
-                        }
-                    }
-                    else  client.Sock.Close();
+                    dataGridView1.Rows.RemoveAt(row.Index);
                     break;
-                case IRC_QUERIES.OPSYS:
-                    for (int i = 0; i < 7; i++)
-                    {
-                        string rd = read.ReadString();
-                        if (rd == EndofMessage) break;
-                        client.OperationSistem[i] = rd;
-                    }
-                    stream.Position = 0;
-                    writer.Write(IRC_QUERIES.CPUUNIT);
-                    writer.Write(EndofMessage);
-                    client.Sock.Send(m_byBuff);
-                    break;
-                case IRC_QUERIES.CPUUNIT:
-                    for (int i = 0; i < 15; i++)
-                    {
-                        string rd = read.ReadString();
-                        if (rd == EndofMessage) break;
-                        client.CPUUNIT[i] = rd;
-                    }
-                    CheckMySQLInformation(client.Clientid, client);
-                    break;
-                case IRC_QUERIES.ERROR_IRC:
-
-                    break;
-                default:
-                    break;
-            }
-            client.SetupRecieveCallback(this);
-        }
-
-        public void CheckMySQLInformation(int id, SocketManagment client)
-        {
-            if (DB.SqlConnection != ConnectionState.Open)
-            {
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Соединение с базой данной разорвано!") });
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("MySQL DataBase Status: {0}", DB.SqlConnection.ToString()) });
-                return;
-            }
-            string sql = String.Format("SELECT * FROM operationsys WHERE systemid = {0} LIMIT 1", id);
-            DB.SendQuery(sql, out MySqlDataReader dataReader);
-
-            if (dataReader.HasRows)
-            {
-                while (dataReader.Read())
-                {
-                    string s = dataReader.GetString(1);
-                    if (s != client.OperationSistem[0]) { MessageBox.Show(s); }
-                    if (dataReader.GetString(2) != client.OperationSistem[1]) { }
-                    if (dataReader.GetString(3) != client.OperationSistem[2]) { }
-                    if (dataReader.GetString(4) != client.OperationSistem[3]) { }
-                    if (dataReader.GetString(5) != client.OperationSistem[4]) { }
-                    if (dataReader.GetString(6) != client.OperationSistem[5]) { }
-                    if (dataReader.GetString(7) != client.OperationSistem[6]) { }
                 }
-            }
-            else
-            {
-                dataReader.Close();
-                //cmd.ExecuteNonQuery();
-                //cmd.Dispose();
-                sql = String.Format("INSERT INTO operationsys(Name, Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber, systemid) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')",
-                    client.OperationSistem[0],
-                    client.OperationSistem[1],
-                     client.OperationSistem[2],
-                      client.OperationSistem[3],
-                       client.OperationSistem[4],
-                        client.OperationSistem[5],
-                         client.OperationSistem[6],
-                         id);
-                try
-                {
-                    DB.SendQuery(sql);
-                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
-                }
-                catch
-                {
-                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
-                }
-            }
-
-            sql = String.Format("SELECT * FROM cpuunit WHERE systemid = {0} LIMIT 1", id);
-            dataReader.Close();
-            DB.SendQuery(sql, out dataReader);
-            if (dataReader.HasRows)
-            {
-                while (dataReader.Read())
-                {
-                    if (dataReader.GetString(1) != client.CPUUNIT[5]) { }
-                    if (dataReader.GetString(2) != client.CPUUNIT[0]) { }
-                    if (dataReader.GetString(3) != client.CPUUNIT[1]) { }
-                    if (dataReader.GetString(4) != client.CPUUNIT[2]) { }
-                    if (dataReader.GetString(5) != client.CPUUNIT[3]) { }
-                    if (dataReader.GetString(6) != client.CPUUNIT[4]) { }
-                    if (dataReader.GetString(7) != client.CPUUNIT[6]) { }
-                    if (dataReader.GetString(8) != client.CPUUNIT[7]) { }
-                    if (dataReader.GetString(9) != client.CPUUNIT[8]) { }
-                    if (dataReader.GetString(10) != client.CPUUNIT[9]) { }
-                    if (dataReader.GetString(11) != client.CPUUNIT[10]) { }
-                    if (dataReader.GetString(12) != client.CPUUNIT[11]) { }
-                    if (dataReader.GetString(13) != client.CPUUNIT[12]) { }
-                }
-            }
-            else
-            {
-                dataReader.Close();
-             //   cmd.ExecuteNonQuery();
-             //   cmd.Dispose();
-                sql = String.Format("INSERT INTO cpuunit(`Name`, `Description`, `DeviceID`, `L2CacheSize`, `L3CacheSize`, `MaxClockSpeed`, `NumberOfCores`, `NumberOfLogicalProcessors`, `ProcessorId`, `ProcessorType`, `Revision`, `Role`, `SocketDesignation`, `systemid`) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')",
-                    client.CPUUNIT[5],
-                    client.CPUUNIT[0],
-                    client.CPUUNIT[1],
-                     client.CPUUNIT[2],
-                      client.CPUUNIT[3],
-                       client.CPUUNIT[4],
-                        client.CPUUNIT[6],
-                         client.CPUUNIT[7],
-                          client.CPUUNIT[8],
-                           client.CPUUNIT[9],
-                            client.CPUUNIT[10],
-                             client.CPUUNIT[11],
-                              client.CPUUNIT[12],
-                              id);
-                try
-                {
-                    DB.SendQuery(sql);
-                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
-                }
-                catch
-                {
-                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
-                }
-            }
-            
-            dataReader.Close();
-        }
-        private int CheckRegister(string mac)
-        {
-            int id = -1;
-            string queryString = @"SELECT id FROM systems WHERE mac = '" + mac + "' LIMIT 1";
-            DB.SendQuery(queryString, out MySqlDataReader reader);
-            if (reader.HasRows)
-            {
-                reader.Read();
-                id = reader.GetInt32(0);
-            }
-            return id;
-        }
-
-        private void RegisterNewClient(string name, string mac)
-        {
-            try
-            {
-                string queryString = String.Format("INSERT INTO systems (name, mac) VALUES('{0}', '{1}')", name, mac);
-                DB.SendQuery(queryString);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
             }
         }
 
@@ -580,254 +210,18 @@ namespace Server
             Application.Exit();
         }
 
+      /*  private void button1_Click(object sender, EventArgs e)
+        {
+            AddToDataGrid();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow collection in dataGridView1.Rows)
+            {
+                collection.Cells["Time"].Value = DateTime.Now;
+            }
+        }*/
     }
-
-    public class ListViewExtender : IDisposable
-    {
-        private readonly Dictionary<int, ListViewColumn> _columns = new Dictionary<int, ListViewColumn>();
-
-        public ListViewExtender(ListView listView)
-        {
-            if (listView == null)
-                throw new ArgumentNullException("listView");
-
-            if (listView.View != View.Details)
-                throw new ArgumentException(null, "listView");
-
-            ListView = listView;
-            ListView.OwnerDraw = true;
-            ListView.DrawItem += OnDrawItem;
-            ListView.DrawSubItem += OnDrawSubItem;
-            ListView.DrawColumnHeader += OnDrawColumnHeader;
-            ListView.MouseMove += OnMouseMove;
-            ListView.MouseClick += OnMouseClick;
-
-            Font = new Font(ListView.Font.FontFamily, ListView.Font.Size - 2);
-        }
-
-        public virtual Font Font { get; private set; }
-        public ListView ListView { get; private set; }
-
-        protected virtual void OnMouseClick(object sender, MouseEventArgs e)
-        {
-            ListViewColumn column = GetColumnAt(e.X, e.Y, out ListViewItem item, out ListViewItem.ListViewSubItem sub);
-            if (column != null)
-            {
-                column.MouseClick(e, item, sub);
-            }
-        }
-
-        public ListViewColumn GetColumnAt(int x, int y, out ListViewItem item, out ListViewItem.ListViewSubItem subItem)
-        {
-            subItem = null;
-            item = ListView.GetItemAt(x, y);
-            if (item == null)
-                return null;
-
-            subItem = item.GetSubItemAt(x, y);
-            if (subItem == null)
-                return null;
-
-            for (int i = 0; i < item.SubItems.Count; i++)
-            {
-                if (item.SubItems[i] == subItem)
-                    return GetColumn(i);
-            }
-            return null;
-        }
-
-        protected virtual void OnMouseMove(object sender, MouseEventArgs e)
-        {
-            ListViewColumn column = GetColumnAt(e.X, e.Y, out ListViewItem item, out ListViewItem.ListViewSubItem sub);
-            if (column != null)
-            {
-                column.Invalidate(item, sub);
-                return;
-            }
-            if (item != null)
-            {
-                ListView.Invalidate(item.Bounds);
-            }
-        }
-
-        protected virtual void OnDrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
-        {
-            e.DrawDefault = true;
-        }
-
-        protected virtual void OnDrawSubItem(object sender, DrawListViewSubItemEventArgs e)
-        {
-            ListViewColumn column = GetColumn(e.ColumnIndex);
-            if (column == null)
-            {
-                e.DrawDefault = true;
-                return;
-            }
-
-            column.Draw(e);
-        }
-
-        protected virtual void OnDrawItem(object sender, DrawListViewItemEventArgs e)
-        {
-            // do nothing
-        }
-
-        public void AddColumn(ListViewColumn column)
-        {
-            if (column == null)
-                throw new ArgumentNullException("column");
-
-            column.Extender = this;
-            _columns[column.ColumnIndex] = column;
-        }
-
-        public ListViewColumn GetColumn(int index)
-        {
-            return _columns.TryGetValue(index, out ListViewColumn column) ? column : null;
-        }
-
-        public IEnumerable<ListViewColumn> Columns
-        {
-            get
-            {
-                return _columns.Values;
-            }
-        }
-
-        public virtual void Dispose()
-        {
-            if (Font != null)
-            {
-                Font.Dispose();
-                Font = null;
-            }
-        }
-    }
-
-    public abstract class ListViewColumn
-    {
-        public event EventHandler<ListViewColumnMouseEventArgs> Click;
-
-        protected ListViewColumn(int columnIndex)
-        {
-            if (columnIndex < 0)
-                throw new ArgumentException(null, "columnIndex");
-
-            ColumnIndex = columnIndex;
-        }
-
-        public virtual ListViewExtender Extender { get; protected internal set; }
-        public int ColumnIndex { get; private set; }
-
-        public virtual Font Font
-        {
-            get
-            {
-                return Extender?.Font;
-            }
-        }
-
-        public ListView ListView
-        {
-            get
-            {
-                return Extender?.ListView;
-            }
-        }
-
-        public abstract void Draw(DrawListViewSubItemEventArgs e);
-
-        public virtual void MouseClick(MouseEventArgs e, ListViewItem item, ListViewItem.ListViewSubItem subItem)
-        {
-            Click?.Invoke(this, new ListViewColumnMouseEventArgs(e, item, subItem));
-        }
-
-        public virtual void Invalidate(ListViewItem item, ListViewItem.ListViewSubItem subItem)
-        {
-            if (Extender != null)
-            {
-                Extender.ListView.Invalidate(subItem.Bounds);
-            }
-        }
-    }
-
-    public class ListViewColumnMouseEventArgs : MouseEventArgs
-    {
-        public ListViewColumnMouseEventArgs(MouseEventArgs e, ListViewItem item, ListViewItem.ListViewSubItem subItem)
-            : base(e.Button, e.Clicks, e.X, e.Y, e.Delta)
-        {
-            Item = item;
-            SubItem = subItem;
-        }
-
-        public ListViewItem Item { get; private set; }
-        public ListViewItem.ListViewSubItem SubItem { get; private set; }
-    }
-
-    public class ListViewButtonColumn : ListViewColumn
-    {
-        private Rectangle _hot = Rectangle.Empty;
-
-        public ListViewButtonColumn(int columnIndex)
-            : base(columnIndex)
-        {
-        }
-
-        public bool FixedWidth { get; set; }
-        public bool DrawIfEmpty { get; set; }
-
-        public override ListViewExtender Extender
-        {
-            get
-            {
-                return base.Extender;
-            }
-            protected internal set
-            {
-                base.Extender = value;
-                if (FixedWidth)
-                {
-                    base.Extender.ListView.ColumnWidthChanging += OnColumnWidthChanging;
-                }
-            }
-        }
-
-        protected virtual void OnColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-        {
-            if (e.ColumnIndex == ColumnIndex)
-            {
-                e.Cancel = true;
-                e.NewWidth = ListView.Columns[e.ColumnIndex].Width;
-            }
-        }
-
-        public override void Draw(DrawListViewSubItemEventArgs e)
-        {
-            if (_hot != Rectangle.Empty)
-            {
-                if (_hot != e.Bounds)
-                {
-                    ListView.Invalidate(_hot);
-                    _hot = Rectangle.Empty;
-                }
-            }
-
-            if ((!DrawIfEmpty) && (string.IsNullOrEmpty(e.SubItem.Text)))
-                return;
-
-            Point mouse = e.Item.ListView.PointToClient(Control.MousePosition);
-            if ((ListView.GetItemAt(mouse.X, mouse.Y) == e.Item) && (e.Item.GetSubItemAt(mouse.X, mouse.Y) == e.SubItem))
-            {
-                ButtonRenderer.DrawButton(e.Graphics, e.Bounds, e.SubItem.Text, Font, true, PushButtonState.Hot);
-                _hot = e.Bounds;
-            }
-            else
-            {
-                ButtonRenderer.DrawButton(e.Graphics, e.Bounds, e.SubItem.Text, Font, false, PushButtonState.Default);
-            }
-        }
-    }
-
-
 
 }

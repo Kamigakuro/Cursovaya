@@ -48,7 +48,6 @@ namespace Server
         /// Отправка запроса в БД с получением результата выполнения
         /// </summary>
         /// <param name="command">текст запроса</param>
-        /// <param name="reader">Объект вывода результата выполнения запроса</param>
         public void SendQuery(string command, out MySqlDataReader reader)
         {
             MySqlCommand com = new MySqlCommand(command, dbHandle);
