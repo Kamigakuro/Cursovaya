@@ -11,6 +11,9 @@ namespace Server
     {
         private MySqlConnection dbHandle;
         public MySqlConnection GetHandle { get { return dbHandle; } }
+        /// <summary>
+        /// Получение статуса соединения
+        /// </summary>
         public System.Data.ConnectionState SqlConnection
         {
             get { return dbHandle.State; }
@@ -25,7 +28,6 @@ namespace Server
         public void OpenConnection(string DB_USER, string DB_PASS, string DB_BASE, string DB_HOST)
         {
             dbHandle = new MySqlConnection("Database=" + DB_BASE + ";Data Source=" + DB_HOST + ";User Id=" + DB_USER + ";Password=" + DB_PASS + ";charset = utf8");
-            //MySqlCommand myCommand = new MySqlCommand(ConnectionName, dbHandle);
             try
             {
                 dbHandle.Open();
@@ -53,6 +55,10 @@ namespace Server
             MySqlCommand com = new MySqlCommand(command, dbHandle);
             reader = com.ExecuteReader();
         }
+        /// <summary>
+        /// Закрытие подключения к базе данных
+        /// </summary>
+        /// <returns></returns>
         public bool CloseConnection()
         {
             if (dbHandle != null)
@@ -70,6 +76,10 @@ namespace Server
             }
             return true;
         }
+        /// <summary>
+        /// Проверка целостности базы данных (Наличие необходимых таблиц)
+        /// </summary>
+        /// <param name="DB_USER"></param>
         public void CheckBaseIntegrity(string DB_USER)
         {
             MySqlDataReader MyDataReader;

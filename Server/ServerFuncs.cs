@@ -33,6 +33,9 @@ namespace Server
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
+        /// <summary>
+        /// Соединение с базой данных
+        /// </summary>
         private void InitializeMySQL()
         {
             DB.OpenConnection("user10870", "0lwHqEJe4X75", "user10870", "137.74.4.167");
@@ -48,6 +51,10 @@ namespace Server
                 dbStatusLabel.ForeColor = Color.Red;
             }
         }
+        /// <summary>
+        /// Получение внешнего IP-адреса
+        /// </summary>
+        /// <returns>IP-адрес ввиде строки</returns>
         private string GetExternalIp()
         {
             try
@@ -60,6 +67,9 @@ namespace Server
             }
             catch { return null; }
         }
+        /// <summary>
+        /// Включение прослушивания сокетом по порту
+        /// </summary>
         private void IntializeSocket()
         {
             const int nPortListen = 7777;
@@ -102,6 +112,10 @@ namespace Server
                 MessageBox.Show(e.ToString());
             }
         }
+        /// <summary>
+        /// Обработчик событий при получении каких-либо данных
+        /// </summary>
+        /// <param name="ar"></param>
         public void OnConnectRequest(IAsyncResult ar)
         {
             Socket listener = (Socket)ar.AsyncState;
@@ -109,6 +123,10 @@ namespace Server
             OnNewConnection(listener.EndAccept(ar));
             listener.BeginAccept(new AsyncCallback(OnConnectRequest), listener);
         }
+        /// <summary>
+        /// Метод вызываемый при подключении новых соединений
+        /// </summary>
+        /// <param name="sockClient"></param>
         public void OnNewConnection(Socket sockClient)
         {
             //SocketChatClient client = new SocketChatClient( listener.AcceptSocket() );
@@ -120,6 +138,10 @@ namespace Server
             client.Sock.Send(m_byBuff);
             client.SetupRecieveCallback(this);
         }
+        /// <summary>
+        /// Метод, вызываемый после разрыва соединения с клиентом
+        /// </summary>
+        /// <param name="ar"></param>
         public void OnRecievedData(IAsyncResult ar)
         {
             SocketManagment client = (SocketManagment)ar.AsyncState;
@@ -211,6 +233,11 @@ namespace Server
             }
             client.SetupRecieveCallback(this);
         }
+        /// <summary>
+        /// Метод проверки данных клиента с базой данных сервера
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="client"></param>
         public void CheckMySQLInformation(int id, SocketManagment client)
         {
             if (DB.SqlConnection != ConnectionState.Open)
@@ -316,6 +343,11 @@ namespace Server
 
             dataReader.Close();
         }
+        /// <summary>
+        /// Метод проверки клиента на наличие в базе данных
+        /// </summary>
+        /// <param name="mac">В качестве параметра сверки принимается MAC адрес</param>
+        /// <returns></returns>
         private int CheckRegister(string mac)
         {
             int id = -1;
@@ -329,6 +361,11 @@ namespace Server
             reader.Close();
             return id;
         }
+        /// <summary>
+        /// Регистрация клиента в случае его отсутствия в БД
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="mac"></param>
         private void RegisterNewClient(string name, string mac)
         {
             try
