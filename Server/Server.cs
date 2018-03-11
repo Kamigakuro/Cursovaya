@@ -20,13 +20,13 @@ using System.Windows.Forms.VisualStyles;
 namespace Server
 {
 
-    public struct Configuration
+   /* public struct Configuration
     {
         public const string DB_USER = "user10870";
         public const string DB_PASS = "0lwHqEJe4X75";
         public const string DB_BASE = "user10870";
         public const string DB_HOST = "137.74.4.167";
-    }
+    }*/
 
     public struct IRC_QUERIES
     {
@@ -42,7 +42,6 @@ namespace Server
     public partial class Server : Form
     {
         Socket listener;
-        MySqlConnection dbHandle;
         private static ArrayList m_aryClients = new ArrayList();	// Список подключенных клиентов
         static byte[] m_byBuff = new byte[1024]; // размер буфера
         public static MemoryStream stream = new MemoryStream(m_byBuff);
@@ -50,6 +49,7 @@ namespace Server
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
         Thread TimerThread;
+        MySQLCon DB = new MySQLCon();
         
         public Server()
         {
@@ -158,20 +158,15 @@ namespace Server
 
         private void InitializeMySQL()
         {
-            string CommandText = "Test Connection";
-            dbHandle = new MySqlConnection("Database=" + Configuration.DB_BASE + ";Data Source=" +  Configuration.DB_HOST + ";User Id=" + Configuration.DB_USER + ";Password=" + Configuration.DB_PASS + ";charset = utf8");
-            MySqlCommand myCommand = new MySqlCommand(CommandText, dbHandle);
-            try
-            {
-                dbHandle.Open();
-                
+            DB.OpenConnection("user10870", "0lwHqEJe4X75", "user10870", "137.74.4.167");
+            if (DB.SqlConnection == ConnectionState.Open)
+            {   
                 dbStatusLabel.Text = "Подключено ";
                 dbStatusLabel.ForeColor = Color.Green;
-                CheckBaseIntegrity();
+                DB.CheckBaseIntegrity("user10870");
             }
-            catch (MySqlException e)
+            else
             {
-                MessageBox.Show(e.ToString());
                 dbStatusLabel.Text = "Отключено";
                 dbStatusLabel.ForeColor = Color.Red;
             }
@@ -404,15 +399,15 @@ namespace Server
 
         public void CheckMySQLInformation(int id, SocketManagment client)
         {
-            if (dbHandle.State.ToString() != "Open")
+            if (DB.SqlConnection != ConnectionState.Open)
             {
                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Соединение с базой данной разорвано!") });
-                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("MySQL DataBase Status: {0}", dbHandle.State.ToString()) });
+                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("MySQL DataBase Status: {0}", DB.SqlConnection.ToString()) });
                 return;
             }
             string sql = String.Format("SELECT * FROM operationsys WHERE systemid = {0} LIMIT 1", id);
-            MySqlCommand cmd = new MySqlCommand(sql, dbHandle);
-            MySqlDataReader dataReader = cmd.ExecuteReader();
+            DB.SendQuery(sql, out MySqlDataReader dataReader);
+
             if (dataReader.HasRows)
             {
                 while (dataReader.Read())
@@ -430,8 +425,8 @@ namespace Server
             else
             {
                 dataReader.Close();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
+                //cmd.ExecuteNonQuery();
+                //cmd.Dispose();
                 sql = String.Format("INSERT INTO operationsys(Name, Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber, systemid) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')",
                     client.OperationSistem[0],
                     client.OperationSistem[1],
@@ -443,8 +438,7 @@ namespace Server
                          id);
                 try
                 {
-                    cmd = new MySqlCommand(sql, dbHandle);
-                    cmd.ExecuteNonQuery();
+                    DB.SendQuery(sql);
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                 }
                 catch
@@ -454,9 +448,8 @@ namespace Server
             }
 
             sql = String.Format("SELECT * FROM cpuunit WHERE systemid = {0} LIMIT 1", id);
-            cmd = new MySqlCommand(sql, dbHandle);
             dataReader.Close();
-            dataReader = cmd.ExecuteReader();
+            DB.SendQuery(sql, out dataReader);
             if (dataReader.HasRows)
             {
                 while (dataReader.Read())
@@ -479,8 +472,8 @@ namespace Server
             else
             {
                 dataReader.Close();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
+             //   cmd.ExecuteNonQuery();
+             //   cmd.Dispose();
                 sql = String.Format("INSERT INTO cpuunit(`Name`, `Description`, `DeviceID`, `L2CacheSize`, `L3CacheSize`, `MaxClockSpeed`, `NumberOfCores`, `NumberOfLogicalProcessors`, `ProcessorId`, `ProcessorType`, `Revision`, `Role`, `SocketDesignation`, `systemid`) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')",
                     client.CPUUNIT[5],
                     client.CPUUNIT[0],
@@ -498,8 +491,7 @@ namespace Server
                               id);
                 try
                 {
-                    cmd = new MySqlCommand(sql, dbHandle);
-                    cmd.ExecuteNonQuery();
+                    DB.SendQuery(sql);
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                 }
                 catch
@@ -514,14 +506,11 @@ namespace Server
         {
             int id = -1;
             string queryString = @"SELECT id FROM systems WHERE mac = '" + mac + "' LIMIT 1";
-            MySqlCommand com = new MySqlCommand(queryString, dbHandle);
-            try
+            DB.SendQuery(queryString, out MySqlDataReader reader);
+            if (reader.HasRows)
             {
-                id = Convert.ToInt32(com.ExecuteScalar());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
+                reader.Read();
+                id = reader.GetInt32(0);
             }
             return id;
         }
@@ -531,8 +520,7 @@ namespace Server
             try
             {
                 string queryString = String.Format("INSERT INTO systems (name, mac) VALUES('{0}', '{1}')", name, mac);
-                MySqlCommand com = new MySqlCommand(queryString, dbHandle);
-                com.ExecuteNonQuery();
+                DB.SendQuery(queryString);
             }
             catch (Exception e)
             {
@@ -555,17 +543,7 @@ namespace Server
             {
                 MessageBox.Show(es.ToString());
             }
-            if (dbHandle != null)
-            {
-                try
-                {
-                    dbHandle.Close();
-                }
-                catch (Exception es)
-                {
-                    MessageBox.Show(es.ToString());
-                }
-            }
+            DB.CloseConnection();
         }
 
         private void ListView1_StyleChanged(object sender, EventArgs e)
@@ -602,106 +580,7 @@ namespace Server
             Application.Exit();
         }
 
-        private void CheckBaseIntegrity()
-        {
-            MySqlDataReader MyDataReader;
-            int tablecount = 0;
-            MySqlCommand com = new MySqlCommand("SHOW TABLES FROM `" + Configuration.DB_USER + "`", dbHandle);
-            MyDataReader = com.ExecuteReader();
-            string[] Tables = new String[10];
-            if (MyDataReader.HasRows)
-            {
-                while (MyDataReader.Read())
-                {
-                    Tables[tablecount] = MyDataReader.GetString(0);
-                    tablecount++;
-                }
-                MyDataReader.Close();
-                
-                if (!Tables.Contains("systems")) {
-                    com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
-                    com = new MySqlCommand(command, dbHandle);
-                    com.ExecuteNonQuery();
-                    MyDataReader.Close();
-                }
-                if (!Tables.Contains("operationsys")) {
-                    com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Version VARCHAR(30), CDVersion VARCHAR(30), InstallDate VARCHAR(30), NumberOfProcesses VARCHAR(4), NumberOfUsers VARCHAR(2), SerialNumber VARCHAR(30), systemid INT NOT NULL)");
-                    com = new MySqlCommand(command, dbHandle);
-                    com.ExecuteNonQuery();
-                    MyDataReader.Close();
-                }
-                if (!Tables.Contains("cpuunit")) {
-                    com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS cpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), L2CacheSize VARCHAR(30), L3CacheSize VARCHAR(30), MaxClockSpeed VARCHAR(30), NumberOfCores VARCHAR(30), NumberOfLogicalProcessors VARCHAR(30), ProcessorId VARCHAR(30), ProcessorType VARCHAR(30), Revision VARCHAR(30), Role VARCHAR(30), SocketDesignation VARCHAR(30), systemid INT NOT NULL)");
-                    com = new MySqlCommand(command, dbHandle);
-                    com.ExecuteNonQuery();
-                    MyDataReader.Close();
-                }
-               /* if (!Tables.Contains("gpuuunit")) {
-                    com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
-                    com = new MySqlCommand(command, dbHandle);
-                    com.ExecuteNonQuery();
-                    MyDataReader.Close();
-                }*/
-                //if (!Tables.Contains("system")) { }
-            }
-            // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать
-        }
-
     }
-
-
-
-
-    public class SocketManagment
-    {
-        private Socket m_sock;                      // Connection to the client
-        static byte[] m_byBuff = new byte[1024];		// Receive data buffer
-        static MemoryStream mem = new MemoryStream(m_byBuff);
-        static BinaryReader reader = new BinaryReader(mem);
-        public string name = String.Empty;
-        public DateTime time = new DateTime();
-        /*[Name,Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber]*/
-        public string[] OperationSistem = new string[7];
-        public string[] CPUUNIT = new string[15];
-        public int Clientid = -1;
-        public Socket Sock
-        {
-            get { return m_sock; }
-        }
-        public SocketManagment(Socket sock)
-        {
-            m_sock = sock;
-        }
-        public void SetupRecieveCallback(Server main)
-        {
-
-            try
-            {
-                AsyncCallback recieveData = new AsyncCallback(main.OnRecievedData);
-                m_sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, this);
-            }
-            catch (Exception ex) { MessageBox.Show(String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message)); }
-        }
-        public byte[] GetRecievedData(IAsyncResult ar, out SocketError SockError)
-        {
-            int nBytesRec = 0;
-            SockError = SocketError.Success;
-            try
-            {
-                nBytesRec = m_sock.EndReceive(ar, out SockError);
-            }
-            catch { }
-            byte[] byReturn = new byte[nBytesRec];
-            Array.Copy(m_byBuff, byReturn, nBytesRec);
-            return byReturn;
-        }
-
-    }
-
 
     public class ListViewExtender : IDisposable
     {
