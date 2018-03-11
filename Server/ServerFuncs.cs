@@ -33,8 +33,6 @@ namespace Server
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
-
-
         private void InitializeMySQL()
         {
             DB.OpenConnection("user10870", "0lwHqEJe4X75", "user10870", "137.74.4.167");

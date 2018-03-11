@@ -119,45 +119,7 @@ namespace Server
                 client.CPUUNIT[5] + "  " + client.CPUUNIT[0] + " " + client.CPUUNIT[1], client.CPUUNIT[6], client.CPUUNIT[7], client.CPUUNIT[2], client.CPUUNIT[3], client.CPUUNIT[12],
                 client.CPUUNIT[4], client.CPUUNIT[11], client.CPUUNIT[8], client.CPUUNIT[9], client.CPUUNIT[10]);
             MessageBox.Show(this, text, e.Item.SubItems[1].Text);
-        }*/
-/*
-        public delegate void UpdateTimeEx();
-        public  void UpdateTime()
-        {
-            ArrayList clients = m_aryClients;
-            foreach (SocketManagment client in clients)
-            {
-                string ip = client.Sock.RemoteEndPoint.ToString();
-                long time = DateTime.Now.Ticks - client.time.Ticks;
-                DateTime watch = new DateTime();
-                watch = watch.AddTicks(time);
-                foreach (ListViewItem item in listView1.Items)
-                {
-                    if (item.SubItems[1].Text == ip)
-                    {
-                        item.SubItems[2].Text = String.Format("{0:mm:ss}", watch);
-                        int indexit = item.Index;
-                        break;
-                    }
-                    
-                }
-            }
-        }
-        public void UpdateTimer()
-        {
-            while(true)
-            {
-                try
-                {
-                    Invoke(new UpdateTimeEx(UpdateTime), new object[] { });
-                }
-                catch { }
-                Thread.Sleep(1000);
-            }
-        }
-
-        */
-        
+        }*/        
 
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
@@ -205,34 +167,12 @@ namespace Server
             DB.CloseConnection();
         }
 
-        private void ListView1_StyleChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ListView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            /*if (listView1.SelectedItems.Count > 0)
-            {
-                string ip = listView1.SelectedItems[0].SubItems[1].Text;
-                foreach (SocketManagment client in m_aryClients)
-                {
-                    if (client.Sock.RemoteEndPoint.ToString() == ip)
-                    {
-                        MessageBox.Show(client.OperationSistem[0] + client.OperationSistem[1] + client.OperationSistem[2]);
-                        MessageBox.Show(client.CPUUNIT[0] + client.CPUUNIT[1] + client.CPUUNIT[2]);
-                    }
-                }
-            }*/
-        }
-
         bool cancelevent = true;
         private void Server_FormClosing(object sender, FormClosingEventArgs e)
         {
             e.Cancel = cancelevent;
             this.Hide();
         }
-
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
             cancelevent = false;
