@@ -34,7 +34,19 @@ namespace Server
                             dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, "DBError",node.Value.GetTime(), node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
                             break;
                         }
-                    case QueryElement.QueryType.SysError: break;
+                    case QueryElement.QueryType.SysError:
+                        {
+                            dataGridView1.Rows.Add(Properties.Resources.Important_16x, "SysError", node.Value.GetTime(), node.Value.GetMessage(), "", "", "", "", "Пропустить");
+                            break;
+                        }
+                    case QueryElement.QueryType.ClientError:
+                        {
+                            SocketManagment client = node.Value.GetSocket();
+                            string name = client.name;
+                            int id = client.Clientid;
+                            dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, "ClientError", node.Value.GetTime(), node.Value.GetMessage(), name, id, "", "", "Пропустить");
+                            break;
+                        }
                 }
             }
             dataGridView1.AutoResizeColumns();

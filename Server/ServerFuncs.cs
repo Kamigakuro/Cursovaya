@@ -178,7 +178,7 @@ namespace Server
             catch (Exception e){
                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) });
                 string mess = String.Format("Принят битый пакет от: {0}. {1}", client.Sock.RemoteEndPoint, e.ToString());
-                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.ClientError, DateTime.Now);
                 ErrorsListForm.link.AddFirst(query);
 
             }
@@ -301,7 +301,7 @@ namespace Server
                 {
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                     string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
-                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.SysError, DateTime.Now);
+                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.ClientError, DateTime.Now);
                     ErrorsListForm.link.AddFirst(query);
                 }
             }
@@ -356,7 +356,7 @@ namespace Server
                 {
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                     string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
-                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.SysError, DateTime.Now);
+                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.ClientError, DateTime.Now);
                     ErrorsListForm.link.AddFirst(query);
                 }
             }
@@ -394,7 +394,10 @@ namespace Server
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString());
+                //MessageBox.Show(e.ToString());
+                string mess = String.Format("Ошибка при регистрации нового клиента в таблицу. Имя: {0}, MAC: {1}. {2}", name, mac, e.ToString());
+                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                ErrorsListForm.link.AddFirst(query);
             }
         }
 

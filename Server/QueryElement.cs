@@ -12,7 +12,8 @@ namespace Server
             None = 0,
             DBError = 1,
             SysError = 2,
-            Error = 3
+            Error = 3,
+            ClientError = 4
         }
         private string Message = String.Empty;
         private SocketManagment socket;

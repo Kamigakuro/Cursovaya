@@ -70,19 +70,21 @@
             this.Image.HeaderText = "";
             this.Image.Name = "Image";
             this.Image.ReadOnly = true;
-            this.Image.Width = 16;
+            this.Image.Width = 18;
             // 
             // Time
             // 
             this.Time.HeaderText = "Время";
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
+            this.Time.Width = 150;
             // 
             // QType
             // 
             this.QType.HeaderText = "Тип";
             this.QType.Name = "QType";
             this.QType.ReadOnly = true;
+            this.QType.Width = 70;
             // 
             // Info
             // 
@@ -96,20 +98,21 @@
             this.Client.HeaderText = "Клиент";
             this.Client.Name = "Client";
             this.Client.ReadOnly = true;
-            this.Client.Width = 50;
+            this.Client.Width = 45;
             // 
             // ClientId
             // 
             this.ClientId.HeaderText = "ID";
             this.ClientId.Name = "ClientId";
             this.ClientId.ReadOnly = true;
-            this.ClientId.Width = 30;
+            this.ClientId.Width = 20;
             // 
             // solution
             // 
             this.solution.HeaderText = "Решение";
             this.solution.Name = "solution";
             this.solution.ReadOnly = true;
+            this.solution.Width = 250;
             // 
             // Completebutton
             // 
