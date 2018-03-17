@@ -33,6 +33,8 @@ namespace Server
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
+        //LinkedList<QueryElement> link = new LinkedList<QueryElement>();
+
         /// <summary>
         /// Соединение с базой данных
         /// </summary>
@@ -85,7 +87,10 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при попытке получить локальный адресс: " + ex.Message);
+                    //MessageBox.Show("Ошибка при попытке получить локальный адресс: " + ex.Message);
+                    string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", ex.Message);
+                    QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                    ErrorsListForm.link.AddFirst(query);
                 }
             }
             if (aryLocalAddr == null)
@@ -109,7 +114,10 @@ namespace Server
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString());
+                //MessageBox.Show(e.ToString());
+                string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", e.Message);
+                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                ErrorsListForm.link.AddFirst(query);
             }
         }
         /// <summary>
@@ -167,7 +175,13 @@ namespace Server
             {
                 irc = read.ReadInt32();
             }
-            catch { Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) }); }
+            catch (Exception e){
+                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) });
+                string mess = String.Format("Принят битый пакет от: {0}. {1}", client.Sock.RemoteEndPoint, e.ToString());
+                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                ErrorsListForm.link.AddFirst(query);
+
+            }
             switch (irc)
             {
                 case IRC_QUERIES.REQ_AUTH:
@@ -248,19 +262,20 @@ namespace Server
             }
             string sql = String.Format("SELECT * FROM operationsys WHERE systemid = {0} LIMIT 1", id);
             DB.SendQuery(sql, out MySqlDataReader dataReader);
-
             if (dataReader.HasRows)
             {
                 while (dataReader.Read())
                 {
                     string s = dataReader.GetString(1);
-                    if (s != client.OperationSistem[0]) { MessageBox.Show(s); }
-                    if (dataReader.GetString(2) != client.OperationSistem[1]) { }
-                    if (dataReader.GetString(3) != client.OperationSistem[2]) { }
-                    if (dataReader.GetString(4) != client.OperationSistem[3]) { }
-                    if (dataReader.GetString(5) != client.OperationSistem[4]) { }
-                    if (dataReader.GetString(6) != client.OperationSistem[5]) { }
-                    if (dataReader.GetString(7) != client.OperationSistem[6]) { }
+                    if (s != client.OperationSistem[0]) {
+                        QueryElement query = new QueryElement("Несовпадение!\nБыло: " + s + "\nСтало: " + client.OperationSistem[0], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Name = '{0}' WHERE systemid = {1}", client.OperationSistem[0], id), DateTime.Now);
+                        ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(2) != client.OperationSistem[1]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(2) + "\nСтало: " + client.OperationSistem[1], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Version = '{0}' WHERE systemid = {1}", client.OperationSistem[1], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(3) != client.OperationSistem[2]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(3) + "\nСтало: " + client.OperationSistem[2], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET CDVersion = '{0}' WHERE systemid = {1}", client.OperationSistem[2], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(4) != client.OperationSistem[3]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(4) + "\nСтало: " + client.OperationSistem[3], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET InstallDate = '{0}' WHERE systemid = {1}", client.OperationSistem[3], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(5) != client.OperationSistem[4]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(5) + "\nСтало: " + client.OperationSistem[4], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfProcesses = '{0}' WHERE systemid = {1}", client.OperationSistem[4], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(6) != client.OperationSistem[5]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(6) + "\nСтало: " + client.OperationSistem[5], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfUsers = '{0}' WHERE systemid = {1}", client.OperationSistem[5], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
+                    if (dataReader.GetString(7) != client.OperationSistem[6]) { QueryElement query = new QueryElement("Несовпадение!\nБыло: " + dataReader.GetString(7) + "\nСтало: " + client.OperationSistem[6], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET SerialNumber = '{0}' WHERE systemid = {1}", client.OperationSistem[6], id), DateTime.Now); ErrorsListForm.link.AddFirst(query); }
                 }
             }
             else
@@ -282,12 +297,14 @@ namespace Server
                     DB.SendQuery(sql);
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                 }
-                catch
+                catch(MySqlException me)
                 {
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
+                    string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.SysError, DateTime.Now);
+                    ErrorsListForm.link.AddFirst(query);
                 }
             }
-
             sql = String.Format("SELECT * FROM cpuunit WHERE systemid = {0} LIMIT 1", id);
             dataReader.Close();
             DB.SendQuery(sql, out dataReader);
@@ -335,12 +352,14 @@ namespace Server
                     DB.SendQuery(sql);
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                 }
-                catch
+                catch(MySqlException me)
                 {
                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
+                    string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                    QueryElement query = new QueryElement(mess, client, QueryElement.QueryType.SysError, DateTime.Now);
+                    ErrorsListForm.link.AddFirst(query);
                 }
             }
-
             dataReader.Close();
         }
         /// <summary>

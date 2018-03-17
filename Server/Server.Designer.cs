@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dbStatusLabel = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -53,8 +53,14 @@
             this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Test = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.DataGridStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.MoreInfo = new System.Windows.Forms.ToolStripMenuItem();
+            this.Reboot = new System.Windows.Forms.ToolStripMenuItem();
+            this.ShutDown = new System.Windows.Forms.ToolStripMenuItem();
+            this.querylist = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.DataGridStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // dbStatusLabel
@@ -171,14 +177,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Number,
@@ -189,37 +195,38 @@
             this.dataGridView1.Location = new System.Drawing.Point(378, 9);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(545, 541);
+            this.dataGridView1.Size = new System.Drawing.Size(544, 541);
             this.dataGridView1.TabIndex = 13;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // Number
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Number.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Number.DefaultCellStyle = dataGridViewCellStyle12;
             this.Number.HeaderText = "##";
             this.Number.Name = "Number";
             this.Number.ReadOnly = true;
             // 
             // GName
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.GName.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.GName.DefaultCellStyle = dataGridViewCellStyle13;
             this.GName.HeaderText = "Name";
             this.GName.Name = "GName";
             this.GName.ReadOnly = true;
             // 
             // ip
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ip.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ip.DefaultCellStyle = dataGridViewCellStyle14;
             this.ip.HeaderText = "IP adress";
             this.ip.Name = "ip";
             this.ip.ReadOnly = true;
             // 
             // Time
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Time.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Time.DefaultCellStyle = dataGridViewCellStyle15;
             this.Time.HeaderText = "Time";
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
@@ -230,11 +237,50 @@
             this.Test.Name = "Test";
             this.Test.ReadOnly = true;
             // 
+            // DataGridStrip
+            // 
+            this.DataGridStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MoreInfo,
+            this.Reboot,
+            this.ShutDown});
+            this.DataGridStrip.Name = "DataGridStrip";
+            this.DataGridStrip.Size = new System.Drawing.Size(204, 70);
+            // 
+            // MoreInfo
+            // 
+            this.MoreInfo.Name = "MoreInfo";
+            this.MoreInfo.Size = new System.Drawing.Size(203, 22);
+            this.MoreInfo.Text = "Подробнее";
+            this.MoreInfo.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // Reboot
+            // 
+            this.Reboot.Name = "Reboot";
+            this.Reboot.Size = new System.Drawing.Size(203, 22);
+            this.Reboot.Text = "Перезапустить систему";
+            // 
+            // ShutDown
+            // 
+            this.ShutDown.Name = "ShutDown";
+            this.ShutDown.Size = new System.Drawing.Size(203, 22);
+            this.ShutDown.Text = "Выключить систему";
+            // 
+            // querylist
+            // 
+            this.querylist.Location = new System.Drawing.Point(12, 326);
+            this.querylist.Name = "querylist";
+            this.querylist.Size = new System.Drawing.Size(360, 28);
+            this.querylist.TabIndex = 14;
+            this.querylist.Text = "Очередь сообщений";
+            this.querylist.UseVisualStyleBackColor = true;
+            this.querylist.Click += new System.EventHandler(this.querylist_Click);
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(928, 562);
+            this.Controls.Add(this.querylist);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
@@ -247,10 +293,12 @@
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dbStatusLabel);
             this.Name = "Server";
-            this.Text = "Form1";
+            this.Text = "Server";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Server_FormClosing);
+            this.Resize += new System.EventHandler(this.Server_Resize);
             this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.DataGridStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -277,6 +325,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ip;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;
         private System.Windows.Forms.DataGridViewButtonColumn Test;
+        private System.Windows.Forms.ContextMenuStrip DataGridStrip;
+        private System.Windows.Forms.ToolStripMenuItem MoreInfo;
+        private System.Windows.Forms.ToolStripMenuItem Reboot;
+        private System.Windows.Forms.ToolStripMenuItem ShutDown;
+        private System.Windows.Forms.Button querylist;
     }
 }
 

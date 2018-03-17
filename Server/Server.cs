@@ -1,4 +1,5 @@
 ﻿//using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Server
     public partial class Server : Form
     {
         Thread TimerThread;
-        MySQLCon DB = new MySQLCon();
+        public MySQLCon DB = new MySQLCon();
         
         public Server()
         {
@@ -123,9 +124,11 @@ namespace Server
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
         {
-            dataGridView1.Rows.Add(id, name, ip);
+            label6.Text = Convert.ToString(m_aryClients.Count);
+            dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее");
             AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
+
 
         public delegate void AddMessageToConsole(string text);
         public void AddNewConsoleMessage(string text)
@@ -146,6 +149,7 @@ namespace Server
                     break;
                 }
             }
+            label6.Text = Convert.ToString(m_aryClients.Count);
         }
 
         private void OnApplicationExit(object sender, EventArgs e)
@@ -178,6 +182,39 @@ namespace Server
             Application.Exit();
         }
 
+        private void Server_Resize(object sender, EventArgs e)
+        {
+            dataGridView1.Width = this.Width - 400;
+            dataGridView1.Height = this.Height - 60;
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var senderGrid = (DataGridView)sender;
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
+            {
+                foreach (SocketManagment client in m_aryClients)
+                {
+                    if (client.Clientid == Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[0].Value))
+                    {
+                        AboutClientForm f2 = new AboutClientForm(client.OperationSistem, client.CPUUNIT);
+                        f2.Show();
+                        break;
+                    }
+                }
+            }
+        }
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void querylist_Click(object sender, EventArgs e)
+        {
+            if (ErrorsListForm.link != null && ErrorsListForm.link.Count == 0) { MessageBox.Show("Очередь пуста!"); return; }
+            ErrorsListForm form = new ErrorsListForm();
+            form.Show();
+        }
     }
 
 }

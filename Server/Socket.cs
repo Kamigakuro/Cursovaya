@@ -30,13 +30,17 @@ namespace Server
         }
         public void SetupRecieveCallback(Server main)
         {
-
             try
             {
                 AsyncCallback recieveData = new AsyncCallback(main.OnRecievedData);
                 m_sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, this);
             }
-            catch (Exception ex) { MessageBox.Show(String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message)); }
+            catch (Exception ex) {
+                //MessageBox.Show(String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message));
+                string mess = String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message);
+                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                ErrorsListForm.link.AddFirst(query);
+            }
         }
         public byte[] GetRecievedData(IAsyncResult ar, out SocketError SockError)
         {

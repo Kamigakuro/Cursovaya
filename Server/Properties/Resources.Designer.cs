@@ -59,5 +59,15 @@ namespace Server.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CacheWarning_16x {
+            get {
+                object obj = ResourceManager.GetObject("CacheWarning_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

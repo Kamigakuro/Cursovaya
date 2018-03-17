@@ -88,16 +88,16 @@ namespace Client
 
         public struct IRC_QUERIES
         {
-            public const int REQ_AUTH = 1;
-            const int RES_AUTH = 2;
+            public const int REQ_AUTH = 1; // Код запроса авторизации клиента 
+            const int RES_AUTH = 2; // Код ответа на авторизацию
             const int TEST = 8888;
-            public const int ERROR_IRC = 0;
-            public const string EndOfMessage = "<EOF>";
-            public const int OPSYS = 3;
-            public const int CPUUNIT = 4;
-            public const int ERRONCLIENTSIDE = 9999;
-            public const int GPUUNIT = 5;
-            public const int Board = 6;
+            public const int ERROR_IRC = 0; // Ошибка при обратоке запроса
+            public const string EndOfMessage = "<EOF>"; // Метка конца сообщения
+            public const int OPSYS = 3; // Код запроса операционной системы
+            public const int CPUUNIT = 4; // Код запроса процессора
+            public const int ERRONCLIENTSIDE = 9999; // Ошибка на стороне клиента
+            public const int GPUUNIT = 5; // Код GPU
+            public const int Board = 6; // Код материнской платы
         }
 
         public Client()
@@ -110,6 +110,7 @@ namespace Client
 
         private void GetComponets()
         {
+            // Здесь планируются дальнейшие действии при возникновении каких либо проблем
             if (!GetOpeationSystem()) return;
             if (!GetProcessUnit()) return;
             if (!GetGPU()) return;
@@ -120,6 +121,13 @@ namespace Client
 
         private bool GetRAM()
         {
+           /* ManagementObjectSearcher searcher12 = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
+            foreach (ManagementObject queryObj in searcher12.Get())
+            {
+                Console.WriteLine("BankLabel: {0} ; Capacity: {1} Gb; Speed: {2} ", queryObj["BankLabel"],
+                                  Math.Round(System.Convert.ToDouble(queryObj["Capacity"]) / 1024 / 1024 / 1024, 2),
+                                   queryObj["Speed"]);
+            }*/
             return true;
         }
 

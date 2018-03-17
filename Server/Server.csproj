@@ -87,7 +87,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutClientForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutClientForm.Designer.cs">
+      <DependentUpon>AboutClientForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErrorsListForm.Designer.cs">
+      <DependentUpon>ErrorsListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MySQLCon.cs" />
+    <Compile Include="QueryElement.cs" />
     <Compile Include="Server.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,6 +113,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Socket.cs" />
+    <EmbeddedResource Include="AboutClientForm.resx">
+      <DependentUpon>AboutClientForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ErrorsListForm.resx">
+      <DependentUpon>ErrorsListForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -134,6 +153,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\CacheWarning_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

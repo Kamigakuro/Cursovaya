@@ -9,7 +9,7 @@ namespace Server
 {
     public class MySQLCon
     {
-        private MySqlConnection dbHandle;
+        private static MySqlConnection dbHandle;
         public MySqlConnection GetHandle { get { return dbHandle; } }
         /// <summary>
         /// Получение статуса соединения
@@ -34,7 +34,10 @@ namespace Server
             }
             catch (MySqlException e)
             {
-                MessageBox.Show(e.ToString());
+                string mess = String.Format("Не удалось установить соединение с базой данных! {0}", e.Message);
+                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                ErrorsListForm.link.AddFirst(query);
+                //MessageBox.Show(e.ToString());
             }
         }
         /// <summary>
@@ -52,6 +55,7 @@ namespace Server
         /// <param name="command">текст запроса</param>
         public void SendQuery(string command, out MySqlDataReader reader)
         {
+            
             MySqlCommand com = new MySqlCommand(command, dbHandle);
             reader = com.ExecuteReader();
         }
@@ -70,7 +74,11 @@ namespace Server
                 }
                 catch (Exception es)
                 {
-                    MessageBox.Show(es.ToString());
+                    //MessageBox.Show(es.ToString());
+                    string mess = String.Format("Не удалось разорвать соединение с базой данных! {0}", es.Message);
+                    QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
+                    ErrorsListForm.link.AddFirst(query);
+                    //MessageBox.Show(e.ToString());
                     return false;
                 }
             }
