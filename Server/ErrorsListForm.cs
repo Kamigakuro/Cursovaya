@@ -64,13 +64,13 @@ namespace Server
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
+            LinkedListNode<QueryElement> node;
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
             {
                 if (e.ColumnIndex == IgnoreButton.DisplayIndex)
                 {
                     string mess = senderGrid.Rows[e.RowIndex].Cells[Info.DisplayIndex].Value.ToString();
                     int id = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ClientId.DisplayIndex].Value);
-                    LinkedListNode<QueryElement> node;
                     for (node = link.Last; node != null; node = node.Previous)
                     {
                         SocketManagment client = node.Value.GetSocket();
@@ -107,27 +107,43 @@ namespace Server
                 if (e.ColumnIndex == Completebutton.DisplayIndex)
                 {
                     string mess = senderGrid.Rows[e.RowIndex].Cells[Info.DisplayIndex].Value.ToString();
-                    int id = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ClientId.DisplayIndex].Value);
-                    LinkedListNode<QueryElement> node;
-                    for (node = link.Last; node != null; node = node.Previous)
+                    string qtype = senderGrid.Rows[e.RowIndex].Cells[QType.DisplayIndex].Value.ToString();
+                    if(qtype == "DBError")
                     {
-                        SocketManagment clientr = node.Value.GetSocket();
-                        if (node.Value.GetMessage() == mess && id == clientr.Clientid) break;   
-                    }
-                    if (node.Value.GetQType() == QueryElement.QueryType.DBError)
-                    {
-                        if (!String.IsNullOrEmpty(node.Value.GetQuery()))
+                        int id = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ClientId.DisplayIndex].Value);
+                        for (node = link.Last; node != null; node = node.Previous)
                         {
-                            MySQLCon DB = new MySQLCon();
-                            DB.SendQuery(node.Value.GetQuery());
-                            node.Value.Dispose();
-                            node.Value = null;
-                            link.Remove(node);
-                            dataGridView1.Rows.RemoveAt(e.RowIndex);
-                            DBErrors--;
-                            RemoveQueryHandle();
+                            SocketManagment clientr = node.Value.GetSocket();
+                            if (node.Value.GetMessage() == mess && id == clientr.Clientid) break;
+                            if (node.Value.GetQType() == QueryElement.QueryType.DBError)
+                            {
+                                if (!String.IsNullOrEmpty(node.Value.GetQuery()))
+                                {
+                                    MySQLCon DB = new MySQLCon();
+                                    DB.SendQuery(node.Value.GetQuery());
+                                    node.Value.Dispose();
+                                    node.Value = null;
+                                    link.Remove(node);
+                                    dataGridView1.Rows.RemoveAt(e.RowIndex);
+                                    DBErrors--;
+                                    RemoveQueryHandle();
+                                }
+
+                            }
                         }
-                
+
+                    }
+                    else if (qtype == "SysError")
+                    {
+
+                    }
+                    else if (qtype == "ClientWarning")
+                    {
+
+                    }
+                    else if (qtype == "ClientError")
+                    {
+
                     }
                 }
             }

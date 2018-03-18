@@ -23,6 +23,8 @@ namespace Server
         public const int OPSYS = 3;
         public const int CPUUNIT = 4;
         public const int GPUUNIT = 5;
+        public const int Board = 6;
+        public const int RAM = 7;
         public const int ERRONCLIENTSIDE = 9999;
     }
     public partial class Server
@@ -256,7 +258,43 @@ namespace Server
                         if (rd == EndofMessage) break;
                         client.GPUUNIT[i] = rd;
                     }
+                    stream.Position = 0;
+                    writer.Write(IRC_QUERIES.Board);
+                    writer.Write(EndofMessage);
+                    client.Sock.Send(m_byBuff);
                     CheckMySQLInformation(client.Clientid, client, 2);
+                    break;
+                #endregion
+                #region Материнка
+                case IRC_QUERIES.Board:
+                    for (int i = 0; i < 12; i++)
+                    {
+                        string rd = read.ReadString();
+                        if (rd == EndofMessage) break;
+                        client.Board[i] = rd;
+                    }
+                    stream.Position = 0;
+                    writer.Write(IRC_QUERIES.RAM);
+                    writer.Write(EndofMessage);
+                    client.Sock.Send(m_byBuff);
+                    CheckMySQLInformation(client.Clientid, client, 3);
+                    break;
+                #endregion
+                #region RAM
+                case IRC_QUERIES.RAM:
+                    int count = read.ReadInt32();
+                    for (int k = 0; k < count; k++)
+                    {
+                        object[] array = new object[16];
+                        for (int i = 0; i < 16; i++)
+                        {
+                            string rd = read.ReadString();
+                            if (rd == EndofMessage) break;
+                            array[i] = rd;
+                        }
+                        client.RAM.Rows.Add(array);
+                    }
+                    CheckMySQLInformation(client.Clientid, client, 4);
                     break;
                 #endregion
                 case IRC_QUERIES.ERROR_IRC:
@@ -452,7 +490,124 @@ namespace Server
                         dataReader.Close();
                         break;
                     }
-                case 3: break;
+                case 3:
+                    {
+                        sql = String.Format("SELECT * FROM boards WHERE systemid = {0} LIMIT 1", id);
+                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        if (dataReader.HasRows)
+                        {
+                            while (dataReader.Read())
+                            {
+                                if (dataReader.GetString(1) != client.Board[5]) { ErrorsListForm.AddQuery("boards: Несовпадение значений Name!\tБыло: " + dataReader.GetString(1) + " Стало: " + client.Board[12], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET Name = '{0}' WHERE systemid = {1}", client.Board[5], id)); }
+                                if (dataReader.GetString(2) != client.Board[0]) { ErrorsListForm.AddQuery("boards: Несовпадение значений Description!\tБыло: " + dataReader.GetString(2) + " Стало: " + client.Board[5], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET Description = '{0}' WHERE systemid = {1}", client.Board[0], id)); }
+                                if (dataReader.GetString(3) != client.Board[1]) { ErrorsListForm.AddQuery("boards: Несовпадение значений HostingBoard!\tБыло: " + dataReader.GetString(3) + " Стало: " + client.Board[6], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET HostingBoard = '{0}' WHERE systemid = {1}", client.Board[1], id)); }
+                                if (dataReader.GetString(4) != client.Board[2]) { ErrorsListForm.AddQuery("boards: Несовпадение значений HotSwappable!\tБыло: " + dataReader.GetString(4) + " Стало: " + client.Board[0], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET HotSwappable = '{0}' WHERE systemid = {1}", client.Board[2], id)); }
+                                if (dataReader.GetString(5) != client.Board[3]) { ErrorsListForm.AddQuery("boards: Несовпадение значений Manufacturer!\tБыло: " + dataReader.GetString(5) + " Стало: " + client.Board[1], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET Manufacturer = '{0}' WHERE systemid = {1}", client.Board[3], id)); }
+                                if (dataReader.GetString(6) != client.Board[4]) { ErrorsListForm.AddQuery("boards: Несовпадение значений Model!\tБыло: " + dataReader.GetString(6) + " Стало: " + client.Board[2], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET Model = '{0}' WHERE systemid = {1}", client.Board[4], id)); }
+                                if (dataReader.GetString(7) != client.Board[6]) { ErrorsListForm.AddQuery("boards: Несовпадение значений OtherIdentifyingInfo!\tБыло: " + dataReader.GetString(7) + " Стало: " + client.Board[3], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET OtherIdentifyingInfo = '{0}' WHERE systemid = {1}", client.Board[6], id)); }
+                                if (dataReader.GetString(8) != client.Board[7]) { ErrorsListForm.AddQuery("boards: Несовпадение значений Product!\tБыло: " + dataReader.GetString(8) + " Стало: " + client.Board[4], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET Product = '{0}' WHERE systemid = {1}", client.Board[7], id)); }
+                                if (dataReader.GetString(9) != client.Board[8]) { ErrorsListForm.AddQuery("boards: Несовпадение значений SerialNumber!\tБыло: " + dataReader.GetString(9) + " Стало: " + client.Board[7], client, QueryElement.QueryType.DBError, String.Format("UPDATE boards SET SerialNumber = '{0}' WHERE systemid = {1}", client.Board[8], id)); }
+
+                            }
+                        }
+                        else
+                        {
+                            dataReader.Close();
+                            sql = String.Format("INSERT INTO boards(`Name`, `Description`, `HostingBoard`, `HotSwappable`, `Manufacturer`, `Model`, `OtherIdentifyingInfo`, `Product`, `SerialNumber`, `systemid`) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}', '{8}', '{9}')",
+                                client.Board[5],
+                                client.Board[0],
+                                client.Board[1],
+                                 client.Board[2],
+                                  client.Board[3],
+                                   client.Board[4],
+                                    client.Board[6],
+                                     client.Board[7],
+                                      client.Board[8],
+                                          id);
+                            try
+                            {
+                                DB.SendQuery(sql);
+                                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                            }
+                            catch (MySqlException me)
+                            {
+                                Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
+                                string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
+                            }
+                        }
+                        dataReader.Close();
+                        break;
+                    }
+                case 4:
+                    {
+                        sql = String.Format("SELECT * FROM rams WHERE systemid = {0}", id);
+                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        int records = 0;
+                        if (dataReader.HasRows)
+                        {
+                            while (dataReader.Read())
+                            {
+                                int rid = dataReader.GetInt32(0);
+                                if (dataReader.GetString(1) != client.RAM.Rows[records][0].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений BankLabel!\tБыло: " + dataReader.GetString(1) + " Стало: " + client.RAM.Rows[records][0].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET BankLabel = '{0}' WHERE id = {1}", client.RAM.Rows[records][0].ToString(), rid)); }
+                                if (dataReader.GetString(2) != client.RAM.Rows[records][1].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Capacity!\tБыло: " + dataReader.GetString(2) + " Стало: " + client.RAM.Rows[records][1].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Capacity = '{0}' WHERE id = {1}", client.RAM.Rows[records][1].ToString(), rid)); }
+                                if (dataReader.GetString(3) != client.RAM.Rows[records][2].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений DataWidth!\tБыло: " + dataReader.GetString(3) + " Стало: " + client.RAM.Rows[records][2].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET DataWidth = '{0}' WHERE id = {1}", client.RAM.Rows[records][2].ToString(), rid)); }
+                                if (dataReader.GetString(4) != client.RAM.Rows[records][3].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Description!\tБыло: " + dataReader.GetString(4) + " Стало: " + client.RAM.Rows[records][3].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Description = '{0}' WHERE id = {1}", client.RAM.Rows[records][3].ToString(), rid)); }
+                                if (dataReader.GetString(5) != client.RAM.Rows[records][4].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений DeviceLocator!\tБыло: " + dataReader.GetString(5) + " Стало: " + client.RAM.Rows[records][4].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET DeviceLocator = '{0}' WHERE id = {1}", client.RAM.Rows[records][4].ToString(), rid)); }
+                                if (dataReader.GetString(6) != client.RAM.Rows[records][5].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений FormFactor!\tБыло: " + dataReader.GetString(6) + " Стало: " + client.RAM.Rows[records][5].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET FormFactor = '{0}' WHERE id = {1}", client.RAM.Rows[records][5].ToString(), rid)); }
+                                if (dataReader.GetString(7) != client.RAM.Rows[records][6].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений MemoryType!\tБыло: " + dataReader.GetString(7) + " Стало: " + client.RAM.Rows[records][6].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET MemoryType = '{0}' WHERE id = {1}", client.RAM.Rows[records][6].ToString(), rid)); }
+                                if (dataReader.GetString(8) != client.RAM.Rows[records][7].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Model!\tБыло: " + dataReader.GetString(8) + " Стало: " + client.RAM.Rows[records][7].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Model = '{0}' WHERE id = {1}", client.RAM.Rows[records][7].ToString(), rid)); }
+                                if (dataReader.GetString(9) != client.RAM.Rows[records][8].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Name!\tБыло: " + dataReader.GetString(9) + " Стало: " + client.RAM.Rows[records][8].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Name = '{0}' WHERE id = {1}", client.RAM.Rows[records][8].ToString(), rid)); }
+                                if (dataReader.GetString(10) != client.RAM.Rows[records][9].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений OtherIdentifyingInfo!\tБыло: " + dataReader.GetString(10) + " Стало: " + client.RAM.Rows[records][9].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET OtherIdentifyingInfo = '{0}' WHERE id = {1}", client.RAM.Rows[records][9].ToString(), rid)); }
+                                if (dataReader.GetString(11) != client.RAM.Rows[records][10].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений PartNumber!\tБыло: " + dataReader.GetString(1) + " Стало: " + client.RAM.Rows[records][10].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET PartNumber = '{0}' WHERE id = {1}", client.RAM.Rows[records][10].ToString(), rid)); }
+                                if (dataReader.GetString(12) != client.RAM.Rows[records][11].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений PositionInRow!\tБыло: " + dataReader.GetString(12) + " Стало: " + client.RAM.Rows[records][11].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET PositionInRow = '{0}' WHERE id = {1}", client.RAM.Rows[records][11].ToString(), rid)); }
+                                if (dataReader.GetString(13) != client.RAM.Rows[records][12].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений SerialNumber!\tБыло: " + dataReader.GetString(13) + " Стало: " + client.RAM.Rows[records][12].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET SerialNumber = '{0}' WHERE id = {1}", client.RAM.Rows[records][12].ToString(), rid)); }
+                                if (dataReader.GetString(14) != client.RAM.Rows[records][13].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Speed!\tБыло: " + dataReader.GetString(14) + " Стало: " + client.RAM.Rows[records][13].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Speed = '{0}' WHERE id = {1}", client.RAM.Rows[records][13].ToString(), rid)); }
+                                if (dataReader.GetString(15) != client.RAM.Rows[records][14].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Status!\tБыло: " + dataReader.GetString(15) + " Стало: " + client.RAM.Rows[records][14].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Status = '{0}' WHERE id = {1}", client.RAM.Rows[records][14].ToString(), rid)); }
+                                if (dataReader.GetString(16) != client.RAM.Rows[records][15].ToString()) { ErrorsListForm.AddQuery("rams: Несовпадение значений Version!\tБыло: " + dataReader.GetString(16) + " Стало: " + client.RAM.Rows[records][15].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE rams SET Version = '{0}' WHERE id = {1}", client.RAM.Rows[records][15].ToString(), rid)); }
+
+                                records++;
+                            }
+                        }
+                        else
+                        {
+                            dataReader.Close();
+                            for (int i = 0; i < client.RAM.Rows.Count; i++)
+                            {
+                                sql = String.Format("INSERT INTO rams(`BankLabel`, `Capacity`, `DataWidth`, `Description`, `DeviceLocator`, `FormFactor`, `MemoryType`, `Model`, `Name`, `OtherIdentifyingInfo`, `PartNumber`, `PositionInRow`, `SerialNumber`, `Speed`, `Status`, `Version`, `systemid`) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}')",
+                                client.RAM.Rows[i][0].ToString(),
+                                client.RAM.Rows[i][1].ToString(),
+                                client.RAM.Rows[i][2].ToString(),
+                                 client.RAM.Rows[i][3].ToString(),
+                                  client.RAM.Rows[i][4].ToString(),
+                                   client.RAM.Rows[i][5].ToString(),
+                                    client.RAM.Rows[i][6].ToString(),
+                                     client.RAM.Rows[i][7].ToString(),
+                                      client.RAM.Rows[i][8].ToString(),
+                                      client.RAM.Rows[i][9].ToString(),
+                                      client.RAM.Rows[i][10].ToString(),
+                                      client.RAM.Rows[i][11].ToString(),
+                                      client.RAM.Rows[i][12].ToString(),
+                                      client.RAM.Rows[i][13].ToString(),
+                                      client.RAM.Rows[i][14].ToString(),
+                                      client.RAM.Rows[i][15].ToString(),
+                                          id);
+                                try
+                                {
+                                    DB.SendQuery(sql);
+                                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                }
+                                catch (MySqlException me)
+                                {
+                                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
+                                    string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                    ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
+                                }
+                            }
+                        }
+                        dataReader.Close();
+                        break;
+                    }
                 default: break;
             }
         }

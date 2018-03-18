@@ -132,6 +132,22 @@ namespace Server
                      com.ExecuteNonQuery();
                      MyDataReader.Close();
                  }
+                if (!Tables.Contains("boards"))
+                {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS boards (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), HostingBoard VARCHAR(30), HotSwappable VARCHAR(30), Manufacturer VARCHAR(30), Model VARCHAR(30), OtherIdentifyingInfo VARCHAR(30), Product VARCHAR(30), SerialNumber VARCHAR(30), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
+                if (!Tables.Contains("rams"))
+                {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS rams (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, BankLabel VARCHAR(30), Capacity VARCHAR(30), DataWidth VARCHAR(30), Description VARCHAR(60), DeviceLocator VARCHAR(30), FormFactor VARCHAR(30), MemoryType VARCHAR(30), Model VARCHAR(30), Name VARCHAR(60), OtherIdentifyingInfo VARCHAR(30), PartNumber VARCHAR(30), PositionInRow VARCHAR(30), SerialNumber VARCHAR(30), Speed VARCHAR(30), Status VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
                 //if (!Tables.Contains("system")) { }
             }
             // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать

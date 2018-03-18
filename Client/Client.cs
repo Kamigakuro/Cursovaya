@@ -26,7 +26,6 @@ namespace Client
         public static int NumberOfUsers = 0;
         public static string SerialNumber = String.Empty;
     }
-
     struct CPUUNIT
     {
         public static string Description = String.Empty;
@@ -46,7 +45,6 @@ namespace Client
         public static int StatusInfo = 0;
 
     }
-
     struct GPUUNIT
     {
         public static string AdapterRAM = String.Empty;
@@ -76,6 +74,7 @@ namespace Client
         public static string Product = String.Empty;
         public static string SerialNumber = String.Empty;
     }
+
     public partial class Client : Form
     {
 
@@ -85,6 +84,7 @@ namespace Client
         static MemoryStream stream = new MemoryStream(m_byBuff);
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
+        DataTable rams = new DataTable("RAM");
 
         public struct IRC_QUERIES
         {
@@ -98,6 +98,7 @@ namespace Client
             public const int ERRONCLIENTSIDE = 9999; // Ошибка на стороне клиента
             public const int GPUUNIT = 5; // Код GPU
             public const int Board = 6; // Код материнской платы
+            public const int RAM = 7; // Оперативная память
         }
 
         public Client()
@@ -105,29 +106,61 @@ namespace Client
             InitializeComponent();
             Thread thread = new Thread(getExternalIp);
             thread.Start();
+            rams.Columns.Add("BankLabel");
+            rams.Columns.Add("Capacity");
+            rams.Columns.Add("DataWidth");
+            rams.Columns.Add("Description");
+            rams.Columns.Add("DeviceLocator");
+            rams.Columns.Add("FormFactor");
+            rams.Columns.Add("MemoryType");
+            rams.Columns.Add("Model");
+            rams.Columns.Add("Name");
+            rams.Columns.Add("OtherIdentifyingInfo");
+            rams.Columns.Add("PartNumber");
+            rams.Columns.Add("PositionInRow");
+            rams.Columns.Add("SerialNumber");
+            rams.Columns.Add("Speed");
+            rams.Columns.Add("Status");
+            rams.Columns.Add("Version");
             GetComponets();
         }
 
         private void GetComponets()
         {
             // Здесь планируются дальнейшие действии при возникновении каких либо проблем
-            if (!GetOpeationSystem()) return;
+            if (!GetOperationSystem()) return;
             if (!GetProcessUnit()) return;
             if (!GetGPU()) return;
             if (!GetBoard()) return;
             if (!GetRAM()) return;
-
         }
 
         private bool GetRAM()
         {
-           /* ManagementObjectSearcher searcher12 = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
-            foreach (ManagementObject queryObj in searcher12.Get())
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_PhysicalMemory");
+            ManagementObjectCollection colItems = searcher.Get();
+            foreach (ManagementObject queryObj in colItems)
             {
-                Console.WriteLine("BankLabel: {0} ; Capacity: {1} Gb; Speed: {2} ", queryObj["BankLabel"],
-                                  Math.Round(System.Convert.ToDouble(queryObj["Capacity"]) / 1024 / 1024 / 1024, 2),
-                                   queryObj["Speed"]);
-            }*/
+                string[] s = new string[16];
+                if (queryObj["BankLabel"] != null) s[0] = queryObj["BankLabel"].ToString();
+                if (queryObj["Capacity"] != null) s[1] = queryObj["Capacity"].ToString();
+                if (queryObj["DataWidth"] != null) s[2] = queryObj["DataWidth"].ToString();
+                if (queryObj["Description"] != null) s[3] = queryObj["Description"].ToString();
+                if (queryObj["DeviceLocator"] != null) s[4] = queryObj["DeviceLocator"].ToString();
+                if (queryObj["FormFactor"] != null) s[5] = queryObj["FormFactor"].ToString();
+                if (queryObj["MemoryType"] != null) s[6] = queryObj["MemoryType"].ToString();
+                if (queryObj["Model"] != null) s[7] = queryObj["Model"].ToString();
+                if (queryObj["Name"] != null) s[8] = queryObj["Name"].ToString();
+                if (queryObj["OtherIdentifyingInfo"] != null) s[9] = queryObj["OtherIdentifyingInfo"].ToString();
+                if (queryObj["PartNumber"] != null) s[10] = queryObj["PartNumber"].ToString();
+                if (queryObj["PositionInRow"] != null) s[11] = queryObj["PositionInRow"].ToString();
+                if (queryObj["SerialNumber"] != null) s[12] = queryObj["SerialNumber"].ToString();
+                if (queryObj["Speed"] != null) s[13] = queryObj["Speed"].ToString();
+                if (queryObj["Status"] != null) s[14] = queryObj["Status"].ToString();
+                if (queryObj["Version"] != null) s[15] = queryObj["Version"].ToString();
+
+                rams.Rows.Add(s);      
+            }
             return true;
         }
 
@@ -176,7 +209,7 @@ namespace Client
             return true;
         }
 
-        private bool GetOpeationSystem()
+        private bool GetOperationSystem()
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher( @"root\CIMV2", "SELECT * FROM CIM_OperatingSystem");
             ManagementObjectCollection colItems = searcher.Get();
@@ -336,6 +369,7 @@ namespace Client
                     int irc = reader.ReadInt32();
                     switch (irc)
                     {
+                        #region Авторизация
                         case IRC_QUERIES.REQ_AUTH:
                             stream.Position = 0;
                             writer.Write(IRC_QUERIES.REQ_AUTH);
@@ -345,7 +379,8 @@ namespace Client
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             sock.Send(m_byBuff);
                             break;
-
+                        #endregion
+                        #region OC
                         case IRC_QUERIES.OPSYS:
                             stream.Position = 0;
                             if (OperationSistem.Name == String.Empty || OperationSistem.CDVersion == String.Empty)
@@ -367,6 +402,8 @@ namespace Client
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
                             break;
+                        #endregion
+                        #region CPU
                         case IRC_QUERIES.CPUUNIT:
                             stream.Position = 0;
                             if (CPUUNIT.Name == String.Empty || CPUUNIT.NumberOfCores == 0)
@@ -396,6 +433,8 @@ namespace Client
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
                             break;
+                        #endregion
+                        #region GPU
                         case IRC_QUERIES.GPUUNIT:
                             stream.Position = 0;
                             if (GPUUNIT.Name == String.Empty || GPUUNIT.Description == String.Empty)
@@ -424,7 +463,53 @@ namespace Client
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
                             break;
+                        #endregion
+                        #region Board
                         case IRC_QUERIES.Board:
+                            stream.Position = 0;
+                            if (Board.Name == String.Empty || Board.Description == String.Empty)
+                            {
+                                writer.Write(IRC_QUERIES.ERROR_IRC);
+                                writer.Write(IRC_QUERIES.ERRONCLIENTSIDE);
+                                writer.Write(IRC_QUERIES.EndOfMessage);
+                                socket.Send(m_byBuff);
+                                break;
+                            }
+                            writer.Write(IRC_QUERIES.Board);
+                            writer.Write(Board.Description);//0
+                            writer.Write(Board.HostingBoard);//1
+                            writer.Write(Board.HotSwappable);
+                            writer.Write(Board.Manufacturer);
+                            writer.Write(Board.Model);
+                            writer.Write(Board.Name);//5
+                            writer.Write(Board.OtherIdentifyingInfo);
+                            writer.Write(Board.Product);
+                            writer.Write(Board.SerialNumber);
+                            writer.Write(IRC_QUERIES.EndOfMessage);//9
+                            socket.Send(m_byBuff);
+                            break;
+                        #endregion
+                        case IRC_QUERIES.RAM:
+                            stream.Position = 0;
+                            if (rams.Rows.Count == 0)
+                            {
+                                writer.Write(IRC_QUERIES.ERROR_IRC);
+                                writer.Write(IRC_QUERIES.ERRONCLIENTSIDE);
+                                writer.Write(IRC_QUERIES.EndOfMessage);
+                                socket.Send(m_byBuff);
+                                break;
+                            }
+                            writer.Write(IRC_QUERIES.RAM);
+                            writer.Write(rams.Rows.Count);
+                            for (int i = 0; i < rams.Rows.Count; i++)
+                            {
+                                for (int k = 0; k < rams.Columns.Count; k++)
+                                {
+                                    writer.Write(rams.Rows[i][k].ToString());
+                                }
+                            }
+                            writer.Write(IRC_QUERIES.EndOfMessage);//9
+                            socket.Send(m_byBuff);
                             break;
                         default:
                             break;

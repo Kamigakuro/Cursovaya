@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -20,6 +21,8 @@ namespace Server
         public string[] OperationSistem = new string[7];
         public string[] CPUUNIT = new string[15];
         public string[] GPUUNIT = new string[14];
+        public string[] Board = new string[9];
+        public DataTable RAM = new DataTable("RAM");
         public int Clientid = -1;
         public Socket Sock
         {
@@ -28,6 +31,22 @@ namespace Server
         public SocketManagment(Socket sock)
         {
             m_sock = sock;
+            RAM.Columns.Add("BankLabel");
+            RAM.Columns.Add("Capacity");
+            RAM.Columns.Add("DataWidth");
+            RAM.Columns.Add("Description");
+            RAM.Columns.Add("DeviceLocator");
+            RAM.Columns.Add("FormFactor");
+            RAM.Columns.Add("MemoryType");
+            RAM.Columns.Add("Model");
+            RAM.Columns.Add("Name");
+            RAM.Columns.Add("OtherIdentifyingInfo");
+            RAM.Columns.Add("PartNumber");
+            RAM.Columns.Add("PositionInRow");
+            RAM.Columns.Add("SerialNumber");
+            RAM.Columns.Add("Speed");
+            RAM.Columns.Add("Status");
+            RAM.Columns.Add("Version");
         }
         public void SetupRecieveCallback(Server main)
         {
