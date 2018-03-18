@@ -34,12 +34,12 @@ namespace Server
                             SocketManagment client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
-                            dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, "DBError",node.Value.GetTime(), node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, node.Value.GetTime(), "DBError", node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
                             break;
                         }
                     case QueryElement.QueryType.SysError:
                         {
-                            dataGridView1.Rows.Add(Properties.Resources.Important_16x, "SysError", node.Value.GetTime(), node.Value.GetMessage(), "", "", "", "", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.Important_16x, node.Value.GetTime(), "SysError", node.Value.GetMessage(), "", "", "", "", "Пропустить");
                             break;
                         }
                     case QueryElement.QueryType.ClientError:
@@ -47,7 +47,12 @@ namespace Server
                             SocketManagment client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
-                            dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, "ClientError", node.Value.GetTime(), node.Value.GetMessage(), name, id, "", "", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, node.Value.GetTime(), "ClientError", node.Value.GetMessage(), name, id, "", "", "Пропустить");
+                            break;
+                        }
+                    case QueryElement.QueryType.ClientWarning:
+                        {
+                            dataGridView1.Rows.Add(Properties.Resources.AddUser_16x, node.Value.GetTime(), "ClientWarning", node.Value.GetMessage(), "", "", "", "Исправить", "Пропустить");
                             break;
                         }
                 }
@@ -69,7 +74,7 @@ namespace Server
                     for (node = link.Last; node != null; node = node.Previous)
                     {
                         SocketManagment client = node.Value.GetSocket();
-                        if (node.Value.GetMessage() == mess && id == client.Clientid)
+                        if (node.Value.GetMessage() == mess)
                         {
                             switch(node.Value.GetQType())
                             {
@@ -85,6 +90,9 @@ namespace Server
                                 case QueryElement.QueryType.Error:
                                     break;
                                 case QueryElement.QueryType.None:
+                                    break;
+                                case QueryElement.QueryType.ClientWarning:
+                                    ClientErrors--;
                                     break;
                             }
                             node.Value.Dispose();
@@ -189,6 +197,31 @@ namespace Server
                     break;
             }
             QueryElement query = new QueryElement(mess, sock, QType, sql, DateTime.Now);
+            link.AddFirst(query);
+            AddQueryHandle();
+        }
+        public static void AddQuery(string mess, QueryElement.QueryType QType, string sql)
+        {
+            switch (QType)
+            {
+                case QueryElement.QueryType.SysError:
+                    SysErrors++;
+                    break;
+                case QueryElement.QueryType.DBError:
+                    DBErrors++;
+                    break;
+                case QueryElement.QueryType.ClientError:
+                    ClientErrors++;
+                    break;
+                case QueryElement.QueryType.Error:
+                    break;
+                case QueryElement.QueryType.None:
+                    break;
+                case QueryElement.QueryType.ClientWarning:
+                    ClientErrors++;
+                    break;
+            }
+            QueryElement query = new QueryElement(mess, QType, sql, DateTime.Now);
             link.AddFirst(query);
             AddQueryHandle();
         }

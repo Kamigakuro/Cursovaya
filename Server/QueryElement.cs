@@ -13,7 +13,8 @@ namespace Server
             DBError = 1,
             SysError = 2,
             Error = 3,
-            ClientError = 4
+            ClientError = 4,
+            ClientWarning = 5,
         }
         private string Message = String.Empty;
         private SocketManagment socket;
@@ -38,6 +39,13 @@ namespace Server
         {
             Message = Mess;
             socket = sock;
+            Type = QType;
+            sqlquery = sql;
+            time = tie;
+        }
+        public QueryElement(string Mess, QueryType QType, string sql, DateTime tie)
+        {
+            Message = Mess;
             Type = QType;
             sqlquery = sql;
             time = tie;

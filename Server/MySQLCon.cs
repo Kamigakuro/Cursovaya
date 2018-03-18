@@ -53,8 +53,7 @@ namespace Server
         /// </summary>
         /// <param name="command">текст запроса</param>
         public void SendQuery(string command, out MySqlDataReader reader)
-        {
-            
+        {   
             MySqlCommand com = new MySqlCommand(command, dbHandle);
             reader = com.ExecuteReader();
         }
@@ -105,7 +104,7 @@ namespace Server
                 if (!Tables.Contains("systems"))
                 {
                     com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50), isConfirm BOOLEAN)");
                     com = new MySqlCommand(command, dbHandle);
                     com.ExecuteNonQuery();
                     MyDataReader.Close();

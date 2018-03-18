@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dbStatusLabel = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -71,6 +71,8 @@
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.mac = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.confirmed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.delbutton = new System.Windows.Forms.DataGridViewButtonColumn();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.DataGridStrip.SuspendLayout();
@@ -194,14 +196,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Number,
@@ -218,32 +220,32 @@
             // 
             // Number
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Number.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Number.DefaultCellStyle = dataGridViewCellStyle2;
             this.Number.HeaderText = "##";
             this.Number.Name = "Number";
             this.Number.ReadOnly = true;
             // 
             // GName
             // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.GName.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.GName.DefaultCellStyle = dataGridViewCellStyle3;
             this.GName.HeaderText = "Name";
             this.GName.Name = "GName";
             this.GName.ReadOnly = true;
             // 
             // ip
             // 
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ip.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ip.DefaultCellStyle = dataGridViewCellStyle4;
             this.ip.HeaderText = "IP adress";
             this.ip.Name = "ip";
             this.ip.ReadOnly = true;
             // 
             // Time
             // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Time.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Time.DefaultCellStyle = dataGridViewCellStyle5;
             this.Time.HeaderText = "Time";
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
@@ -387,12 +389,15 @@
             this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ID,
             this.CName,
-            this.mac});
+            this.mac,
+            this.confirmed,
+            this.delbutton});
             this.dataGridView2.Location = new System.Drawing.Point(-4, 0);
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.ReadOnly = true;
             this.dataGridView2.Size = new System.Drawing.Size(544, 519);
             this.dataGridView2.TabIndex = 0;
+            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
             // 
             // ID
             // 
@@ -411,6 +416,18 @@
             this.mac.HeaderText = "MAC";
             this.mac.Name = "mac";
             this.mac.ReadOnly = true;
+            // 
+            // confirmed
+            // 
+            this.confirmed.HeaderText = "Зарегистрирован";
+            this.confirmed.Name = "confirmed";
+            this.confirmed.ReadOnly = true;
+            // 
+            // delbutton
+            // 
+            this.delbutton.HeaderText = "";
+            this.delbutton.Name = "delbutton";
+            this.delbutton.ReadOnly = true;
             // 
             // Server
             // 
@@ -438,7 +455,7 @@
             this.Name = "Server";
             this.Text = "Server";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Server_FormClosing);
-            this.Resize += new System.EventHandler(this.Server_Resize);
+            this.Shown += new System.EventHandler(this.Server_Shown);
             this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.DataGridStrip.ResumeLayout(false);
@@ -490,6 +507,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn CName;
         private System.Windows.Forms.DataGridViewTextBoxColumn mac;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn confirmed;
+        private System.Windows.Forms.DataGridViewButtonColumn delbutton;
     }
 }
 

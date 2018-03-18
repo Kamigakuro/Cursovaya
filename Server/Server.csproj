@@ -165,5 +165,8 @@
   <ItemGroup>
     <None Include="Images\RouteServiceError_16x.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\AddUser_16x.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

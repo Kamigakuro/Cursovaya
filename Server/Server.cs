@@ -38,7 +38,6 @@ namespace Server
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             InitializeMySQL();
             IntializeSocket();
-            GetAllClients();
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             TimerThread = new Thread(UpdateTimer);
@@ -94,7 +93,7 @@ namespace Server
             }
         }
 
-   /*     private void OnButtonActionClick(object sender, ListViewColumnMouseEventArgs e)//Кнопка в листе
+   /*    private void OnButtonActionClick(object sender, ListViewColumnMouseEventArgs e)//Кнопка в листе
         {
             SocketManagment client = null;
             foreach (SocketManagment clients in m_aryClients)
@@ -137,7 +136,7 @@ namespace Server
             dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее");
             AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
-
+        public delegate void GetClientsList();
         public void GetAllClients()
         {
             string sql = "SELECT * FROM systems";
@@ -146,7 +145,13 @@ namespace Server
             {
                 while (reader.Read())
                 {
-                    dataGridView2.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+                    if (!reader.GetBoolean(3))
+                    {
+                        string mess = String.Format("Не подтвержденный клиент - {0}({1})!", reader.GetString(1), reader.GetInt32(0));
+                        string db = String.Format("UPDATE systems SET isConfirm = True WHERE id = {0}", reader.GetInt32(0));
+                        ErrorsListForm.AddQuery(mess, QueryElement.QueryType.ClientWarning, db);
+                    }
+                    dataGridView2.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetBoolean(3), "Удалить");
                 }
             }
             else
@@ -208,12 +213,6 @@ namespace Server
             Application.Exit();
         }
 
-        private void Server_Resize(object sender, EventArgs e)
-        {
-            dataGridView1.Width = this.Width - 400;
-            dataGridView1.Height = this.Height - 60;
-        }
-
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
@@ -227,6 +226,29 @@ namespace Server
                         f2.Show();
                         break;
                     }
+                }
+            }
+        }
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var senderGrid = (DataGridView)sender;
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
+            {
+                if (MessageBox.Show("Вы действительно хотите удалить клиента с именем " + senderGrid.Rows[e.RowIndex].Cells[CName.DisplayIndex].Value + "?\nВсе данные будут удалены безвозвратно, ключая компоненты.", "Подтвердите удаление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    string sql = String.Format("DELETE FROM `cpuunit` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
+                    DB.SendQuery(sql);
+                    sql = String.Format("DELETE FROM `operationsys` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
+                    DB.SendQuery(sql);
+                    sql = String.Format("DELETE FROM `gpuunit` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
+                    DB.SendQuery(sql);
+                    sql = String.Format("DELETE FROM `systems` WHERE id = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
+                    DB.SendQuery(sql);
+                    dataGridView2.Rows.RemoveAt(e.RowIndex);
+                }
+                else
+                {
+                    // user clicked no
                 }
             }
         }
@@ -245,6 +267,11 @@ namespace Server
         private void label7_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Server_Shown(object sender, EventArgs e)
+        {
+            GetAllClients();
         }
     }
 
