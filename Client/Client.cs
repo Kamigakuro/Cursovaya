@@ -329,7 +329,6 @@ namespace Client
             // Check if we got any data
             try
             {
-                
                 int nBytesRec = sock.EndReceive(ar);
                 if (nBytesRec > 0)
                 {
@@ -398,6 +397,32 @@ namespace Client
                             socket.Send(m_byBuff);
                             break;
                         case IRC_QUERIES.GPUUNIT:
+                            stream.Position = 0;
+                            if (GPUUNIT.Name == String.Empty || GPUUNIT.Description == String.Empty)
+                            {
+                                writer.Write(IRC_QUERIES.ERROR_IRC);
+                                writer.Write(IRC_QUERIES.ERRONCLIENTSIDE);
+                                writer.Write(IRC_QUERIES.EndOfMessage);
+                                socket.Send(m_byBuff);
+                                break;
+                            }
+                            writer.Write(IRC_QUERIES.GPUUNIT);
+                            writer.Write(GPUUNIT.AdapterRAM);//0
+                            writer.Write(GPUUNIT.Availability);
+                            writer.Write(GPUUNIT.Caption);
+                            writer.Write(GPUUNIT.CurrentRefreshRate);
+                            writer.Write(GPUUNIT.CurrentScanMode);
+                            writer.Write(GPUUNIT.Description);//5
+                            writer.Write(GPUUNIT.DeviceID);
+                            writer.Write(GPUUNIT.DriverDate);
+                            writer.Write(GPUUNIT.DriverVersion);
+                            writer.Write(GPUUNIT.MaxRefreshRate);
+                            writer.Write(GPUUNIT.MinRefreshRate);//10
+                            writer.Write(GPUUNIT.Monochrome);
+                            writer.Write(GPUUNIT.Name);
+                            writer.Write(GPUUNIT.VideoProcessor);
+                            writer.Write(IRC_QUERIES.EndOfMessage);
+                            socket.Send(m_byBuff);
                             break;
                         case IRC_QUERIES.Board:
                             break;

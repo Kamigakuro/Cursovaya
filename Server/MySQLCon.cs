@@ -35,8 +35,7 @@ namespace Server
             catch (MySqlException e)
             {
                 string mess = String.Format("Не удалось установить соединение с базой данных! {0}", e.Message);
-                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
-                ErrorsListForm.link.AddFirst(query);
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
                 //MessageBox.Show(e.ToString());
             }
         }
@@ -76,8 +75,7 @@ namespace Server
                 {
                     //MessageBox.Show(es.ToString());
                     string mess = String.Format("Не удалось разорвать соединение с базой данных! {0}", es.Message);
-                    QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
-                    ErrorsListForm.link.AddFirst(query);
+                    ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
                     //MessageBox.Show(e.ToString());
                     return false;
                 }
@@ -128,13 +126,13 @@ namespace Server
                     com.ExecuteNonQuery();
                     MyDataReader.Close();
                 }
-                /* if (!Tables.Contains("gpuuunit")) {
-                     com.Dispose();
-                     string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50))");
+                if (!Tables.Contains("gpuuunit")) {
+                     com.Dispose();                                                                                                                                                                                              
+                     string command = String.Format("CREATE TABLE IF NOT EXISTS gpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), AdapterRAM VARCHAR(30), Availability VARCHAR(30), Caption VARCHAR(30), CurrentRefreshRate VARCHAR(30), CurrentScanMode VARCHAR(30), DriverDate VARCHAR(30), DriverVersion VARCHAR(30), MaxRefreshRate VARCHAR(30), MinRefreshRate VARCHAR(30), Monochrome VARCHAR(30), VideoProcessor VARCHAR(30), systemid INT NOT NULL)");
                      com = new MySqlCommand(command, dbHandle);
                      com.ExecuteNonQuery();
                      MyDataReader.Close();
-                 }*/
+                 }
                 //if (!Tables.Contains("system")) { }
             }
             // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать

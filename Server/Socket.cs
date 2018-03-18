@@ -19,6 +19,7 @@ namespace Server
         /*[Name,Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber]*/
         public string[] OperationSistem = new string[7];
         public string[] CPUUNIT = new string[15];
+        public string[] GPUUNIT = new string[14];
         public int Clientid = -1;
         public Socket Sock
         {
@@ -38,8 +39,8 @@ namespace Server
             catch (Exception ex) {
                 //MessageBox.Show(String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message));
                 string mess = String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message);
-                QueryElement query = new QueryElement(mess, QueryElement.QueryType.SysError, DateTime.Now);
-                ErrorsListForm.link.AddFirst(query);
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+
             }
         }
         public byte[] GetRecievedData(IAsyncResult ar, out SocketError SockError)

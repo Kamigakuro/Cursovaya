@@ -38,6 +38,9 @@ namespace Server
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             InitializeMySQL();
             IntializeSocket();
+            GetAllClients();
+            ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
+            ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start(); //запускаем поток
             
@@ -75,6 +78,12 @@ namespace Server
             }
         }
 
+        public void UpdateQueryCounts()
+        {
+            dberrorslabel.BeginInvoke((MethodInvoker)(() => dberrorslabel.Text = ErrorsListForm.DBErrors.ToString()));
+            syserorslabel.BeginInvoke((MethodInvoker)(() => syserorslabel.Text = ErrorsListForm.SysErrors.ToString()));
+            clienterrorlabel.BeginInvoke((MethodInvoker)(() => clienterrorlabel.Text = ErrorsListForm.ClientErrors.ToString()));
+        }
         private void NotifyIcon1_Click(object sender, EventArgs e)
         {
             MouseEventArgs me = (MouseEventArgs)e;
@@ -129,6 +138,23 @@ namespace Server
             AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
 
+        public void GetAllClients()
+        {
+            string sql = "SELECT * FROM systems";
+            DB.SendQuery(sql, out MySqlDataReader reader);
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    dataGridView2.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+                }
+            }
+            else
+            {
+
+            }
+            reader.Close();
+        }
 
         public delegate void AddMessageToConsole(string text);
         public void AddNewConsoleMessage(string text)
@@ -214,6 +240,11 @@ namespace Server
             if (ErrorsListForm.link != null && ErrorsListForm.link.Count == 0) { MessageBox.Show("Очередь пуста!"); return; }
             ErrorsListForm form = new ErrorsListForm();
             form.Show();
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

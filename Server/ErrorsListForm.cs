@@ -12,6 +12,9 @@ namespace Server
     public partial class ErrorsListForm : Form
     {
         public static LinkedList<QueryElement> link = new LinkedList<QueryElement>();
+        public static int SysErrors = 0;
+        public static int DBErrors = 0;
+        public static int ClientErrors = 0;
         public ErrorsListForm()
         {
             InitializeComponent();
@@ -51,6 +54,8 @@ namespace Server
             }
             dataGridView1.AutoResizeColumns();
         }
+        public delegate void RemoveQuery();
+        public static event RemoveQuery RemoveQueryHandle;
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
@@ -66,10 +71,27 @@ namespace Server
                         SocketManagment client = node.Value.GetSocket();
                         if (node.Value.GetMessage() == mess && id == client.Clientid)
                         {
+                            switch(node.Value.GetQType())
+                            {
+                                case QueryElement.QueryType.DBError:
+                                    DBErrors--;
+                                    break;
+                                case QueryElement.QueryType.SysError:
+                                    SysErrors--;
+                                    break;
+                                case QueryElement.QueryType.ClientError:
+                                    ClientErrors--;
+                                    break;
+                                case QueryElement.QueryType.Error:
+                                    break;
+                                case QueryElement.QueryType.None:
+                                    break;
+                            }
                             node.Value.Dispose();
                             node.Value = null;
                             link.Remove(node);
                             dataGridView1.Rows.RemoveAt(e.RowIndex);
+                            RemoveQueryHandle();
                             break;
                         }
                     }
@@ -94,13 +116,82 @@ namespace Server
                             node.Value = null;
                             link.Remove(node);
                             dataGridView1.Rows.RemoveAt(e.RowIndex);
+                            DBErrors--;
+                            RemoveQueryHandle();
                         }
                 
                     }
                 }
             }
         }
-
+        public delegate void AddQueryEvent();
+        public static event AddQueryEvent AddQueryHandle;
+        public static void AddQuery(string mess, QueryElement.QueryType querytype)
+        {
+            switch (querytype)
+            {
+                case QueryElement.QueryType.SysError:
+                    SysErrors++;
+                    break;
+                case QueryElement.QueryType.DBError:
+                    DBErrors++;
+                    break;
+                case QueryElement.QueryType.ClientError:
+                    ClientErrors++;
+                    break;
+                case QueryElement.QueryType.Error:
+                    break;
+                case QueryElement.QueryType.None:
+                    break;
+            }
+            QueryElement query = new QueryElement(mess, querytype, DateTime.Now);
+            link.AddFirst(query);
+            AddQueryHandle();
+        }
+        public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType)
+        {
+            switch (QType)
+            {
+                case QueryElement.QueryType.SysError:
+                    SysErrors++;
+                    break;
+                case QueryElement.QueryType.DBError:
+                    DBErrors++;
+                    break;
+                case QueryElement.QueryType.ClientError:
+                    ClientErrors++;
+                    break;
+                case QueryElement.QueryType.Error:
+                    break;
+                case QueryElement.QueryType.None:
+                    break;
+            }
+            QueryElement query = new QueryElement(mess, sock, QType, DateTime.Now);
+            link.AddFirst(query);
+            AddQueryHandle();
+        }
+        public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType, string sql)
+        {
+            switch (QType)
+            {
+                case QueryElement.QueryType.SysError:
+                    SysErrors++;
+                    break;
+                case QueryElement.QueryType.DBError:
+                    DBErrors++;
+                    break;
+                case QueryElement.QueryType.ClientError:
+                    ClientErrors++;
+                    break;
+                case QueryElement.QueryType.Error:
+                    break;
+                case QueryElement.QueryType.None:
+                    break;
+            }
+            QueryElement query = new QueryElement(mess, sock, QType, sql, DateTime.Now);
+            link.AddFirst(query);
+            AddQueryHandle();
+        }
         private void ErrorsListForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             GC.Collect();
@@ -108,4 +199,5 @@ namespace Server
             GC.Collect();
         }
     }
+
 }
