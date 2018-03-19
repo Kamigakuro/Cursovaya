@@ -28,11 +28,6 @@ namespace Server
         public Server()
         {
             InitializeComponent();
-            notifyIcon1 = new NotifyIcon
-            {
-                Icon = SystemIcons.Asterisk,
-                Visible = true
-            };
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
@@ -40,6 +35,7 @@ namespace Server
             IntializeSocket();
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
+            ErrorsListForm.UpdateAllCients += this.GetAllClients;
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start(); //запускаем поток
             
@@ -82,6 +78,7 @@ namespace Server
             dberrorslabel.BeginInvoke((MethodInvoker)(() => dberrorslabel.Text = ErrorsListForm.DBErrors.ToString()));
             syserorslabel.BeginInvoke((MethodInvoker)(() => syserorslabel.Text = ErrorsListForm.SysErrors.ToString()));
             clienterrorlabel.BeginInvoke((MethodInvoker)(() => clienterrorlabel.Text = ErrorsListForm.ClientErrors.ToString()));
+            if (ErrorsListForm.link.Count == 0) ErrorsListForm.ErrorsCounter = 0;
         }
         private void NotifyIcon1_Click(object sender, EventArgs e)
         {
@@ -93,42 +90,6 @@ namespace Server
             }
         }
 
-   /*    private void OnButtonActionClick(object sender, ListViewColumnMouseEventArgs e)//Кнопка в листе
-        {
-            SocketManagment client = null;
-            foreach (SocketManagment clients in m_aryClients)
-            {
-                if (clients.Sock.RemoteEndPoint.ToString() == e.Item.SubItems[1].Text) client = clients;
-                break;
-            }
-            if (client == null) return;
-            string text = String.Format("\t\t\tИнформация по клиенту - {0}\n\n" +
-                "IP-адрес: {1}\n" +
-                "Время подключения: {2}\n" +
-                "\t\t\tИнформация о системе:\n\n" +
-                "Операционная система: {3}\n\n" +
-                "Дата установки: {4}\t\t Количество пользователей: {5}\n" +
-                "Серийный номер: {6}\n\n" +
-                "Процессор: {7}\n" +
-                "Количество ядер: {8}\t\t Количество логических ядер: {9}\n" +
-                "L2 Cache: {10} \t L3 Cache: {11}\t Socket Designation: {12}\n" +
-                "Максимальная частота: {13}\t Роль: {14}\n" +
-                "Id процессора: {15}\t Тип процессора: {16}\t Ревизия: {17}\n\n" +
-                "Видеокарта: Geforce GTX 760\n" +
-                "Название: Gigabyte\n" +
-                "Частота: 6008 MHz\n" +
-                "Объем памяти: 2048 MB\n\n" +
-                "Материнская плата: M2N32-SLI DELUXE\n" +
-                "Тип: Base Board\n" +
-                "Производитель: ASUSTeK Computer INC\n" +
-                "Серийный номер: 123456789000\n" +
-                "", e.Item.Text, client.Sock.RemoteEndPoint.ToString(), client.time.ToString(),  client.OperationSistem[0] + "  " + client.OperationSistem[2] + "  " + client.OperationSistem[1],
-                client.OperationSistem[3], client.OperationSistem[5], client.OperationSistem[6],
-                client.CPUUNIT[5] + "  " + client.CPUUNIT[0] + " " + client.CPUUNIT[1], client.CPUUNIT[6], client.CPUUNIT[7], client.CPUUNIT[2], client.CPUUNIT[3], client.CPUUNIT[12],
-                client.CPUUNIT[4], client.CPUUNIT[11], client.CPUUNIT[8], client.CPUUNIT[9], client.CPUUNIT[10]);
-            MessageBox.Show(this, text, e.Item.SubItems[1].Text);
-        }*/        
-
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
         {
@@ -139,6 +100,7 @@ namespace Server
         public delegate void GetClientsList();
         public void GetAllClients()
         {
+            dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
             DB.SendQuery(sql, out MySqlDataReader reader);
             if (reader.HasRows)

@@ -21,41 +21,46 @@ namespace Server
         private QueryType Type = QueryType.None;
         private string sqlquery = String.Empty;
         private DateTime time;
+        private int index;
 
-        public QueryElement(string Mess, SocketManagment sock, QueryType QType, DateTime tie)
+        public QueryElement(string Mess, SocketManagment sock, QueryType QType, DateTime tie, int indx)
         {
             Message = Mess;
             socket = sock;
             Type = QType;
             time = tie;
+            index = indx;
         }
-        public QueryElement(string Mess, QueryType QType, DateTime tie)
+        public QueryElement(string Mess, QueryType QType, DateTime tie, int indx)
         {
             Message = Mess;
             Type = QType;
             time = tie;
+            index = indx;
         }
-        public QueryElement(string Mess, SocketManagment sock, QueryType QType, string sql, DateTime tie)
+        public QueryElement(string Mess, SocketManagment sock, QueryType QType, string sql, DateTime tie, int indx)
         {
             Message = Mess;
             socket = sock;
             Type = QType;
             sqlquery = sql;
             time = tie;
+            index = indx;
         }
-        public QueryElement(string Mess, QueryType QType, string sql, DateTime tie)
+        public QueryElement(string Mess, QueryType QType, string sql, DateTime tie, int indx)
         {
             Message = Mess;
             Type = QType;
             sqlquery = sql;
             time = tie;
+            index = indx;
         }
         public string GetMessage() { return Message; }
         public string GetQuery() { return sqlquery; }
         public SocketManagment GetSocket() { return socket; }
         public DateTime GetTime() { return time; }
         public QueryType GetQType() { return Type; }
-
+        public int GetIndex() { return index; }
         public void Dispose()
         {
             Message = null;

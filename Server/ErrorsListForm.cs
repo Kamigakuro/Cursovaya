@@ -11,10 +11,20 @@ namespace Server
 {
     public partial class ErrorsListForm : Form
     {
+        //-------------Events & Delegates---------------
+        public delegate void RemoveQuery();
+        public static event RemoveQuery RemoveQueryHandle;
+        public delegate void UpdateClients();
+        public static event UpdateClients UpdateAllCients;
+        public delegate void AddQueryEvent();
+        public static event AddQueryEvent AddQueryHandle;
+        //----------------------------------------------
+
         public static LinkedList<QueryElement> link = new LinkedList<QueryElement>();
         public static int SysErrors = 0;
         public static int DBErrors = 0;
         public static int ClientErrors = 0;
+        public static int ErrorsCounter = 0;
         public ErrorsListForm()
         {
             InitializeComponent();
@@ -34,12 +44,12 @@ namespace Server
                             SocketManagment client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
-                            dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, node.Value.GetTime(), "DBError", node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, node.Value.GetIndex(),node.Value.GetTime(), "DBError", node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
                             break;
                         }
                     case QueryElement.QueryType.SysError:
                         {
-                            dataGridView1.Rows.Add(Properties.Resources.Important_16x, node.Value.GetTime(), "SysError", node.Value.GetMessage(), "", "", "", "", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.Important_16x, node.Value.GetIndex(), node.Value.GetTime(), "SysError", node.Value.GetMessage(), "", "", "", "", "Пропустить");
                             break;
                         }
                     case QueryElement.QueryType.ClientError:
@@ -47,20 +57,18 @@ namespace Server
                             SocketManagment client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
-                            dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, node.Value.GetTime(), "ClientError", node.Value.GetMessage(), name, id, "", "", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, node.Value.GetIndex(), node.Value.GetTime(), "ClientError", node.Value.GetMessage(), name, id, "", "", "Пропустить");
                             break;
                         }
                     case QueryElement.QueryType.ClientWarning:
                         {
-                            dataGridView1.Rows.Add(Properties.Resources.AddUser_16x, node.Value.GetTime(), "ClientWarning", node.Value.GetMessage(), "", "", "", "Исправить", "Пропустить");
+                            dataGridView1.Rows.Add(Properties.Resources.AddUser_16x, node.Value.GetIndex(), node.Value.GetTime(), "ClientWarning", node.Value.GetMessage(), "", "", "", "Исправить", "Пропустить");
                             break;
                         }
                 }
             }
             dataGridView1.AutoResizeColumns();
         }
-        public delegate void RemoveQuery();
-        public static event RemoveQuery RemoveQueryHandle;
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
@@ -69,14 +77,12 @@ namespace Server
             {
                 if (e.ColumnIndex == IgnoreButton.DisplayIndex)
                 {
-                    string mess = senderGrid.Rows[e.RowIndex].Cells[Info.DisplayIndex].Value.ToString();
-                    int id = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ClientId.DisplayIndex].Value);
+                    int indx = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[index.DisplayIndex].Value.ToString());
                     for (node = link.Last; node != null; node = node.Previous)
                     {
-                        SocketManagment client = node.Value.GetSocket();
-                        if (node.Value.GetMessage() == mess)
+                        if (indx == node.Value.GetIndex())
                         {
-                            switch(node.Value.GetQType())
+                            switch (node.Value.GetQType())
                             {
                                 case QueryElement.QueryType.DBError:
                                     DBErrors--;
@@ -101,20 +107,17 @@ namespace Server
                             dataGridView1.Rows.RemoveAt(e.RowIndex);
                             RemoveQueryHandle();
                             break;
+                            
                         }
                     }
                 }
-                if (e.ColumnIndex == Completebutton.DisplayIndex)
+                else if (e.ColumnIndex == Completebutton.DisplayIndex)
                 {
-                    string mess = senderGrid.Rows[e.RowIndex].Cells[Info.DisplayIndex].Value.ToString();
-                    string qtype = senderGrid.Rows[e.RowIndex].Cells[QType.DisplayIndex].Value.ToString();
-                    if(qtype == "DBError")
+                    int indx = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[index.DisplayIndex].Value.ToString());
+                    for (node = link.Last; node != null; node = node.Previous)
                     {
-                        int id = Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ClientId.DisplayIndex].Value);
-                        for (node = link.Last; node != null; node = node.Previous)
+                        if (indx == node.Value.GetIndex())
                         {
-                            SocketManagment clientr = node.Value.GetSocket();
-                            if (node.Value.GetMessage() == mess && id == clientr.Clientid) break;
                             if (node.Value.GetQType() == QueryElement.QueryType.DBError)
                             {
                                 if (!String.IsNullOrEmpty(node.Value.GetQuery()))
@@ -127,29 +130,37 @@ namespace Server
                                     dataGridView1.Rows.RemoveAt(e.RowIndex);
                                     DBErrors--;
                                     RemoveQueryHandle();
+                                    break;
                                 }
+                            }
+                            else if (node.Value.GetQType() == QueryElement.QueryType.SysError)
+                            {
 
                             }
+                            else if (node.Value.GetQType() == QueryElement.QueryType.ClientError)
+                            {
+
+                            }
+                            else if (node.Value.GetQType() == QueryElement.QueryType.ClientWarning)
+                            {
+                                if (!String.IsNullOrEmpty(node.Value.GetQuery()))
+                                {
+                                    MySQLCon DB = new MySQLCon();
+                                    DB.SendQuery(node.Value.GetQuery());
+                                    node.Value.Dispose();
+                                    node.Value = null;
+                                    link.Remove(node);
+                                    dataGridView1.Rows.RemoveAt(e.RowIndex);
+                                    ClientErrors--;
+                                    RemoveQueryHandle();
+                                    break;
+                                }
+                            }
                         }
-
-                    }
-                    else if (qtype == "SysError")
-                    {
-
-                    }
-                    else if (qtype == "ClientWarning")
-                    {
-
-                    }
-                    else if (qtype == "ClientError")
-                    {
-
                     }
                 }
             }
         }
-        public delegate void AddQueryEvent();
-        public static event AddQueryEvent AddQueryHandle;
         public static void AddQuery(string mess, QueryElement.QueryType querytype)
         {
             switch (querytype)
@@ -168,8 +179,8 @@ namespace Server
                 case QueryElement.QueryType.None:
                     break;
             }
-            QueryElement query = new QueryElement(mess, querytype, DateTime.Now);
-            link.AddFirst(query);
+            QueryElement query = new QueryElement(mess, querytype, DateTime.Now, ErrorsCounter++);
+            link.AddLast(query);
             AddQueryHandle();
         }
         public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType)
@@ -190,8 +201,8 @@ namespace Server
                 case QueryElement.QueryType.None:
                     break;
             }
-            QueryElement query = new QueryElement(mess, sock, QType, DateTime.Now);
-            link.AddFirst(query);
+            QueryElement query = new QueryElement(mess, sock, QType, DateTime.Now, ErrorsCounter++);
+            link.AddLast(query);
             AddQueryHandle();
         }
         public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType, string sql)
@@ -212,8 +223,8 @@ namespace Server
                 case QueryElement.QueryType.None:
                     break;
             }
-            QueryElement query = new QueryElement(mess, sock, QType, sql, DateTime.Now);
-            link.AddFirst(query);
+            QueryElement query = new QueryElement(mess, sock, QType, sql, DateTime.Now, ErrorsCounter++);
+            link.AddLast(query);
             AddQueryHandle();
         }
         public static void AddQuery(string mess, QueryElement.QueryType QType, string sql)
@@ -237,12 +248,13 @@ namespace Server
                     ClientErrors++;
                     break;
             }
-            QueryElement query = new QueryElement(mess, QType, sql, DateTime.Now);
-            link.AddFirst(query);
+            QueryElement query = new QueryElement(mess, QType, sql, DateTime.Now, ErrorsCounter++);
+            link.AddLast(query);
             AddQueryHandle();
         }
         private void ErrorsListForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            UpdateAllCients();
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
