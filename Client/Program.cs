@@ -47,7 +47,8 @@ namespace Client
         }
         private static void CreateMiniDump()
         {
-            using (FileStream fs = new FileStream("ClientCrashDump.dmp", FileMode.Create))
+            string data = DateTime.Now.ToString();
+            using (FileStream fs = new FileStream(data + "_ClientCrashDump.dmp", FileMode.Create))
             {
                 using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
                 {

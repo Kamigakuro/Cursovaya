@@ -50,7 +50,8 @@ namespace Server
         }
         private static void CreateMiniDump()
         {
-            using (FileStream fs = new FileStream("ServerCrashDump.dmp", FileMode.Create))
+            string data = DateTime.Now.ToString();
+            using (FileStream fs = new FileStream(data + "_ServerCrashDump.dmp", FileMode.Create))
             {
                 using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
                 {
