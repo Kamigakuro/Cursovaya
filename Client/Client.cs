@@ -308,7 +308,8 @@ namespace Client
                     return;
                 }
                 button1.Text = "Отключиться";
-                socket = new Socket(IPAddress.Parse(IpAdressString).AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                //socket = new Socket(IPAddress.Parse(IpAdressString).AddressFamily, SocketType.Stream, ProtocolType.Tcp); Старая версия подключения
                 IPEndPoint epServer = new IPEndPoint(IPAddress.Parse(adresslabel.Text), port);
                 socket.Blocking = false;
                 AsyncCallback onconnect = new AsyncCallback(OnConnect);

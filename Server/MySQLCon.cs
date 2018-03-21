@@ -45,17 +45,35 @@ namespace Server
         /// <param name="command">текст запроса</param>
         public void SendQuery(string command)
         {
-            MySqlCommand com = new MySqlCommand(command, dbHandle);
-            com.ExecuteNonQuery();
+            try
+            {
+                MySqlCommand com = new MySqlCommand(command, dbHandle);
+                com.ExecuteNonQuery();
+            }
+            catch(MySqlException me)
+            {
+                string mess = String.Format("Ошибка при выполнении запроса в БД. ({0}). {1}", command, me.ToString());
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+            }
         }
         /// <summary>
         /// Отправка запроса в БД с получением результата выполнения
         /// </summary>
         /// <param name="command">текст запроса</param>
         public void SendQuery(string command, out MySqlDataReader reader)
-        {   
-            MySqlCommand com = new MySqlCommand(command, dbHandle);
-            reader = com.ExecuteReader();
+        {
+            try
+            {
+                MySqlCommand com = new MySqlCommand(command, dbHandle);
+                reader = com.ExecuteReader();
+            }
+            catch (MySqlException me)
+            {
+                string mess = String.Format("Ошибка при выполнении запроса в БД. ({0}). {1}", command, me.ToString());
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+                reader = null;
+            }
+            
         }
         /// <summary>
         /// Закрытие подключения к базе данных

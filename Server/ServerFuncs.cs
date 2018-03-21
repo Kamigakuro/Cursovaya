@@ -97,7 +97,8 @@ namespace Server
             }
             if (aryLocalAddr == null)
             {
-                MessageBox.Show("Невозможно получить локальный адрес");
+                string mess = String.Format("Невозможно получить локальный адрес");
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
                 label4.Text = "Отключено";
                 label4.ForeColor = Color.Red;
                 label10.Text = "";
