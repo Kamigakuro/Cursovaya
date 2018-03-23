@@ -73,28 +73,33 @@ namespace Server
             catch { return null; }
         }
         /// <summary>
+        /// Метод получения локального IP-адреса
+        /// </summary>
+        /// <returns></returns>
+        private IPAddress GetLocalIP()
+        {
+            try
+            {
+                String strHostName = Dns.GetHostName();
+                IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
+                IPAddress aryLocalAddr = ipEntry.AddressList[0];
+                return aryLocalAddr;
+            }
+            catch (Exception e)
+            {
+                string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", e.Message);
+                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+                return null;
+            }
+        }
+        /// <summary>
         /// Включение прослушивания сокетом по порту
         /// </summary>
         private void IntializeSocket()
         {
             const int nPortListen = 7777;
-            String strHostName = "";
             IPAddress.TryParse(GetExternalIp(), out IPAddress aryLocalAddr);
-            if (aryLocalAddr == null || aryLocalAddr == IPAddress.None)
-            {
-                try
-                {
-                    strHostName = Dns.GetHostName();
-                    IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
-                    aryLocalAddr = ipEntry.AddressList[0];
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Ошибка при попытке получить локальный адресс: " + ex.Message);
-                    string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", ex.Message);
-                    ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-                }
-            }
+            if (aryLocalAddr == null || aryLocalAddr == IPAddress.None) aryLocalAddr = GetLocalIP();
             if (aryLocalAddr == null)
             {
                 string mess = String.Format("Невозможно получить локальный адрес");
@@ -104,10 +109,10 @@ namespace Server
                 label10.Text = "";
                 return;
             }
-            //MessageBox.Show("Активировано прослушивание: [" + strHostName +"] " + aryLocalAddr[0] + ":" + nPortListen);
+            string localip = "" + GetLocalIP().ToString();
             label4.Text = "Подключено";
             label4.ForeColor = Color.Green;
-            label10.Text = aryLocalAddr + ":" + nPortListen;
+            label10.Text = aryLocalAddr + ":" + nPortListen + " (" + localip + ")";
             try
             {
                 listener = new Socket(aryLocalAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -651,6 +656,10 @@ namespace Server
             }
         }
 
+        public void CheckAdresses(IPAddress BeginIP, IPAddress EndIP)
+        {
+
+        }
     }
 }
 

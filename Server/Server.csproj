@@ -116,6 +116,7 @@
     <Compile Include="ServerFuncs.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="SettingsClass.cs" />
     <Compile Include="Socket.cs" />
     <EmbeddedResource Include="AboutClientForm.resx">
       <DependentUpon>AboutClientForm.cs</DependentUpon>

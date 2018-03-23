@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 //using System.IO;
 //using System.Linq;
-//using System.Net;
+using System.Net;
 //using System.Net.Sockets;
 //using System.Text;
 //using System.Text.RegularExpressions;
@@ -36,6 +36,8 @@ namespace Server
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.UpdateAllCients += this.GetAllClients;
+            //maskedTextBox1.Mask = "###.###.###.###";
+            //maskedTextBox1.ValidatingType = typeof(System.Net.IPAddress);
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start(); //запускаем поток
             
@@ -234,6 +236,22 @@ namespace Server
         private void Server_Shown(object sender, EventArgs e)
         {
             GetAllClients();
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label13_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            IPAddress.TryParse(textBox2.Text, out IPAddress BeginIP);
+            IPAddress.TryParse(textBox3.Text, out IPAddress EndnIP);
         }
     }
 
