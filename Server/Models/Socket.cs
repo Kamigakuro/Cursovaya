@@ -11,18 +11,18 @@ namespace Server
 {
     public class SocketManagment
     {
-        private Socket m_sock;                      // Connection to the client
-        static byte[] m_byBuff = new byte[1024];		// Receive data buffer
+        private Socket m_sock;
+        static byte[] m_byBuff = new byte[1024];
         static MemoryStream mem = new MemoryStream(m_byBuff);
         static BinaryReader reader = new BinaryReader(mem);
         public string name = String.Empty;
         public DateTime time = new DateTime();
-        /*[Name,Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber]*/
         public string[] OperationSistem = new string[7];
         public string[] CPUUNIT = new string[15];
         public string[] GPUUNIT = new string[14];
         public string[] Board = new string[9];
         public DataTable RAM = new DataTable("RAM");
+        public DataTable Products = new DataTable("Products");
         public int Clientid = -1;
         public Socket Sock
         {
@@ -47,6 +47,13 @@ namespace Server
             RAM.Columns.Add("Speed");
             RAM.Columns.Add("Status");
             RAM.Columns.Add("Version");
+
+            Products.Columns.Add("DisplayName");
+            Products.Columns.Add("DisplayVersion");
+            Products.Columns.Add("InstallDate");
+            Products.Columns.Add("Publisher");
+            Products.Columns.Add("IdentifyingNumber");
+
         }
         public void SetupRecieveCallback(Server main)
         {

@@ -91,37 +91,43 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutClientForm.cs">
+    <Compile Include="Forms\AboutClientForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutClientForm.Designer.cs">
+    <Compile Include="Forms\AboutClientForm.Designer.cs">
       <DependentUpon>AboutClientForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ErrorsListForm.cs">
+    <Compile Include="Forms\ErrorsListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ErrorsListForm.Designer.cs">
+    <Compile Include="Forms\ErrorsListForm.Designer.cs">
       <DependentUpon>ErrorsListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MySQLCon.cs" />
-    <Compile Include="QueryElement.cs" />
-    <Compile Include="Server.cs">
+    <Compile Include="Models\MySQLCon.cs" />
+    <Compile Include="Models\QueryElement.cs" />
+    <Compile Include="Forms\Server.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Server.Designer.cs">
+    <Compile Include="Forms\Server.Designer.cs">
       <DependentUpon>Server.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ServerFuncs.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerFuncs.cs">
+    <Compile Include="Forms\Settings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SettingsClass.cs" />
-    <Compile Include="Socket.cs" />
-    <EmbeddedResource Include="AboutClientForm.resx">
+    <Compile Include="Forms\Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SettingsClass.cs" />
+    <Compile Include="Models\Socket.cs" />
+    <EmbeddedResource Include="Forms\AboutClientForm.resx">
       <DependentUpon>AboutClientForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ErrorsListForm.resx">
+    <EmbeddedResource Include="Forms\ErrorsListForm.resx">
       <DependentUpon>ErrorsListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -134,8 +140,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Server.resx">
+    <EmbeddedResource Include="Forms\Server.resx">
       <DependentUpon>Server.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

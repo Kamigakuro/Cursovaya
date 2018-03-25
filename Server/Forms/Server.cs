@@ -36,8 +36,6 @@ namespace Server
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.UpdateAllCients += this.GetAllClients;
-            //maskedTextBox1.Mask = "###.###.###.###";
-            //maskedTextBox1.ValidatingType = typeof(System.Net.IPAddress);
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start(); //запускаем поток
             
@@ -104,7 +102,7 @@ namespace Server
         {
             dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
-            DB.SendQuery(sql, out MySqlDataReader reader);
+            MySqlDataReader reader = DB.SendQuery(sql);
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -252,6 +250,12 @@ namespace Server
         {
             IPAddress.TryParse(textBox2.Text, out IPAddress BeginIP);
             IPAddress.TryParse(textBox3.Text, out IPAddress EndnIP);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Settings settings = new Settings();
+            settings.Show();
         }
     }
 

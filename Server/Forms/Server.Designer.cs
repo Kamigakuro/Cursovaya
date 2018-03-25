@@ -30,11 +30,11 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Server));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dbStatusLabel = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -75,15 +75,16 @@
             this.confirmed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.delbutton = new System.Windows.Forms.DataGridViewButtonColumn();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
             this.num = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tablestate = new System.Windows.Forms.DataGridViewImageColumn();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.DataGridStrip.SuspendLayout();
@@ -213,14 +214,14 @@
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle31.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle31.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle31.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle31.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle31.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Number,
@@ -237,32 +238,32 @@
             // 
             // Number
             // 
-            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Number.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Number.DefaultCellStyle = dataGridViewCellStyle2;
             this.Number.HeaderText = "##";
             this.Number.Name = "Number";
             this.Number.ReadOnly = true;
             // 
             // GName
             // 
-            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.GName.DefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.GName.DefaultCellStyle = dataGridViewCellStyle3;
             this.GName.HeaderText = "Name";
             this.GName.Name = "GName";
             this.GName.ReadOnly = true;
             // 
             // ip
             // 
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ip.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ip.DefaultCellStyle = dataGridViewCellStyle4;
             this.ip.HeaderText = "IP adress";
             this.ip.Name = "ip";
             this.ip.ReadOnly = true;
             // 
             // Time
             // 
-            dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Time.DefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Time.DefaultCellStyle = dataGridViewCellStyle5;
             this.Time.HeaderText = "Time";
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
@@ -469,50 +470,6 @@
             this.tabPage3.Text = "IP-адреса";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(29, 5);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(87, 20);
-            this.textBox2.TabIndex = 0;
-            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
-            // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(152, 3);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 20);
-            this.textBox3.TabIndex = 1;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 8);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(17, 13);
-            this.label12.TabIndex = 2;
-            this.label12.Text = "С:";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(122, 6);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(24, 13);
-            this.label13.TabIndex = 3;
-            this.label13.Text = "По:";
-            this.label13.Click += new System.EventHandler(this.label13_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(258, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(89, 25);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Сканировать";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // dataGridView3
             // 
             this.dataGridView3.AllowUserToAddRows = false;
@@ -522,10 +479,10 @@
             this.num,
             this.tableip,
             this.tablestate});
-            this.dataGridView3.Location = new System.Drawing.Point(0, 24);
+            this.dataGridView3.Location = new System.Drawing.Point(0, 29);
             this.dataGridView3.Name = "dataGridView3";
             this.dataGridView3.ReadOnly = true;
-            this.dataGridView3.Size = new System.Drawing.Size(540, 491);
+            this.dataGridView3.Size = new System.Drawing.Size(540, 486);
             this.dataGridView3.TabIndex = 5;
             // 
             // num
@@ -546,11 +503,66 @@
             this.tablestate.Name = "tablestate";
             this.tablestate.ReadOnly = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(258, 2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(89, 25);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Сканировать";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(122, 6);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(24, 13);
+            this.label13.TabIndex = 3;
+            this.label13.Text = "По:";
+            this.label13.Click += new System.EventHandler(this.label13_Click);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 8);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(17, 13);
+            this.label12.TabIndex = 2;
+            this.label12.Text = "С:";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(152, 4);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(100, 20);
+            this.textBox3.TabIndex = 1;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(29, 5);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(87, 20);
+            this.textBox2.TabIndex = 0;
+            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(12, 98);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 22;
+            this.button2.Text = "Настройки";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(928, 562);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label9);
@@ -641,6 +653,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn num;
         private System.Windows.Forms.DataGridViewTextBoxColumn tableip;
         private System.Windows.Forms.DataGridViewImageColumn tablestate;
+        private System.Windows.Forms.Button button2;
     }
 }
 

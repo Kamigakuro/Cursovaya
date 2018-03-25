@@ -43,7 +43,7 @@ namespace Server
         /// Отправка запроса в БД без получения результата выполнения
         /// </summary>
         /// <param name="command">текст запроса</param>
-        public void SendQuery(string command)
+        public void SendNonQuery(string command)
         {
             try
             {
@@ -60,18 +60,25 @@ namespace Server
         /// Отправка запроса в БД с получением результата выполнения
         /// </summary>
         /// <param name="command">текст запроса</param>
-        public void SendQuery(string command, out MySqlDataReader reader)
+        /// 
+        private object threadLock = new object();
+        public MySqlDataReader SendQuery(string command)
         {
-            try
+            lock (threadLock)
             {
-                MySqlCommand com = new MySqlCommand(command, dbHandle);
-                reader = com.ExecuteReader();
-            }
-            catch (MySqlException me)
-            {
-                string mess = String.Format("Ошибка при выполнении запроса в БД. ({0}). {1}", command, me.ToString());
-                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-                reader = null;
+                MySqlDataReader reader;
+                try
+                {
+                    MySqlCommand com = new MySqlCommand(command, dbHandle);
+                    reader = com.ExecuteReader();
+                }
+                catch (MySqlException me)
+                {
+                    string mess = String.Format("Ошибка при выполнении запроса в БД. ({0}). {1}", command, me.ToString());
+                    ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+                    reader = null;
+                }
+                return reader;
             }
             
         }
@@ -166,12 +173,18 @@ namespace Server
                     com.ExecuteNonQuery();
                     MyDataReader.Close();
                 }
+                if (!Tables.Contains("products"))
+                {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS products (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DisplayName VARCHAR(60), DisplayVersion VARCHAR(60), InstallDate VARCHAR(30), Publisher VARCHAR(60), IdentifyingNumber VARCHAR(60), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, dbHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
                 //if (!Tables.Contains("system")) { }
             }
             // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать
         }
-
-
 
     }
 }

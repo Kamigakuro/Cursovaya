@@ -21,6 +21,8 @@ namespace Server
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            SettingsClass settings = new SettingsClass();
+            if (settings.CheckSettingsFile()) settings.LoadSettings();
             Application.Run(new Server());
         }
 
@@ -50,8 +52,7 @@ namespace Server
         }
         private static void CreateMiniDump()
         {
-            string data = DateTime.Now.ToString();
-            using (FileStream fs = new FileStream(data + "_ServerCrashDump.dmp", FileMode.Create))
+            using (FileStream fs = new FileStream("_ServerCrashDump.dmp", FileMode.Create))
             {
                 using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
                 {

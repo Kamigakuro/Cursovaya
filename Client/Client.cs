@@ -13,6 +13,7 @@ using System.Net;
 using System.IO;
 using System.Management;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
 namespace Client
 {
@@ -85,6 +86,7 @@ namespace Client
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         DataTable rams = new DataTable("RAM");
+        DataTable Programs = new DataTable("Programs");
 
         public struct IRC_QUERIES
         {
@@ -99,6 +101,7 @@ namespace Client
             public const int GPUUNIT = 5; // Код GPU
             public const int Board = 6; // Код материнской платы
             public const int RAM = 7; // Оперативная память
+            public const int Products = 8; // Программы
         }
 
         public Client()
@@ -122,6 +125,12 @@ namespace Client
             rams.Columns.Add("Speed");
             rams.Columns.Add("Status");
             rams.Columns.Add("Version");
+
+            Programs.Columns.Add("DisplayName");
+            Programs.Columns.Add("DisplayVersion");
+            Programs.Columns.Add("InstallDate");
+            Programs.Columns.Add("Publisher");
+            Programs.Columns.Add("IdentifyingNumber");
             GetComponets();
         }
 
@@ -133,8 +142,56 @@ namespace Client
             if (!GetGPU()) return;
             if (!GetBoard()) return;
             if (!GetRAM()) return;
+            if (!GetProducts()) return;
+            InitializeSocket();
         }
 
+        private bool GetProducts()
+        {
+            /*ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM Win32_Product");
+            ManagementObjectCollection colItems = searcher.Get();
+            string d = "";
+            foreach (ManagementObject queryObj in colItems)
+            {
+                string[] s = new string[8];
+                if (queryObj["Vendor"] != null && (queryObj["Vendor"].ToString() != "Microsoft Corporation"))
+                {
+                    if (queryObj["Caption"] != null) s[0] = queryObj["Caption"].ToString();
+                    if (queryObj["Description"] != null) s[1] = queryObj["Description"].ToString();
+                    if (queryObj["IdentifyingNumber"] != null) s[2] = queryObj["IdentifyingNumber"].ToString();
+                    if (queryObj["InstallDate"] != null) s[3] = queryObj["InstallDate"].ToString();
+                    if (queryObj["Name"] != null) s[4] = queryObj["Name"].ToString();
+                    if (queryObj["ProductID"] != null) s[5] = queryObj["ProductID"].ToString();
+                    if (queryObj["Vendor"] != null) s[6] = queryObj["Vendor"].ToString();
+                    if (queryObj["Version"] != null) s[7] = queryObj["Version"].ToString();
+                    for (int i = 0; i < 8; i++)
+                    {
+                        d = d + s[i] + "\t";
+                    }
+                    d = d + "\n";
+                    Programs.Rows.Add(s);
+                }
+            }*/
+            string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
+            {
+                foreach (string subkey_name in key.GetSubKeyNames())
+                {
+                    string[] s = new string[5];
+                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                    {
+                        if (subkey.GetValue("DisplayName") != null && !String.IsNullOrWhiteSpace(subkey.GetValue("DisplayName").ToString())) s[0] = subkey.GetValue("DisplayName").ToString();
+                        else continue;
+                        if (subkey.GetValue("DisplayVersion") != null) s[1] = subkey.GetValue("DisplayVersion").ToString();
+                        if (subkey.GetValue("InstallDate") != null) s[2] = subkey.GetValue("InstallDate").ToString();
+                        if (subkey.GetValue("Publisher") != null) s[3] = subkey.GetValue("Publisher").ToString();
+                        s[4] = subkey.Name;
+                    }
+                    Programs.Rows.Add(s);
+                }
+            }
+            return true;
+        }
         private bool GetRAM()
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_PhysicalMemory");
@@ -327,11 +384,8 @@ namespace Client
             Socket sock = (Socket)ar.AsyncState;
             try
             {
-                //sock.EndConnect( ar );
-                if (sock.Connected)
-                    SetupRecieveCallback(sock);
-                else
-                    sock.EndConnect(ar);
+                if (sock.Connected) SetupRecieveCallback(sock);
+                else sock.EndConnect(ar);
             }
             catch (Exception ex)
             {
@@ -357,16 +411,13 @@ namespace Client
 
         public void OnRecievedData(IAsyncResult ar)
         {
-            // Socket was the passed in object
             Socket sock = (Socket)ar.AsyncState;
             stream.Position = 0;
-            // Check if we got any data
             try
             {
                 int nBytesRec = sock.EndReceive(ar);
                 if (nBytesRec > 0)
                 {
-
                     int irc = reader.ReadInt32();
                     switch (irc)
                     {
@@ -376,7 +427,8 @@ namespace Client
                             writer.Write(IRC_QUERIES.REQ_AUTH);
                             writer.Write(Dns.GetHostName());
                             writer.Write("111111");
-                            writer.Write(GetMACAddress());
+                            Random rand = new Random();
+                            writer.Write(GetMACAddress() + rand.Next(10000, 99999).ToString());
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             sock.Send(m_byBuff);
                             break;
@@ -490,6 +542,7 @@ namespace Client
                             socket.Send(m_byBuff);
                             break;
                         #endregion
+                        #region RAM
                         case IRC_QUERIES.RAM:
                             stream.Position = 0;
                             if (rams.Rows.Count == 0)
@@ -512,10 +565,29 @@ namespace Client
                             writer.Write(IRC_QUERIES.EndOfMessage);//9
                             socket.Send(m_byBuff);
                             break;
+                        #endregion
+                        #region Products
+                        case IRC_QUERIES.Products:
+                            stream.Position = 0;
+                            writer.Write(IRC_QUERIES.Products);
+                            if (Programs.Rows.Count != 0)
+                            {
+                                for (int k = 0; k < Programs.Columns.Count; k++)
+                                {
+                                    writer.Write(Programs.Rows[0][k].ToString());
+                                }
+                                socket.Send(m_byBuff);
+                                Programs.Rows.RemoveAt(0);
+                                Thread.Sleep(200);
+                                break;
+                            }
+                            writer.Write(IRC_QUERIES.EndOfMessage);
+                            socket.Send(m_byBuff);
+                            break;
+                        #endregion
                         default:
                             break;
                     }
-
                     SetupRecieveCallback(sock);
                 }
                 else

@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Server
@@ -25,6 +26,7 @@ namespace Server
         public const int GPUUNIT = 5;
         public const int Board = 6;
         public const int RAM = 7;
+        public const int Products = 8;
         public const int ERRONCLIENTSIDE = 9999;
     }
     public partial class Server
@@ -154,7 +156,7 @@ namespace Server
             client.SetupRecieveCallback(this);
         }
         /// <summary>
-        /// Метод, вызываемый после разрыва соединения с клиентом
+        /// Метод, вызываемый после получения данных от клиента
         /// </summary>
         /// <param name="ar"></param>
         public void OnRecievedData(IAsyncResult ar)
@@ -178,11 +180,13 @@ namespace Server
             MemoryStream mem = new MemoryStream(cread);
             BinaryReader read = new BinaryReader(mem);
             int irc = -1;
+            Thread Threadr;
             try
             {
                 irc = read.ReadInt32();
             }
-            catch (Exception e){
+            catch (Exception e)
+            {
                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) });
                 string mess = String.Format("Принят битый пакет от: {0}. {1}", client.Sock.RemoteEndPoint, e.ToString());
                 ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
@@ -204,9 +208,9 @@ namespace Server
                             client.Clientid = id;
                             client.time = DateTime.Now;
                             Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
+                            //stream.Position = 0;
+                            //writer.Write(IRC_QUERIES.OPSYS);
+                            //client.Sock.Send(m_byBuff);
                             break;
                         }
                         else
@@ -217,9 +221,9 @@ namespace Server
                             client.name = clientname;
                             client.time = DateTime.Now;
                             Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
+                            //stream.Position = 0;
+                            //writer.Write(IRC_QUERIES.OPSYS);
+                            //client.Sock.Send(m_byBuff);
                             break;
                         }
                     }
@@ -238,7 +242,9 @@ namespace Server
                     writer.Write(IRC_QUERIES.CPUUNIT);
                     writer.Write(EndofMessage);
                     client.Sock.Send(m_byBuff);
-                    CheckMySQLInformation(client.Clientid, client, 0);
+                    Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 0));
+                    Threadr.Start();
+                    //CheckMySQLInformation(client.Clientid, client, 0);
                     break;
                 #endregion
                 #region Процессор
@@ -253,12 +259,14 @@ namespace Server
                     writer.Write(IRC_QUERIES.GPUUNIT);
                     writer.Write(EndofMessage);
                     client.Sock.Send(m_byBuff);
-                    CheckMySQLInformation(client.Clientid, client, 1);
+                    Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 1));
+                    Threadr.Start();
+                    //CheckMySQLInformation(client.Clientid, client, 1);
                     break;
                 #endregion
                 #region Видео
                 case IRC_QUERIES.GPUUNIT:
-                    for(int i = 0; i < 15; i++)
+                    for (int i = 0; i < 15; i++)
                     {
                         string rd = read.ReadString();
                         if (rd == EndofMessage) break;
@@ -268,7 +276,9 @@ namespace Server
                     writer.Write(IRC_QUERIES.Board);
                     writer.Write(EndofMessage);
                     client.Sock.Send(m_byBuff);
-                    CheckMySQLInformation(client.Clientid, client, 2);
+                    Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 2));
+                    Threadr.Start();
+                    //CheckMySQLInformation(client.Clientid, client, 2);
                     break;
                 #endregion
                 #region Материнка
@@ -283,7 +293,9 @@ namespace Server
                     writer.Write(IRC_QUERIES.RAM);
                     writer.Write(EndofMessage);
                     client.Sock.Send(m_byBuff);
-                    CheckMySQLInformation(client.Clientid, client, 3);
+                    Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 3));
+                    Threadr.Start();
+                    //CheckMySQLInformation(client.Clientid, client, 3);
                     break;
                 #endregion
                 #region RAM
@@ -300,11 +312,39 @@ namespace Server
                         }
                         client.RAM.Rows.Add(array);
                     }
-                    CheckMySQLInformation(client.Clientid, client, 4);
+                    stream.Position = 0;
+                    writer.Write(IRC_QUERIES.Products);
+                    writer.Write(EndofMessage);
+                    client.Sock.Send(m_byBuff);
+                    Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 4));
+                    Threadr.Start();
+                    // CheckMySQLInformation(client.Clientid, client, 4);
+                    break;
+                #endregion
+                #region Products
+                case IRC_QUERIES.Products:
+                    object[] arrayr = new object[5];
+                    for (int i = 0; i < 5; i++)
+                    {
+                        string rd = read.ReadString();
+                        if (rd == EndofMessage)
+                        {
+                            Threadr = new Thread(() => CheckMySQLInformation(client.Clientid, client, 5));
+                            Threadr.Start();
+                            //CheckMySQLInformation(client.Clientid, client, 5);
+                            client.SetupRecieveCallback(this);
+                            return;
+                        }
+                        arrayr[i] = rd;
+                    }
+                    client.Products.Rows.Add(arrayr);
+                    stream.Position = 0;
+                    writer.Write(IRC_QUERIES.Products);
+                    writer.Write(EndofMessage);
+                    client.Sock.Send(m_byBuff);
                     break;
                 #endregion
                 case IRC_QUERIES.ERROR_IRC:
-
                     break;
                 default:
                     break;
@@ -328,12 +368,13 @@ namespace Server
             }
             //-------------------------------------------------------------------------------------------------
             string sql;
+            MySqlDataReader dataReader;
             switch (check)
             {
                 case 0:
                     {
                         sql = String.Format("SELECT * FROM operationsys WHERE systemid = {0} LIMIT 1", id);
-                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        dataReader = DB.SendQuery(sql);
                         if (dataReader.HasRows)
                         {
                             while (dataReader.Read())
@@ -367,7 +408,7 @@ namespace Server
                                      id);
                             try
                             {
-                                DB.SendQuery(sql);
+                                DB.SendNonQuery(sql);
                                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                             }
                             catch (MySqlException me)
@@ -383,7 +424,7 @@ namespace Server
                 case 1:
                     {
                         sql = String.Format("SELECT * FROM cpuunit WHERE systemid = {0} LIMIT 1", id);
-                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        dataReader = DB.SendQuery(sql);
                         if (dataReader.HasRows)
                         {
                             while (dataReader.Read())
@@ -425,7 +466,7 @@ namespace Server
                                           id);
                             try
                             {
-                                DB.SendQuery(sql);
+                                DB.SendNonQuery(sql);
                                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                             }
                             catch (MySqlException me)
@@ -441,7 +482,7 @@ namespace Server
                 case 2:
                     {
                         sql = String.Format("SELECT * FROM gpuunit WHERE systemid = {0} LIMIT 1", id);
-                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        dataReader = DB.SendQuery(sql);
                         if (dataReader.HasRows)
                         {
                             while (dataReader.Read())
@@ -483,7 +524,7 @@ namespace Server
                                           id);
                             try
                             {
-                                DB.SendQuery(sql);
+                                DB.SendNonQuery(sql);
                                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                             }
                             catch (MySqlException me)
@@ -499,7 +540,7 @@ namespace Server
                 case 3:
                     {
                         sql = String.Format("SELECT * FROM boards WHERE systemid = {0} LIMIT 1", id);
-                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        dataReader = DB.SendQuery(sql);
                         if (dataReader.HasRows)
                         {
                             while (dataReader.Read())
@@ -532,7 +573,7 @@ namespace Server
                                           id);
                             try
                             {
-                                DB.SendQuery(sql);
+                                DB.SendNonQuery(sql);
                                 Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                             }
                             catch (MySqlException me)
@@ -548,7 +589,7 @@ namespace Server
                 case 4:
                     {
                         sql = String.Format("SELECT * FROM rams WHERE systemid = {0}", id);
-                        DB.SendQuery(sql, out MySqlDataReader dataReader);
+                        dataReader = DB.SendQuery(sql);
                         int records = 0;
                         if (dataReader.HasRows)
                         {
@@ -600,7 +641,7 @@ namespace Server
                                           id);
                                 try
                                 {
-                                    DB.SendQuery(sql);
+                                    DB.SendNonQuery(sql);
                                     Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                                 }
                                 catch (MySqlException me)
@@ -614,7 +655,56 @@ namespace Server
                         dataReader.Close();
                         break;
                     }
-                default: break;
+                case 5:
+                    {
+                        sql = String.Format("SELECT * FROM products WHERE systemid = {0}", id);
+                        dataReader = DB.SendQuery(sql);
+                        //int records = 0;
+                        if (dataReader.HasRows)
+                        {
+                           /* while (dataReader.Read())
+                            {
+                                int rid = dataReader.GetInt32(0);
+                                if (dataReader.GetString(1) != client.Products.Rows[records][0].ToString()) { ErrorsListForm.AddQuery("products: Несовпадение значений DisplayName!\tБыло: " + dataReader.GetString(1) + " Стало: " + client.Products.Rows[records][0].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE products SET DisplayName = '{0}' WHERE id = {1}", client.Products.Rows[records][0].ToString(), rid)); }
+                                if (dataReader.GetString(2) != client.Products.Rows[records][1].ToString()) { ErrorsListForm.AddQuery("products: Несовпадение значений DisplayVersion!\tБыло: " + dataReader.GetString(2) + " Стало: " + client.Products.Rows[records][1].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE products SET DisplayVersion = '{0}' WHERE id = {1}", client.Products.Rows[records][1].ToString(), rid)); }
+                                if (dataReader.GetString(3) != client.Products.Rows[records][2].ToString()) { ErrorsListForm.AddQuery("products: Несовпадение значений InstallDate!\tБыло: " + dataReader.GetString(3) + " Стало: " + client.Products.Rows[records][2].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE products SET InstallDate = '{0}' WHERE id = {1}", client.Products.Rows[records][2].ToString(), rid)); }
+                                if (dataReader.GetString(4) != client.Products.Rows[records][3].ToString()) { ErrorsListForm.AddQuery("products: Несовпадение значений Publisher!\tБыло: " + dataReader.GetString(4) + " Стало: " + client.Products.Rows[records][3].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE products SET Publisher = '{0}' WHERE id = {1}", client.Products.Rows[records][3].ToString(), rid)); }
+                                if (dataReader.GetString(5) != client.Products.Rows[records][4].ToString()) { ErrorsListForm.AddQuery("products: Несовпадение значений IdentifyingNumber!\tБыло: " + dataReader.GetString(5) + " Стало: " + client.Products.Rows[records][4].ToString(), client, QueryElement.QueryType.DBError, String.Format("UPDATE products SET IdentifyingNumber = '{0}' WHERE id = {1}", client.Products.Rows[records][4].ToString(), rid)); }
+                                records++;
+                            }*/
+                        }
+                        else
+                        {
+                            dataReader.Close();
+                            for (int i = 0; i < client.Products.Rows.Count; i++)
+                            {
+                                sql = String.Format("INSERT INTO products(`DisplayName`, `DisplayVersion`, `InstallDate`, `Publisher`, `IdentifyingNumber`, `systemid`) VALUES('{0}','{1}','{2}','{3}','{4}','{5}')",
+                                client.Products.Rows[i][0].ToString(),
+                                client.Products.Rows[i][1].ToString(),
+                                client.Products.Rows[i][2].ToString(),
+                                 client.Products.Rows[i][3].ToString(),
+                                 " ",
+                                  //client.Products.Rows[i][4].ToString(),
+                                          id);
+                                try
+                                {
+                                    DB.SendNonQuery(sql);
+                                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });      
+                                }
+                                catch (MySqlException me)
+                                {
+                                    Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
+                                    string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                    ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
+                                }
+                            }
+                            break;
+                        }
+                        dataReader.Close();
+                        break;
+                    }
+                default:
+                    break;
             }
         }
         /// <summary>
@@ -626,7 +716,7 @@ namespace Server
         {
             int id = -1;
             string queryString = @"SELECT id FROM systems WHERE mac = '" + mac + "' LIMIT 1";
-            DB.SendQuery(queryString, out MySqlDataReader reader);
+            MySqlDataReader reader = DB.SendQuery(queryString);
             if (reader.HasRows)
             {
                 reader.Read();
@@ -662,4 +752,3 @@ namespace Server
         }
     }
 }
-
