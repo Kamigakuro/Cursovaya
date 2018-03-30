@@ -100,9 +100,9 @@ namespace Server
         public delegate void GetClientsList();
         public void GetAllClients()
         {
-            dataGridView2.Rows.Clear();
+         /*   dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
-            MySqlDataReader reader = DB.SendQuery(sql);
+            MySqlDataReader reader = DB.SendTQuery(sql);
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -120,7 +120,7 @@ namespace Server
             {
 
             }
-            reader.Close();
+            reader.Close();*/
         }
 
         public delegate void AddMessageToConsole(string text);
@@ -256,6 +256,16 @@ namespace Server
         {
             Settings settings = new Settings();
             settings.Show();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string s = "";
+            foreach (SocketManagment client in m_aryClients)
+            {
+                s = s + client.Clientid + "\n";
+            }
+            MessageBox.Show(s);
         }
     }
 

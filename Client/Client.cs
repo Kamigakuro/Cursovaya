@@ -348,7 +348,7 @@ namespace Client
         {
             if (IpAdressString == String.Empty)
             {
-                MessageBox.Show("Ошибка при получении внешнего IP-адреса. Будет использован локальный адрес.");
+                //MessageBox.Show("Ошибка при получении внешнего IP-адреса. Будет использован локальный адрес.");
                 string strHostName = Dns.GetHostName();
                 IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
                 IpAdressString = Convert.ToString(ipEntry.AddressList[0]);
