@@ -17,13 +17,13 @@ namespace Server
             ClientWarning = 5,
         }
         private string Message = String.Empty;
-        private SocketManagment socket;
+        private SocketClient socket;
         private QueryType Type = QueryType.None;
         private string sqlquery = String.Empty;
         private DateTime time;
         private int index;
 
-        public QueryElement(string Mess, SocketManagment sock, QueryType QType, DateTime tie, int indx)
+        public QueryElement(string Mess, SocketClient sock, QueryType QType, DateTime tie, int indx)
         {
             Message = Mess;
             socket = sock;
@@ -38,7 +38,7 @@ namespace Server
             time = tie;
             index = indx;
         }
-        public QueryElement(string Mess, SocketManagment sock, QueryType QType, string sql, DateTime tie, int indx)
+        public QueryElement(string Mess, SocketClient sock, QueryType QType, string sql, DateTime tie, int indx)
         {
             Message = Mess;
             socket = sock;
@@ -57,7 +57,7 @@ namespace Server
         }
         public string GetMessage() { return Message; }
         public string GetQuery() { return sqlquery; }
-        public SocketManagment GetSocket() { return socket; }
+        public SocketClient GetSocket() { return socket; }
         public DateTime GetTime() { return time; }
         public QueryType GetQType() { return Type; }
         public int GetIndex() { return index; }

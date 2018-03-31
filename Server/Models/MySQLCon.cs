@@ -99,12 +99,12 @@ namespace Server
                 }
                 return reader;
             }
-            
+
         }
         public System.Data.DataTable SendTQuery(string command)
         {
             System.Data.DataTable reader = new System.Data.DataTable();
-            while (ConnectionPool.Count > 10) { Thread.Sleep(100); }
+            //while (ConnectionPool.Count > 10) { Thread.Sleep(100); }
             MySqlConnection lHandle = new MySqlConnection("Database=" + SettingsClass.DB_BASE + ";Data Source=" + SettingsClass.DB_HOST + ";User Id=" + SettingsClass.DB_USER + ";Password=" + SettingsClass.DB_PASS + ";charset = utf8");
             this.ConnectionPool.Add(lHandle);
             try { lHandle.Open(); }
@@ -119,6 +119,11 @@ namespace Server
                 MySqlCommand com = new MySqlCommand(command, lHandle);
                 var adapter = new MySqlDataAdapter(com);
                 adapter.Fill(reader);
+                string s = "";
+                Console.ForegroundColor = ConsoleColor.Green;
+                if (reader.Rows.Count > 0) s = reader.Rows[0][0].ToString();
+                Console.WriteLine(command + "    " + s);
+                
             }
             catch (MySqlException me)
             {
@@ -233,13 +238,14 @@ namespace Server
                     com.ExecuteNonQuery();
                     MyDataReader.Close();
                 }
-                if (!Tables.Contains("gpuuunit")) {
-                     com.Dispose();                                                                                                                                                                                              
-                     string command = String.Format("CREATE TABLE IF NOT EXISTS gpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), AdapterRAM VARCHAR(30), Availability VARCHAR(30), Caption VARCHAR(30), CurrentRefreshRate VARCHAR(30), CurrentScanMode VARCHAR(30), DriverDate VARCHAR(30), DriverVersion VARCHAR(30), MaxRefreshRate VARCHAR(30), MinRefreshRate VARCHAR(30), Monochrome VARCHAR(30), VideoProcessor VARCHAR(30), systemid INT NOT NULL)");
-                     com = new MySqlCommand(command, MainHandle);
-                     com.ExecuteNonQuery();
-                     MyDataReader.Close();
-                 }
+                if (!Tables.Contains("gpuuunit"))
+                {
+                    com.Dispose();
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS gpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), AdapterRAM VARCHAR(30), Availability VARCHAR(30), Caption VARCHAR(30), CurrentRefreshRate VARCHAR(30), CurrentScanMode VARCHAR(30), DriverDate VARCHAR(30), DriverVersion VARCHAR(30), MaxRefreshRate VARCHAR(30), MinRefreshRate VARCHAR(30), Monochrome VARCHAR(30), VideoProcessor VARCHAR(30), systemid INT NOT NULL)");
+                    com = new MySqlCommand(command, MainHandle);
+                    com.ExecuteNonQuery();
+                    MyDataReader.Close();
+                }
                 if (!Tables.Contains("boards"))
                 {
                     com.Dispose();

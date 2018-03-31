@@ -44,7 +44,7 @@ namespace Server
         public void UpdateTime()
         {
             ArrayList clients = m_aryClients;
-            foreach (SocketManagment client in clients)
+            foreach (SocketClient client in clients)
             {
                 int id = client.Clientid;
                 long time = DateTime.Now.Ticks - client.time.Ticks;
@@ -129,8 +129,8 @@ namespace Server
             textBox1.AppendText(">> " + text + "\n");
         }
 
-        private delegate void DeleteClientFromList(SocketManagment client);
-        private void DeleteClient(SocketManagment client)
+        private delegate void DeleteClientFromList(SocketClient client);
+        private void DeleteClient(SocketClient client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();
             int id = client.Clientid;
@@ -180,7 +180,7 @@ namespace Server
             var senderGrid = (DataGridView)sender;
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
             {
-                foreach (SocketManagment client in m_aryClients)
+                foreach (SocketClient client in m_aryClients)
                 {
                     if (client.Clientid == Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[0].Value))
                     {
@@ -261,7 +261,8 @@ namespace Server
         private void button3_Click(object sender, EventArgs e)
         {
             string s = "";
-            foreach (SocketManagment client in m_aryClients)
+            MessageBox.Show(m_aryClients.Count.ToString());
+            foreach (SocketClient client in m_aryClients)
             {
                 s = s + client.Clientid + "\n";
             }

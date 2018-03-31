@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CHandle.cs" />
     <Compile Include="Forms\AboutClientForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,6 +115,7 @@
     <Compile Include="Models\ServerFuncs.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Models\Socket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Forms\Settings.cs">
@@ -123,7 +125,7 @@
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\SettingsClass.cs" />
-    <Compile Include="Models\Socket.cs" />
+    <Compile Include="Models\Clients.cs" />
     <EmbeddedResource Include="Forms\AboutClientForm.resx">
       <DependentUpon>AboutClientForm.cs</DependentUpon>
     </EmbeddedResource>

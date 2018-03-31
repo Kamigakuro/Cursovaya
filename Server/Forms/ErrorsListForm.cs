@@ -41,7 +41,7 @@ namespace Server
                     case QueryElement.QueryType.Error: break;
                     case QueryElement.QueryType.DBError:
                         {
-                            SocketManagment client = node.Value.GetSocket();
+                            SocketClient client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
                             dataGridView1.Rows.Add(Properties.Resources.CacheWarning_16x, node.Value.GetIndex(),node.Value.GetTime(), "DBError", node.Value.GetMessage(), name, id, "Выполнить перезапись в базу данных", "Исправить", "Пропустить");
@@ -54,7 +54,7 @@ namespace Server
                         }
                     case QueryElement.QueryType.ClientError:
                         {
-                            SocketManagment client = node.Value.GetSocket();
+                            SocketClient client = node.Value.GetSocket();
                             string name = client.name;
                             int id = client.Clientid;
                             dataGridView1.Rows.Add(Properties.Resources.RouteServiceError_16x, node.Value.GetIndex(), node.Value.GetTime(), "ClientError", node.Value.GetMessage(), name, id, "", "", "Пропустить");
@@ -183,7 +183,7 @@ namespace Server
             link.AddLast(query);
             AddQueryHandle();
         }
-        public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType)
+        public static void AddQuery(string mess, SocketClient sock, QueryElement.QueryType QType)
         {
             switch (QType)
             {
@@ -205,7 +205,7 @@ namespace Server
             link.AddLast(query);
             AddQueryHandle();
         }
-        public static void AddQuery(string mess, SocketManagment sock, QueryElement.QueryType QType, string sql)
+        public static void AddQuery(string mess, SocketClient sock, QueryElement.QueryType QType, string sql)
         {
             switch (QType)
             {

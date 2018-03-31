@@ -31,13 +31,14 @@ namespace Server
     }
     public partial class Server
     {
-        Socket listener;
+        //Socket listener;
         private static ArrayList m_aryClients = new ArrayList();	// Список подключенных клиентов
         static byte[] m_byBuff = new byte[1024]; // размер буфера
         public static MemoryStream stream = new MemoryStream(m_byBuff);
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
         static string EndofMessage = "<EOF>";
+        public SSocket socket;
         //LinkedList<QueryElement> link = new LinkedList<QueryElement>();
 
         /// <summary>
@@ -51,6 +52,7 @@ namespace Server
                 dbStatusLabel.Text = "Подключено ";
                 dbStatusLabel.ForeColor = Color.Green;
                 DB.CheckBaseIntegrity("user10870");
+
             }
             else
             {
@@ -99,23 +101,40 @@ namespace Server
         /// </summary>
         private void IntializeSocket()
         {
+            socket = new SSocket();
             const int nPortListen = 7777;
             IPAddress.TryParse(GetExternalIp(), out IPAddress aryLocalAddr);
             if (aryLocalAddr == null || aryLocalAddr == IPAddress.None) aryLocalAddr = GetLocalIP();
             if (aryLocalAddr == null)
             {
-                string mess = String.Format("Невозможно получить локальный адрес");
+                string mess = String.Format("Невозможно получить адрес сервера.");
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
                 label4.Text = "Отключено";
                 label4.ForeColor = Color.Red;
                 label10.Text = "";
                 return;
             }
-            string localip = "" + GetLocalIP().ToString();
-            label4.Text = "Подключено";
-            label4.ForeColor = Color.Green;
-            label10.Text = aryLocalAddr + ":" + nPortListen + " (" + localip + ")";
-            try
+            if (socket == null)
+            {
+                socket = new SSocket();
+                if (!socket.StartSocket(SettingsClass.SPort, aryLocalAddr, 10))
+                {
+                    string mess = String.Format("Невозможно подключить службу сообщений.");
+                    ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+                    label4.Text = "Отключено";
+                    label4.ForeColor = Color.Red;
+                    label10.Text = "";
+                }
+                else
+                {
+                    string localip = "" + GetLocalIP().ToString();
+                    label4.Text = "Подключено";
+                    label4.ForeColor = Color.Green;
+                    label10.Text = aryLocalAddr + ":" + nPortListen + " (" + localip + ")";
+                }
+            }
+   
+            /*try
             {
                 listener = new Socket(aryLocalAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 listener.Bind(new IPEndPoint(IPAddress.Any, nPortListen));
@@ -127,7 +146,7 @@ namespace Server
                 //MessageBox.Show(e.ToString());
                 string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", e.Message);
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-            }
+            }*/
         }
         /// <summary>
         /// Обработчик событий при получении каких-либо данных
@@ -137,7 +156,9 @@ namespace Server
         {
             Socket listener = (Socket)ar.AsyncState;
             if (!listener.Blocking) return;
+            listener.Blocking = false;
             OnNewConnection(listener.EndAccept(ar));
+            listener.Blocking = true;
             listener.BeginAccept(new AsyncCallback(OnConnectRequest), listener);
         }
         /// <summary>
@@ -146,8 +167,7 @@ namespace Server
         /// <param name="sockClient"></param>
         public void OnNewConnection(Socket sockClient)
         {
-            //SocketChatClient client = new SocketChatClient( listener.AcceptSocket() );
-            SocketManagment client = new SocketManagment(sockClient);
+            SocketClient client = new SocketClient(sockClient);
             m_aryClients.Add(client);
             stream.Position = 0;
             writer.Write(IRC_QUERIES.REQ_AUTH);
@@ -161,7 +181,7 @@ namespace Server
         /// <param name="ar"></param>
         public void OnRecievedData(IAsyncResult ar)
         {
-            SocketManagment client = (SocketManagment)ar.AsyncState;
+            SocketClient client = (SocketClient)ar.AsyncState;
             byte[] cread = client.GetRecievedData(ar, out SocketError error);
             if (error != SocketError.Success)
             {
@@ -207,22 +227,23 @@ namespace Server
                             client.Clientid = id;
                             client.time = DateTime.Now;
                             Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
+                           // stream.Position = 0;
+                           // writer.Write(IRC_QUERIES.OPSYS);
+                           // client.Sock.Send(m_byBuff);
                             break;
                         }
                         else
                         {
                             RegisterNewClient(clientname, mac);
                             id = CheckRegister(mac);
+                            //id = cons;
                             client.Clientid = id;
                             client.name = clientname;
                             client.time = DateTime.Now;
                             Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
-                            stream.Position = 0;
-                            writer.Write(IRC_QUERIES.OPSYS);
-                            client.Sock.Send(m_byBuff);
+                            //stream.Position = 0;
+                            //writer.Write(IRC_QUERIES.OPSYS);
+                            //client.Sock.Send(m_byBuff);
                             break;
                         }
                     }
@@ -344,7 +365,7 @@ namespace Server
         /// <param name="id"></param>
         /// <param name="client"></param>
         /// <param name="check">Указать что проверять! 0 - ОС, 1 - Процессор, 2 - Видео</param>
-        public void CheckMySQLInformation(int id, SocketManagment client, int check)
+        public void CheckMySQLInformation(int id, SocketClient client, int check)
         {
             //--------------------------------Проверка соединения с БД ----------------------------------------
             if (DB.SqlConnection != ConnectionState.Open)
@@ -361,6 +382,7 @@ namespace Server
                 case 0:
                     {
                         sql = String.Format("SELECT * FROM operationsys WHERE systemid = {0} LIMIT 1", id);
+                        
                         dataReader = DB.SendTQuery(sql);
                         if (dataReader.Rows.Count > 0)
                         {
@@ -721,7 +743,7 @@ namespace Server
             DataTable reader = DB.SendTQuery(queryString);
             if (reader.Rows.Count > 0)
             {
-                id = Convert.ToInt32(reader.Rows[0][0].ToString());
+                id = Convert.ToInt32(reader.Rows[0][0]);
             }
             reader.Clear();
             reader.Dispose();
@@ -747,7 +769,6 @@ namespace Server
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
             }
         }
-
         public void CheckAdresses(IPAddress BeginIP, IPAddress EndIP)
         {
 
