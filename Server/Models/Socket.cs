@@ -302,7 +302,11 @@ namespace Server
                                     client.RAM.Rows.Add(array);
                                 }
                                 stream.Position = 0;
-                                writer.Write(IRC_QUERIES.Products);
+                                writer.Write(IRC_QUERIES.ProductBL);
+                                writer.Write("<Names>");
+                                foreach (string str in SettingsClass.BlackNames) writer.Write(str);
+                                writer.Write("<Publishers>");
+                                foreach (string str in SettingsClass.BlackPublish) writer.Write(str);
                                 writer.Write(EndofMessage);
                                 client.Sock.Send(m_byBuff);
                                 CheckMySQLInformation(client.Clientid, client, 4);
@@ -329,6 +333,12 @@ namespace Server
                                 client.Sock.Send(m_byBuff);
                                 break;
                             #endregion
+                            case IRC_QUERIES.ProductBL:
+                                stream.Position = 0;
+                                writer.Write(IRC_QUERIES.Products);
+                                writer.Write(EndofMessage);
+                                client.Sock.Send(m_byBuff);
+                                break;
                             case IRC_QUERIES.ERROR_IRC:
                                 break;
                             default:

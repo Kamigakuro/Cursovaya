@@ -27,6 +27,7 @@ namespace Server
         public const int Board = 6;
         public const int RAM = 7;
         public const int Products = 8;
+        public const int ProductBL = 9;
         public const int ERRONCLIENTSIDE = 9999;
     }
     public partial class Server

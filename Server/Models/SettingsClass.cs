@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -18,6 +19,8 @@ namespace Server
         public static int SBufferSize;
         public static bool LocalWork;
         public static int MaxClients;
+        public static List<string> BlackPublish = new List<string>();
+        public static List<string> BlackNames = new List<string>();
 
         public SettingsClass()
         {
@@ -131,6 +134,59 @@ namespace Server
             }
 
         }
-
+        public bool CheckProductList()
+        {
+            if (File.Exists("appsblacklist.txt")) return true;
+            return false;
+        }
+        public void CreateProductList()
+        {
+            File.Create("appsblacklist.txt").Close();
+            using (StreamWriter output = new StreamWriter(@"appsblacklist.txt"))
+            {
+                output.WriteLine("// Список приложений, которые собирать с клиентов не требуется.");
+                output.WriteLine("// Комментирование строк производится двойным слэшем ('//'), это значит, что сервер будет игнорировать данную строку.");
+                output.WriteLine("// Перед названием приложения укажите к чему запись относится");
+                output.WriteLine("// Name: - конкретное название приложения");
+                output.WriteLine("// Publisher: - поставщик приложения");
+                output.WriteLine("Publisher: Microsoft Corporation");
+                output.WriteLine("Name: Notepad++ (64-bit x64)");
+                output.Close();
+            }
+        }
+        public void LoadProductList()
+        {
+            using (StreamReader fs = new StreamReader(@"appsblacklist.txt"))
+            {
+                while (true)
+                {
+                    string temp = fs.ReadLine();
+                    if (temp == null) break;
+                    if (temp.Contains("//")) continue;
+                    if (temp.Contains("Name:"))
+                    {
+                        string match = (new Regex(@"Name:\s(.*)"))
+                             .Matches(temp)[0].ToString();
+                        if (match != null) BlackNames.Add(match);
+                    }
+                    else if (temp.Contains("Publisher:"))
+                    {
+                        string match = (new Regex(@"Publisher:\s(.*)"))
+                             .Matches(temp)[0].ToString();
+                        if (match != null) BlackPublish.Add(match);
+                    }
+                }
+            }
+        }
+        public void ClearBlackList()
+        {
+            BlackPublish.Clear();
+            BlackNames.Clear();
+        }
+        public void DeleteBlackList()
+        {
+            ClearBlackList();
+            if (File.Exists("appsblacklist.txt")) File.Delete(@"appsblacklist.txt");
+        }
     }
 }

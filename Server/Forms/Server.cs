@@ -19,10 +19,17 @@ namespace Server
     {
         Thread TimerThread;
         public MySQLCon DB = new MySQLCon();
+        public SettingsClass settings = new SettingsClass();
         
         public Server()
         {
             InitializeComponent();
+            if (settings.CheckProductList()) settings.LoadProductList();
+            else
+            {
+                settings.CreateProductList();
+                settings.LoadProductList();
+            }
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);

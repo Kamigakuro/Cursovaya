@@ -85,6 +85,8 @@ namespace Client
         static MemoryStream stream = new MemoryStream(m_byBuff);
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
+        public static List<string> BlackPublish = new List<string>();
+        public static List<string> BlackNames = new List<string>();
         string macadr = String.Empty;
         DataTable rams = new DataTable("RAM");
         DataTable Programs = new DataTable("Programs");
@@ -104,6 +106,7 @@ namespace Client
             public const int Board = 6; // Код материнской платы
             public const int RAM = 7; // Оперативная память
             public const int Products = 8; // Программы
+            public const int ProductBL = 9;
         }
 
         public Client()
@@ -147,7 +150,7 @@ namespace Client
             if (!GetGPU()) return;
             if (!GetBoard()) return;
             if (!GetRAM()) return;
-            if (!GetProducts()) return;
+            //if (!GetProducts()) return;
             InitializeSocket();
         }
 
@@ -161,11 +164,35 @@ namespace Client
                     string[] s = new string[5];
                     using (RegistryKey subkey = key.OpenSubKey(subkey_name))
                     {
-                        if (subkey.GetValue("DisplayName") != null && !String.IsNullOrWhiteSpace(subkey.GetValue("DisplayName").ToString())) s[0] = subkey.GetValue("DisplayName").ToString();
+                        if (subkey.GetValue("DisplayName") != null && !String.IsNullOrWhiteSpace(subkey.GetValue("DisplayName").ToString()))
+                        {
+                            s[0] = subkey.GetValue("DisplayName").ToString();
+                            foreach (string nm in BlackNames)
+                            {
+                                if (s[0].Contains(nm))
+                                {
+                                    s[0] = String.Empty;
+                                    break;
+                                }
+                            }
+                        }
                         else continue;
+                        if (String.IsNullOrEmpty(s[0])) continue;
                         if (subkey.GetValue("DisplayVersion") != null) s[1] = subkey.GetValue("DisplayVersion").ToString();
                         if (subkey.GetValue("InstallDate") != null) s[2] = subkey.GetValue("InstallDate").ToString();
-                        if (subkey.GetValue("Publisher") != null) s[3] = subkey.GetValue("Publisher").ToString();
+                        if (subkey.GetValue("Publisher") != null)
+                        {
+                            s[3] = subkey.GetValue("Publisher").ToString();
+                            foreach (string nm in BlackPublish)
+                            {
+                                if (s[3].Contains(nm))
+                                {
+                                    s[3] = "<BlackPublisher>";
+                                    break;
+                                }
+                            }
+                            if (s[3].Contains("<BlackPublisher>")) continue;
+                        }
                         s[4] = subkey.Name;
                     }
                     Programs.Rows.Add(s);
@@ -560,13 +587,41 @@ namespace Client
                                 }
                                 socket.Send(m_byBuff);
                                 Programs.Rows.RemoveAt(0);
-                                Thread.Sleep(200);
+                                Thread.Sleep(100);
                                 break;
                             }
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
                             break;
                         #endregion
+                        case IRC_QUERIES.ProductBL:
+                            string tmp = reader.ReadString();
+                            if (tmp.Contains("<Names>"))
+                            {
+                                while (true)
+                                {
+                                    tmp = reader.ReadString();
+                                    if (tmp.Contains("<Publishers>"))
+                                    {
+                                        while (true)
+                                        {
+                                            tmp = reader.ReadString();
+                                            if (tmp.Contains(IRC_QUERIES.EndOfMessage))
+                                            {
+                                                if (!GetProducts()) return;
+                                                stream.Position = 0;
+                                                writer.Write(IRC_QUERIES.ProductBL);
+                                                socket.Send(m_byBuff);
+                                                SetupRecieveCallback(sock);
+                                                return;
+                                            }
+                                            BlackPublish.Add(tmp);
+                                        }
+                                    }
+                                    BlackNames.Add(tmp);        
+                                }
+                            }
+                            break;
                         default:
                             break;
                     }
