@@ -104,7 +104,6 @@ namespace Server
         public System.Data.DataTable SendTQuery(string command)
         {
             System.Data.DataTable reader = new System.Data.DataTable();
-            //while (ConnectionPool.Count > 10) { Thread.Sleep(100); }
             MySqlConnection lHandle = new MySqlConnection("Database=" + SettingsClass.DB_BASE + ";Data Source=" + SettingsClass.DB_HOST + ";User Id=" + SettingsClass.DB_USER + ";Password=" + SettingsClass.DB_PASS + ";charset = utf8");
             this.ConnectionPool.Add(lHandle);
             try { lHandle.Open(); }

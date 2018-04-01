@@ -85,8 +85,10 @@ namespace Client
         static MemoryStream stream = new MemoryStream(m_byBuff);
         static BinaryWriter writer = new BinaryWriter(stream);
         static BinaryReader reader = new BinaryReader(stream);
+        string macadr = String.Empty;
         DataTable rams = new DataTable("RAM");
         DataTable Programs = new DataTable("Programs");
+        IPEndPoint epServer;
 
         public struct IRC_QUERIES
         {
@@ -109,6 +111,9 @@ namespace Client
             InitializeComponent();
             Thread thread = new Thread(getExternalIp);
             thread.Start();
+            Random rand = new Random();
+            macadr = GetMACAddress() + rand.Next(10000, 99999).ToString();
+            label1.Text = macadr;
             rams.Columns.Add("BankLabel");
             rams.Columns.Add("Capacity");
             rams.Columns.Add("DataWidth");
@@ -148,30 +153,6 @@ namespace Client
 
         private bool GetProducts()
         {
-            /*ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM Win32_Product");
-            ManagementObjectCollection colItems = searcher.Get();
-            string d = "";
-            foreach (ManagementObject queryObj in colItems)
-            {
-                string[] s = new string[8];
-                if (queryObj["Vendor"] != null && (queryObj["Vendor"].ToString() != "Microsoft Corporation"))
-                {
-                    if (queryObj["Caption"] != null) s[0] = queryObj["Caption"].ToString();
-                    if (queryObj["Description"] != null) s[1] = queryObj["Description"].ToString();
-                    if (queryObj["IdentifyingNumber"] != null) s[2] = queryObj["IdentifyingNumber"].ToString();
-                    if (queryObj["InstallDate"] != null) s[3] = queryObj["InstallDate"].ToString();
-                    if (queryObj["Name"] != null) s[4] = queryObj["Name"].ToString();
-                    if (queryObj["ProductID"] != null) s[5] = queryObj["ProductID"].ToString();
-                    if (queryObj["Vendor"] != null) s[6] = queryObj["Vendor"].ToString();
-                    if (queryObj["Version"] != null) s[7] = queryObj["Version"].ToString();
-                    for (int i = 0; i < 8; i++)
-                    {
-                        d = d + s[i] + "\t";
-                    }
-                    d = d + "\n";
-                    Programs.Rows.Add(s);
-                }
-            }*/
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
             {
@@ -367,7 +348,7 @@ namespace Client
                 button1.Text = "Отключиться";
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 //socket = new Socket(IPAddress.Parse(IpAdressString).AddressFamily, SocketType.Stream, ProtocolType.Tcp); Старая версия подключения
-                IPEndPoint epServer = new IPEndPoint(IPAddress.Parse(adresslabel.Text), port);
+                epServer = new IPEndPoint(IPAddress.Parse(adresslabel.Text), port);
                 socket.Blocking = false;
                 AsyncCallback onconnect = new AsyncCallback(OnConnect);
                 socket.BeginConnect(epServer, onconnect, socket);
@@ -384,8 +365,9 @@ namespace Client
             Socket sock = (Socket)ar.AsyncState;
             try
             {
+                if (!sock.Connected) socket.BeginConnect(epServer, new AsyncCallback(OnConnect), socket);
                 if (sock.Connected) SetupRecieveCallback(sock);
-                else sock.EndConnect(ar);
+                //else sock.EndConnect(ar);
             }
             catch (Exception ex)
             {
@@ -405,7 +387,8 @@ namespace Client
             catch (Exception ex)
             {
                 button1.Text = "Отключиться";
-                MessageBox.Show(ex.Message, "Setup Recieve Callback failed!");
+                //MessageBox.Show(ex.Message, "Setup Recieve Callback failed!");
+                InitializeSocket();
             }
         }
 
@@ -427,8 +410,7 @@ namespace Client
                             writer.Write(IRC_QUERIES.REQ_AUTH);
                             writer.Write(Dns.GetHostName());
                             writer.Write("111111");
-                            Random rand = new Random();
-                            writer.Write(GetMACAddress() + rand.Next(10000, 99999).ToString());
+                            writer.Write(macadr);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             sock.Send(m_byBuff);
                             break;

@@ -3,19 +3,14 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-//using System.ComponentModel;
-//using System.Data;
+using System.Data;
 using System.Drawing;
 //using System.IO;
 //using System.Linq;
 using System.Net;
-//using System.Net.Sockets;
-//using System.Text;
-//using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using System.Windows.Forms.VisualStyles;
 
 
 namespace Server
@@ -32,19 +27,19 @@ namespace Server
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             InitializeMySQL();
-            IntializeSocket();
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
-            ErrorsListForm.UpdateAllCients += this.GetAllClients;
+            ErrorsListForm.UpdateAllClients += this.GetAllClients;
+            SSocket.CheckNewClient += this.AddNewClient;
             TimerThread = new Thread(UpdateTimer);
-            TimerThread.Start(); //запускаем поток
+            TimerThread.Start();
             
         }
         public delegate void UpdateTimeEx();
         public void UpdateTime()
         {
-            ArrayList clients = m_aryClients;
-            foreach (SocketClient client in clients)
+            //ArrayList clients = SSocket.m_aryClients;
+            foreach (SocketClient client in SSocket.m_aryClients.ToArray())
             {
                 int id = client.Clientid;
                 long time = DateTime.Now.Ticks - client.time.Ticks;
@@ -89,38 +84,40 @@ namespace Server
                 //WindowState = FormWindowState.Normal;
             }
         }
-
         public delegate void AddNewClientDelegate(string name, string ip, int id);
         public void AddNewClient(string name, string ip, int id)
         {
-            label6.Text = Convert.ToString(m_aryClients.Count);
-            dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее");
-            AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
+            label6.Invoke(new Action(() => label6.Text = Convert.ToString(SSocket.m_aryClients.Count)));
+            //label6.Text = Convert.ToString(socket.m_aryClients.Count);
+            dataGridView1.Invoke(new Action(() => dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее")));
+            //dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее");
+            //AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
         public delegate void GetClientsList();
         public void GetAllClients()
         {
-         /*   dataGridView2.Rows.Clear();
+            dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
-            MySqlDataReader reader = DB.SendTQuery(sql);
-            if (reader.HasRows)
+            DataTable reader = DB.SendTQuery(sql);
+            if (reader.Rows.Count > 0)
             {
-                while (reader.Read())
+                foreach (DataRow row in reader.Rows)
                 {
-                    if (!reader.GetBoolean(3))
+                    if (!row.Field<bool>(3))
                     {
-                        string mess = String.Format("Не подтвержденный клиент - {0}({1})!", reader.GetString(1), reader.GetInt32(0));
-                        string db = String.Format("UPDATE systems SET isConfirm = True WHERE id = {0}", reader.GetInt32(0));
+                        string mess = String.Format("Не подтвержденный клиент - {0}({1})!", row.Field<string>(1), row.Field<int>(0));
+                        string db = String.Format("UPDATE systems SET isConfirm = True WHERE id = {0}", row.Field<int>(0));
                         ErrorsListForm.AddQuery(mess, QueryElement.QueryType.ClientWarning, db);
                     }
-                    dataGridView2.Rows.Add(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetBoolean(3), "Удалить");
+                    dataGridView2.Rows.Add(row.Field<int>(0), row.Field<string>(1), row.Field<string>(2), row.Field<bool>(3), "Удалить");
                 }
             }
             else
             {
 
             }
-            reader.Close();*/
+            reader.Clear();
+            reader.Dispose();
         }
 
         public delegate void AddMessageToConsole(string text);
@@ -142,19 +139,17 @@ namespace Server
                     break;
                 }
             }
-            label6.Text = Convert.ToString(m_aryClients.Count);
+            label6.Text = Convert.ToString(SSocket.m_aryClients.Count);
         }
 
         private void OnApplicationExit(object sender, EventArgs e)
         {
             TimerThread.Abort();
+            ErrorsListForm.AddQueryHandle -= this.UpdateQueryCounts;
+            ErrorsListForm.RemoveQueryHandle -= this.UpdateQueryCounts;
             try
             {
-                if (listener != null)
-                {
-                    listener.Blocking = false;
-                    listener.Close();
-                }
+                socket.ShutDown();
             }
             catch (Exception es)
             {
@@ -180,7 +175,7 @@ namespace Server
             var senderGrid = (DataGridView)sender;
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
             {
-                foreach (SocketClient client in m_aryClients)
+                foreach (SocketClient client in SSocket.m_aryClients)
                 {
                     if (client.Clientid == Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[0].Value))
                     {
@@ -199,13 +194,13 @@ namespace Server
                 if (MessageBox.Show("Вы действительно хотите удалить клиента с именем " + senderGrid.Rows[e.RowIndex].Cells[CName.DisplayIndex].Value + "?\nВсе данные будут удалены безвозвратно, ключая компоненты.", "Подтвердите удаление", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     string sql = String.Format("DELETE FROM `cpuunit` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
-                    DB.SendQuery(sql);
+                    DB.SendNonQuery(sql);
                     sql = String.Format("DELETE FROM `operationsys` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
-                    DB.SendQuery(sql);
+                    DB.SendNonQuery(sql);
                     sql = String.Format("DELETE FROM `gpuunit` WHERE systemid = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
-                    DB.SendQuery(sql);
+                    DB.SendNonQuery(sql);
                     sql = String.Format("DELETE FROM `systems` WHERE id = {0}", Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[ID.DisplayIndex].Value));
-                    DB.SendQuery(sql);
+                    DB.SendNonQuery(sql);
                     dataGridView2.Rows.RemoveAt(e.RowIndex);
                 }
                 else
@@ -226,24 +221,10 @@ namespace Server
             form.Show();
         }
 
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void Server_Shown(object sender, EventArgs e)
         {
             GetAllClients();
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label13_Click(object sender, EventArgs e)
-        {
-
+            IntializeSocket();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -261,10 +242,10 @@ namespace Server
         private void button3_Click(object sender, EventArgs e)
         {
             string s = "";
-            MessageBox.Show(m_aryClients.Count.ToString());
-            foreach (SocketClient client in m_aryClients)
+            MessageBox.Show(SSocket.m_aryClients.Count.ToString());
+            foreach (SocketClient client in SSocket.m_aryClients)
             {
-                s = s + client.Clientid + "\n";
+                s = s + client.Clientid + "\t" + client.macadr + "\n";
             }
             MessageBox.Show(s);
         }

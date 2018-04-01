@@ -348,7 +348,6 @@
             this.label7.Size = new System.Drawing.Size(65, 13);
             this.label7.TabIndex = 18;
             this.label7.Text = "Системные";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // label9
             // 
@@ -522,7 +521,6 @@
             this.label13.Size = new System.Drawing.Size(24, 13);
             this.label13.TabIndex = 3;
             this.label13.Text = "По:";
-            this.label13.Click += new System.EventHandler(this.label13_Click);
             // 
             // label12
             // 
@@ -546,7 +544,6 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(87, 20);
             this.textBox2.TabIndex = 0;
-            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
             // button2
             // 

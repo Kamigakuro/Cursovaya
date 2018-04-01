@@ -15,7 +15,7 @@ namespace Server
         public delegate void RemoveQuery();
         public static event RemoveQuery RemoveQueryHandle;
         public delegate void UpdateClients();
-        public static event UpdateClients UpdateAllCients;
+        public static event UpdateClients UpdateAllClients;
         public delegate void AddQueryEvent();
         public static event AddQueryEvent AddQueryHandle;
         //----------------------------------------------
@@ -62,7 +62,10 @@ namespace Server
                         }
                     case QueryElement.QueryType.ClientWarning:
                         {
-                            dataGridView1.Rows.Add(Properties.Resources.AddUser_16x, node.Value.GetIndex(), node.Value.GetTime(), "ClientWarning", node.Value.GetMessage(), "", "", "", "Исправить", "Пропустить");
+                            int index = node.Value.GetIndex();
+                            DateTime time = node.Value.GetTime();
+                            string message = node.Value.GetMessage();
+                            dataGridView1.Rows.Add(Properties.Resources.AddUser_16x, index, time, "ClientWarning", message, "", "", node.Value.GetQuery(), "Исправить", "Пропустить");
                             break;
                         }
                 }
@@ -123,7 +126,7 @@ namespace Server
                                 if (!String.IsNullOrEmpty(node.Value.GetQuery()))
                                 {
                                     MySQLCon DB = new MySQLCon();
-                                    DB.SendQuery(node.Value.GetQuery());
+                                    DB.SendNonQuery(node.Value.GetQuery());
                                     node.Value.Dispose();
                                     node.Value = null;
                                     link.Remove(node);
@@ -146,7 +149,7 @@ namespace Server
                                 if (!String.IsNullOrEmpty(node.Value.GetQuery()))
                                 {
                                     MySQLCon DB = new MySQLCon();
-                                    DB.SendQuery(node.Value.GetQuery());
+                                    DB.SendNonQuery(node.Value.GetQuery());
                                     node.Value.Dispose();
                                     node.Value = null;
                                     link.Remove(node);
@@ -254,7 +257,7 @@ namespace Server
         }
         private void ErrorsListForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            UpdateAllCients();
+            UpdateAllClients();
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();

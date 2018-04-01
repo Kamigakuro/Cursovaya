@@ -12,26 +12,27 @@ namespace Server
     public class SocketClient
     {
         private Socket m_sock;
-        static byte[] m_byBuff = new byte[1024];
-        static MemoryStream mem = new MemoryStream(m_byBuff);
-        static BinaryReader reader = new BinaryReader(mem);
-        public string internalid;
+        public byte[] m_byBuff = new byte[1024];
+        public string macadr = String.Empty;
         public string name = String.Empty;
         public DateTime time = new DateTime();
         public string[] OperationSistem = new string[7];
         public string[] CPUUNIT = new string[15];
         public string[] GPUUNIT = new string[14];
         public string[] Board = new string[9];
+        System.Net.EndPoint endpoint;
         public DataTable RAM = new DataTable("RAM");
         public DataTable Products = new DataTable("Products");
         public int Clientid = -1;
+        private SSocket Main;
         public Socket Sock
         {
             get { return m_sock; }
         }
-        public SocketClient(Socket sock)
+        public SocketClient(Socket sock, SSocket main)
         {
             m_sock = sock;
+            Main = main;
             RAM.Columns.Add("BankLabel");
             RAM.Columns.Add("Capacity");
             RAM.Columns.Add("DataWidth");
@@ -54,13 +55,14 @@ namespace Server
             Products.Columns.Add("InstallDate");
             Products.Columns.Add("Publisher");
             Products.Columns.Add("IdentifyingNumber");
+            endpoint = m_sock.RemoteEndPoint;          
 
         }
-        public void SetupRecieveCallback(Server main)
+        public void SetupRecieveCallback(SSocket main)
         {
             try
             {
-                AsyncCallback recieveData = new AsyncCallback(main.OnRecievedData);
+                AsyncCallback recieveData = new AsyncCallback(GetRecievedData);
                 m_sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, this);
             }
             catch (Exception ex) {
@@ -70,19 +72,40 @@ namespace Server
 
             }
         }
-        public byte[] GetRecievedData(IAsyncResult ar, out SocketError SockError)
+        public void GetRecievedData(IAsyncResult ar)
         {
             int nBytesRec = 0;
-            SockError = SocketError.Success;
+            //SockError = SocketError.Success;
             try
             {
-                nBytesRec = m_sock.EndReceive(ar, out SockError);
+                nBytesRec = m_sock.EndReceive(ar);
+                if (nBytesRec < 1)
+                {
+                    //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", client.Sock.RemoteEndPoint) });
+                    //Invoke(new DeleteClientFromList(DeleteClient), new object[] { client });
+                    m_sock.Close();
+                    SSocket.m_aryClients.Remove(this);
+                    //client.SetupRecieveCallback(this);
+                    return;
+                }
             }
             catch { }
             byte[] byReturn = new byte[nBytesRec];
             Array.Copy(m_byBuff, byReturn, nBytesRec);
-            return byReturn;
+            Main.ReciveArray.Add(this);
+            //return byReturn;
         }
-
+        public void Reconnect()
+        {
+            try
+            {
+                m_sock.Disconnect(true);
+                m_sock.Connect(endpoint);
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
+        }
     }
 }
