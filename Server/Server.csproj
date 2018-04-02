@@ -104,6 +104,7 @@
     <Compile Include="Forms\ErrorsListForm.Designer.cs">
       <DependentUpon>ErrorsListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Log.cs" />
     <Compile Include="Models\MySQLCon.cs" />
     <Compile Include="Models\QueryElement.cs" />
     <Compile Include="Forms\Server.cs">
