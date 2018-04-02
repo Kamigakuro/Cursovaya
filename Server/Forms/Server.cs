@@ -133,7 +133,10 @@ namespace Server
             textBox1.AppendText(">> " + text + "\n");
         }
 
-        private delegate void DeleteClientFromList(SocketClient client);
+        delegate void DeleteClientFromList(SocketClient client);
+
+        //delegate void SetControl(string message);
+
         private void DeleteClient(SocketClient client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();

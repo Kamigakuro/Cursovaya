@@ -48,6 +48,13 @@ namespace Server
         static string EndofMessage = "<EOF>";
         public static MySQLCon DB = new MySQLCon();
         private int CheckCount = 0;
+        public System.Windows.Forms.DataGrid ClientTable = new System.Windows.Forms.DataGrid();
+        private DataColumn cid = new DataColumn("##", typeof(int));
+        private DataColumn cname = new DataColumn("Имя", typeof(string));
+        private DataColumn cipadr = new DataColumn("IP адрес", typeof(string));
+        private DataColumn ctime = new DataColumn("Время соединения", typeof(string));
+        private DataColumn cinfobtn = new DataColumn("      ", typeof(string));
+
         Server server;
         /// <summary>
         /// Конструктор класса
@@ -56,6 +63,8 @@ namespace Server
         public SSocket(Server srv)
         {
             server = srv;
+
+            //ClientTable.Columns.Add();
             Connections = new Thread(OnNewConnection);
             Connections.Name = "Connection Process";
             Reciver = new Thread(OnRecievedData);
