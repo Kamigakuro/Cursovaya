@@ -12,6 +12,7 @@ namespace Server
     public class SocketClient
     {
         private Socket m_sock;
+        Log logger = new Log();
         public byte[] m_byBuff = new byte[1024];
         public string macadr = String.Empty;
         public string name = String.Empty;
@@ -82,10 +83,10 @@ namespace Server
                 if (nBytesRec < 1)
                 {
                     //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", client.Sock.RemoteEndPoint) });
-                    //Invoke(new DeleteClientFromList(DeleteClient), new object[] { client });
+                    logger.AddMessage("[CLIENT] " + String.Format("Клиент [{0}] отключен.", m_sock.RemoteEndPoint));
+                    //Server.Invoke(new Server.DeleteClientFromList(Server.DeleteClient), new object[] { this });      
                     m_sock.Close();
                     SSocket.m_aryClients.Remove(this);
-                    //client.SetupRecieveCallback(this);
                     return;
                 }
             }

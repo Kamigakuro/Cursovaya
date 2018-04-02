@@ -49,6 +49,7 @@ namespace Server
         public static MySQLCon DB = new MySQLCon();
         private int CheckCount = 0;
         Server server;
+        Log logger = new Log();
         /// <summary>
         /// Конструктор класса
         /// </summary>
@@ -181,8 +182,10 @@ namespace Server
                         }
                         catch (Exception e)
                         {
+                            
                             //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) });
                             string mess = String.Format("Принят битый пакет от: {0}. {1}", client.Sock.RemoteEndPoint, e.ToString());
+                            logger.AddMessage("[CLIENT]" + mess);
                             ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                         }
                         switch (irc)
@@ -365,6 +368,8 @@ namespace Server
             {
                 //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Соединение с базой данной разорвано!") });
                 //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("MySQL DataBase Status: {0}", DB.SqlConnection.ToString()) });
+                logger.AddMessage("[BASE] Соединение с базой данной разорвано!");
+                logger.AddMessage("[BASE] MySQL DataBase Status: " + DB.SqlConnection.ToString());
                 return;
             }
             //-------------------------------------------------------------------------------------------------
@@ -411,12 +416,14 @@ namespace Server
                             {
                                 DB.SendNonQuery(sql);
                                 //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                logger.AddMessage("[CLIENT]["+ id + "] Добавлен новый компонент в таблицу.");
                                 break;
                             }
                             catch (MySqlException me)
                             {
                                 //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                 string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                 ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                             }
                         }
@@ -471,13 +478,15 @@ namespace Server
                             try
                             {
                                 DB.SendNonQuery(sql);
-                              //  Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                //  Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                logger.AddMessage("[CLIENT][" + id + "] Добавлен новый компонент в таблицу.");
                                 break;
                             }
                             catch (MySqlException me)
                             {
                                // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                 string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                 ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                             }
                         }
@@ -532,13 +541,15 @@ namespace Server
                             try
                             {
                                 DB.SendNonQuery(sql);
-                               // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                logger.AddMessage("[CLIENT][" + id + "] Добавлен новый компонент в таблицу.");
                                 break;
                             }
                             catch (MySqlException me)
                             {
                                // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                 string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                 ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                             }
                         }
@@ -584,13 +595,15 @@ namespace Server
                             try
                             {
                                 DB.SendNonQuery(sql);
-                               // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                logger.AddMessage("[CLIENT][" + id + "] Добавлен новый компонент в таблицу.");
                                 break;
                             }
                             catch (MySqlException me)
                             {
                                // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                 string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                 ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                             }
                         }
@@ -654,13 +667,15 @@ namespace Server
                                 try
                                 {
                                     DB.SendNonQuery(sql);
-                                   // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                    // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                    logger.AddMessage("[CLIENT][" + id + "] Добавлен новый компонент в таблицу.");
                                     //break;
                                 }
                                 catch (MySqlException me)
                                 {
                                    // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                     string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                    logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                     ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                                 }
                             }
@@ -704,13 +719,15 @@ namespace Server
                                 try
                                 {
                                     DB.SendNonQuery(sql);
-                                   // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
+                                    logger.AddMessage("[CLIENT][" + id + "] Добавлен новый компонент в таблицу.");
+                                    // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Добавлен новый компонент в таблицу.") });
                                     //break;
                                 }
                                 catch (MySqlException me)
                                 {
                                    // Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Ошибка при добавлении нового компонента в таблицу.") });
                                     string mess = String.Format("Ошибка при добавлении нового компонента в таблицу. {0}", me.ToString());
+                                    logger.AddMessage("[CLIENT][" + id + "] " + mess);
                                     ErrorsListForm.AddQuery(mess, client, QueryElement.QueryType.ClientError);
                                 }
                             }

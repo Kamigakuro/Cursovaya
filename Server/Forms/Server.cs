@@ -20,16 +20,21 @@ namespace Server
         Thread TimerThread;
         public MySQLCon DB = new MySQLCon();
         public SettingsClass settings = new SettingsClass();
-        
+        public static TextBox TextBoxLog;
+        public delegate void DeleteClientFromList(SocketClient client);
         public Server()
         {
             InitializeComponent();
+
             if (settings.CheckProductList()) settings.LoadProductList();
             else
             {
                 settings.CreateProductList();
                 settings.LoadProductList();
             }
+            DeleteClientFromList del;
+            del = DeleteClient;
+            TextBoxLog = this.textBox1;
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
@@ -103,6 +108,7 @@ namespace Server
         public delegate void GetClientsList();
         public void GetAllClients()
         {
+            //if (DB.SqlConnection != ConnectionState.Open) return;
             dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
             DataTable reader = DB.SendTQuery(sql);
@@ -133,8 +139,8 @@ namespace Server
             textBox1.AppendText(">> " + text + "\n");
         }
 
-        private delegate void DeleteClientFromList(SocketClient client);
-        private void DeleteClient(SocketClient client)
+        
+        public void DeleteClient(SocketClient client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();
             int id = client.Clientid;
@@ -143,6 +149,7 @@ namespace Server
                 if (row.Cells[0].Value.Equals(id))
                 {
                     dataGridView1.Rows.RemoveAt(row.Index);
+
                     break;
                 }
             }

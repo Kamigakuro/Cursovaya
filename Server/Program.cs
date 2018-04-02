@@ -23,6 +23,11 @@ namespace Server
             Application.SetCompatibleTextRenderingDefault(false);
             SettingsClass settings = new SettingsClass();
             if (settings.CheckSettingsFile()) settings.LoadSettings();
+            else
+            {
+                settings.CreateSettingsFile();
+                settings.LoadSettings();
+            }
             Application.Run(new Server());
         }
 
