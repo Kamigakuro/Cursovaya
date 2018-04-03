@@ -11,7 +11,7 @@ namespace Server
 {
     public partial class AboutClientForm : Form
     {
-        public AboutClientForm(string [] OperationSistem, string[] CPUUNIT)
+        public AboutClientForm(string [] OperationSistem, string[] CPUUNIT, DataTable RAM)
         {
             InitializeComponent();
             //-----------Процессор---------------------
@@ -27,8 +27,36 @@ namespace Server
             OSInstDate.Text = OperationSistem[3];
             //-----------------------------------------
 
-            //---------------Видеокарта----------------
-
+            //---------------RAM----------------
+            if (RAM.Rows.Count > 1)
+            {
+                int count = 0;
+                foreach (DataRow row in RAM.Rows)
+                {
+                    count++;
+                    Label rams = new Label
+                    {
+                        Text = "RAM " + count,
+                        AutoSize = true,
+                        Font = new Font("Verdana", 9.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(204))),
+                        Location = new Point(12, label5.Location.Y + (16*count)),
+                        Name = "ramslbl" + count,
+                        Size = new Size(41, 16),
+                        TabIndex = 4
+                    };
+                    rams.Text = "RAM " + count;
+                    Label ramsinfo = new Label
+                    {
+                        Text = RAM.Rows[count - 1][1].ToString(),
+                        AutoSize = true,
+                        Font = new Font("Verdana", 9.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(204))),
+                        Location = new Point(312, label5.Location.Y + (16 * count)),
+                        Name = "ramslbl" + count,
+                        Size = new Size(41, 16),
+                        TabIndex = 4
+                    };
+                }
+            }
             //-----------------------------------------
 
         }

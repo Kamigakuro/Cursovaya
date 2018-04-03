@@ -139,7 +139,7 @@ namespace Server
             textBox1.AppendText(">> " + text + "\n");
         }
 
-        private delegate void DeleteClientFromList(SocketClient client);
+        //private delegate void DeleteClientFromList(SocketClient client);
         private void DeleteClient(SocketClient client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();
@@ -193,7 +193,7 @@ namespace Server
                 {
                     if (client.Clientid == Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[0].Value))
                     {
-                        AboutClientForm f2 = new AboutClientForm(client.OperationSistem, client.CPUUNIT);
+                        AboutClientForm f2 = new AboutClientForm(client.OperationSistem, client.CPUUNIT, client.RAM);
                         f2.Show();
                         break;
                     }

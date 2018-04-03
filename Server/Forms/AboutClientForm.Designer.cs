@@ -42,11 +42,11 @@
             this.OperSys = new System.Windows.Forms.Label();
             this.GPU = new System.Windows.Forms.Label();
             this.l2l3 = new System.Windows.Forms.Label();
-            this.OSInstDate = new System.Windows.Forms.Label();
             this.OSVers = new System.Windows.Forms.Label();
             this.sockettextlabel = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
             this.cores = new System.Windows.Forms.Label();
+            this.OSInstDate = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -73,7 +73,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(12, 243);
+            this.label3.Location = new System.Drawing.Point(12, 284);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(148, 16);
             this.label3.TabIndex = 2;
@@ -83,7 +83,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(12, 259);
+            this.label4.Location = new System.Drawing.Point(12, 300);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(109, 16);
             this.label4.TabIndex = 3;
@@ -151,9 +151,10 @@
             // 
             // CPU
             // 
+            this.CPU.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CPU.AutoSize = true;
             this.CPU.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.CPU.Location = new System.Drawing.Point(313, 64);
+            this.CPU.Location = new System.Drawing.Point(312, 64);
             this.CPU.Name = "CPU";
             this.CPU.Size = new System.Drawing.Size(167, 16);
             this.CPU.TabIndex = 10;
@@ -161,9 +162,10 @@
             // 
             // OperSys
             // 
+            this.OperSys.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.OperSys.AutoSize = true;
             this.OperSys.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.OperSys.Location = new System.Drawing.Point(313, 142);
+            this.OperSys.Location = new System.Drawing.Point(312, 142);
             this.OperSys.Name = "OperSys";
             this.OperSys.Size = new System.Drawing.Size(167, 16);
             this.OperSys.TabIndex = 11;
@@ -173,7 +175,7 @@
             // 
             this.GPU.AutoSize = true;
             this.GPU.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.GPU.Location = new System.Drawing.Point(312, 259);
+            this.GPU.Location = new System.Drawing.Point(312, 300);
             this.GPU.Name = "GPU";
             this.GPU.Size = new System.Drawing.Size(167, 16);
             this.GPU.TabIndex = 12;
@@ -181,6 +183,7 @@
             // 
             // l2l3
             // 
+            this.l2l3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.l2l3.AutoSize = true;
             this.l2l3.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.l2l3.Location = new System.Drawing.Point(312, 112);
@@ -189,18 +192,9 @@
             this.l2l3.TabIndex = 15;
             this.l2l3.Text = "Информация о клиенте";
             // 
-            // OSInstDate
-            // 
-            this.OSInstDate.AutoSize = true;
-            this.OSInstDate.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.OSInstDate.Location = new System.Drawing.Point(313, 174);
-            this.OSInstDate.Name = "OSInstDate";
-            this.OSInstDate.Size = new System.Drawing.Size(167, 16);
-            this.OSInstDate.TabIndex = 14;
-            this.OSInstDate.Text = "Информация о клиенте";
-            // 
             // OSVers
             // 
+            this.OSVers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.OSVers.AutoSize = true;
             this.OSVers.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.OSVers.Location = new System.Drawing.Point(312, 158);
@@ -211,6 +205,7 @@
             // 
             // sockettextlabel
             // 
+            this.sockettextlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.sockettextlabel.AutoSize = true;
             this.sockettextlabel.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.sockettextlabel.Location = new System.Drawing.Point(312, 80);
@@ -231,13 +226,25 @@
             // 
             // cores
             // 
+            this.cores.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cores.AutoSize = true;
             this.cores.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.cores.Location = new System.Drawing.Point(313, 96);
+            this.cores.Location = new System.Drawing.Point(312, 96);
             this.cores.Name = "cores";
             this.cores.Size = new System.Drawing.Size(167, 16);
             this.cores.TabIndex = 16;
             this.cores.Text = "Информация о клиенте";
+            // 
+            // OSInstDate
+            // 
+            this.OSInstDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.OSInstDate.AutoSize = true;
+            this.OSInstDate.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.OSInstDate.Location = new System.Drawing.Point(312, 174);
+            this.OSInstDate.Name = "OSInstDate";
+            this.OSInstDate.Size = new System.Drawing.Size(167, 16);
+            this.OSInstDate.TabIndex = 14;
+            this.OSInstDate.Text = "Информация о клиенте";
             // 
             // AboutClientForm
             // 
@@ -286,10 +293,10 @@
         private System.Windows.Forms.Label OperSys;
         private System.Windows.Forms.Label GPU;
         private System.Windows.Forms.Label l2l3;
-        private System.Windows.Forms.Label OSInstDate;
         private System.Windows.Forms.Label OSVers;
         private System.Windows.Forms.Label sockettextlabel;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label cores;
+        private System.Windows.Forms.Label OSInstDate;
     }
 }
