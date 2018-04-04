@@ -352,6 +352,7 @@ namespace Client
             catch { return; }
         }
 
+
         private void InitializeSocket()
         {
             if (IpAdressString == String.Empty)
