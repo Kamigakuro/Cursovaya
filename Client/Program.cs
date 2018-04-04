@@ -16,6 +16,21 @@ namespace Client
         [STAThread]
         static void Main()
         {
+            Settings settings = new Settings();
+            EventLogger Log = new EventLogger();
+            Log.AddLog("[MAIN] ----------------------------------------------");
+            Log.AddLog("[MAIN] \t\tСтарт программы........");
+            Log.AddLog("[MAIN] \t\tНазвание: " + Application.ProductName);
+            Log.AddLog("[MAIN] \t\tВерсия: " + Application.ProductVersion);
+            Log.AddLog("[MAIN] ----------------------------------------------");
+            Log.AddLog("[SETTINGS] Проверка существования файла настроек...");
+            if (!settings.CheckSettingsFile())
+            {
+                Log.AddLog("[SETTINGS] Файл настроек отсутсвует!");
+                settings.CreateSettingsFile();
+                settings.LoadSettings();
+            }
+            else settings.LoadSettings();
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

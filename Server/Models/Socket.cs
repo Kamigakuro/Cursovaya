@@ -316,9 +316,9 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.ProductBL);
                                 writer.Write("<Names>");
-                                foreach (string str in SettingsClass.BlackNames) writer.Write(str);
+                                foreach (string str in SettingsClass.BlackNames) writer.Write(str.Substring(6));
                                 writer.Write("<Publishers>");
-                                foreach (string str in SettingsClass.BlackPublish) writer.Write(str);
+                                foreach (string str in SettingsClass.BlackPublish) writer.Write(str.Substring(10));
                                 writer.Write(EndofMessage);
                                 client.Sock.Send(m_byBuff);
                                 CheckMySQLInformation(client.Clientid, client, 4);

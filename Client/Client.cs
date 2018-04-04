@@ -80,6 +80,7 @@ namespace Client
     {
 
         private Socket socket;
+        EventLogger Log = new EventLogger();
         static byte[] m_byBuff = new byte[1024];
         public static string IpAdressString = String.Empty;
         static MemoryStream stream = new MemoryStream(m_byBuff);
@@ -90,7 +91,6 @@ namespace Client
         string macadr = String.Empty;
         DataTable rams = new DataTable("RAM");
         DataTable Programs = new DataTable("Programs");
-        IPEndPoint epServer;
 
         public struct IRC_QUERIES
         {
@@ -112,11 +112,12 @@ namespace Client
         public Client()
         {
             InitializeComponent();
+            Log.AddLog("[THREAD] Запущен процесс получения внешнего IP-адреса...");
             Thread thread = new Thread(getExternalIp);
             thread.Start();
-            Random rand = new Random();
-            macadr = GetMACAddress() + rand.Next(10000, 99999).ToString();
-            label1.Text = macadr;
+            Log.AddLog("[COMPONENT] Начато получение MAC-адреса...");
+            macadr = GetMACAddress();
+            //label1.Text = macadr;
             rams.Columns.Add("BankLabel");
             rams.Columns.Add("Capacity");
             rams.Columns.Add("DataWidth");
@@ -144,6 +145,7 @@ namespace Client
 
         private void GetComponets()
         {
+            Log.AddLog("[COMPONENT] Получение компонентов системы...");
             // Здесь планируются дальнейшие действии при возникновении каких либо проблем
             if (!GetOperationSystem()) return;
             if (!GetProcessUnit()) return;
@@ -151,11 +153,13 @@ namespace Client
             if (!GetBoard()) return;
             if (!GetRAM()) return;
             //if (!GetProducts()) return;
+            Log.AddLog("[COMPONENT] Компоненты получены!");
             InitializeSocket();
         }
 
         private bool GetProducts()
         {
+            Log.AddLog("[COMPONENT] Сбор списка приложений...");
             string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
             {
@@ -198,10 +202,12 @@ namespace Client
                     Programs.Rows.Add(s);
                 }
             }
+            Log.AddLog("[COMPONENT] Списки получены.");
             return true;
         }
         private bool GetRAM()
         {
+            Log.AddLog("[COMPONENT] Сбор информации RAM...");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_PhysicalMemory");
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
@@ -226,11 +232,13 @@ namespace Client
 
                 rams.Rows.Add(s);      
             }
+            Log.AddLog("[COMPONENT] RAM получено.");
             return true;
         }
 
         private bool GetBoard()
         {
+            Log.AddLog("[COMPONENT] Сбор данных материнской платы....");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM Win32_BaseBoard");
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
@@ -245,12 +253,14 @@ namespace Client
                 if (queryObj["Product"] != null) Board.Product = queryObj["Product"].ToString();
                 if (queryObj["SerialNumber"] != null) Board.SerialNumber = queryObj["SerialNumber"].ToString();
             }
+            Log.AddLog("[COMPONENT] Данные материнской платы получены.");
             return true;
 
         }
 
         private bool GetProcessUnit()
         {
+            Log.AddLog("[COMPONENT] Сбор данных центрального процессора...");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_Processor");
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
@@ -271,11 +281,13 @@ namespace Client
                 if (queryObj["Status"] != null) CPUUNIT.Status = queryObj["Status"].ToString();
                 if (queryObj["StatusInfo"] != null) CPUUNIT.StatusInfo = Convert.ToInt32(queryObj["StatusInfo"]);
             }
+            Log.AddLog("[COMPONENT] Данных процессора получены.");
             return true;
         }
 
         private bool GetOperationSystem()
         {
+            Log.AddLog("[COMPONENT] Сбор данных ОС...");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher( @"root\CIMV2", "SELECT * FROM CIM_OperatingSystem");
             ManagementObjectCollection colItems = searcher.Get();
             object vers = String.Empty, name = String.Empty, pack = String.Empty, istdate = String.Empty, NumberOfProcesses = 0, NumberOfUsers = 0, serial = String.Empty;
@@ -311,11 +323,13 @@ namespace Client
 
                 item.Dispose();
             }
+            Log.AddLog("[COMPONENT] Данные ОС получены.");
             return true;
         }
 
         private bool GetGPU()
         {
+            Log.AddLog("[COMPONENT] Сбор данных видеоадаптера...");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM Win32_VideoController");
             ManagementObjectCollection colItems = searcher.Get();
             foreach (ManagementObject queryObj in colItems)
@@ -335,6 +349,7 @@ namespace Client
                 if (queryObj["Name"] != null) GPUUNIT.Name = queryObj["Name"].ToString();
                 if (queryObj["VideoProcessor"] != null) GPUUNIT.VideoProcessor = queryObj["VideoProcessor"].ToString();
             }
+            Log.AddLog("[COMPONENT] Данные получены.");
             return true;
         }
 
@@ -347,7 +362,7 @@ namespace Client
                 externalIP = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"))
                              .Matches(externalIP)[0].ToString();
                 IpAdressString = externalIP;
-               
+                Log.AddLog("[EXTERNAL] Внешний IP=адрес получен: " + externalIP);
             }
             catch { return; }
         }
@@ -355,14 +370,7 @@ namespace Client
 
         private void InitializeSocket()
         {
-            if (IpAdressString == String.Empty)
-            {
-                //MessageBox.Show("Ошибка при получении внешнего IP-адреса. Будет использован локальный адрес.");
-                string strHostName = Dns.GetHostName();
-                IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
-                IpAdressString = Convert.ToString(ipEntry.AddressList[0]);
-            }
-            const int port = 7777;
+            Log.AddLog("[SESSION] Инициализация сессии...");
             try
             {
                 if (socket != null && socket.Connected)
@@ -370,21 +378,18 @@ namespace Client
                     socket.Shutdown(SocketShutdown.Both);
                     Thread.Sleep(100);
                     socket.Close();
-                    button1.Text = "Подключиться";
+                    //button1.Text = "Подключиться";
                     return;
                 }
-                button1.Text = "Отключиться";
+                Log.AddLog("[SESSION] Попытка подключиться к серверу...");
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                //socket = new Socket(IPAddress.Parse(IpAdressString).AddressFamily, SocketType.Stream, ProtocolType.Tcp); Старая версия подключения
-                epServer = new IPEndPoint(IPAddress.Parse(adresslabel.Text), port);
-                socket.Blocking = false;
                 AsyncCallback onconnect = new AsyncCallback(OnConnect);
-                socket.BeginConnect(epServer, onconnect, socket);
+                socket.BeginConnect(Settings.ServerIP, onconnect, socket);
             }
             catch (Exception ex)
             {
-                button1.Text = "Подключиться";
-                MessageBox.Show(ex.Message, "Server Connect failed!");
+                Log.AddLog("[ERROR] Не удалось выполнить инициализацию сессии: " + ex.Message.ToString());
+                //MessageBox.Show(ex.Message, "Server Connect failed!"); // Сделать тут рестарт
             }
         }
 
@@ -393,15 +398,22 @@ namespace Client
             Socket sock = (Socket)ar.AsyncState;
             try
             {
-                if (!sock.Connected) socket.BeginConnect(epServer, new AsyncCallback(OnConnect), socket);
-                if (sock.Connected) SetupRecieveCallback(sock);
+                if (!sock.Connected)
+                {
+                    Log.AddLog("[SESSION] Попытка подключиться к серверу...");
+                    Thread.Sleep(Settings.ReconnectTime);
+                    socket.BeginConnect(Settings.ServerIP, new AsyncCallback(OnConnect), socket);
+                }
+                if (sock.Connected)
+                {
+                    Log.AddLog("[SESSION] Соединение установлено! Конечная точка: " + sock.RemoteEndPoint.ToString());
+                    SetupRecieveCallback(sock);
+                }
                 //else sock.EndConnect(ar);
             }
             catch (Exception ex)
             {
-                if (button1.InvokeRequired) button1.Invoke(new Action(() => button1.Text = "Подключиться"));
-                else button1.Text = "Подключиться";
-                MessageBox.Show(ex.Message, "Unusual error during Connect!");
+                Log.AddLog("[ERROR] Не удалось выполнить подключение к конечно точке: " + ex.Message.ToString()); // СДЕЛАТЬ ТУТ ПЕРЕПОДКЛЮЧЕНИЕ
             }
         }
 
@@ -409,19 +421,21 @@ namespace Client
         {
             try
             {
+                Log.AddLog("[SESSION] Ожидание приема...");
                 AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
                 sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, sock);
+                Log.AddLog("[SESSION] Ожидание приема...");
             }
             catch (Exception ex)
             {
-                button1.Text = "Отключиться";
-                //MessageBox.Show(ex.Message, "Setup Recieve Callback failed!");
+                Log.AddLog("[ERROR] Не удалось установить режим приема: " + ex.Message.ToString());
                 InitializeSocket();
             }
         }
 
         public void OnRecievedData(IAsyncResult ar)
         {
+            Log.AddLog("[RECEIVE] Начат прием сообщения.");
             Socket sock = (Socket)ar.AsyncState;
             stream.Position = 0;
             try
@@ -619,13 +633,14 @@ namespace Client
                                             BlackPublish.Add(tmp);
                                         }
                                     }
-                                    BlackNames.Add(tmp);        
+                                    BlackNames.Add(tmp.Trim());        
                                 }
                             }
                             break;
                         default:
                             break;
                     }
+                    Log.AddLog("[RECEIVE] Сообщение принято.");
                     SetupRecieveCallback(sock);
                 }
                 else
@@ -636,9 +651,7 @@ namespace Client
             }
             catch (Exception ex)
             {
-                if (button1.InvokeRequired) button1.Invoke(new Action(() => button1.Text = "Подключиться"));
-                else button1.Text = "Подключиться";
-                MessageBox.Show(ex.Message, "Unusual error druing Recieve!");
+                Log.AddLog("[ERROR] Не удалось принять сообщение: " + ex.Message.ToString());
             }
         }
 
@@ -653,7 +666,7 @@ namespace Client
                 if (macAddress == String.Empty) macAddress = tempMacAddrObj.ToString(); // only return MAC Address from first card that has a MAC Address
                 mo.Dispose();
             }
-
+            Log.AddLog("[COMPONENT] MAC-адрес получен: " + macAddress);
             return macAddress;
         }
         private void button1_Click(object sender, EventArgs e)
