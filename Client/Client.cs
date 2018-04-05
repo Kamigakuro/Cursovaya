@@ -81,7 +81,7 @@ namespace Client
 
         private Socket socket;
         EventLogger Log = new EventLogger();
-        static byte[] m_byBuff = new byte[1024];
+        static byte[] m_byBuff = new byte[Settings.BufferSize];
         public static string IpAdressString = String.Empty;
         static MemoryStream stream = new MemoryStream(m_byBuff);
         static BinaryWriter writer = new BinaryWriter(stream);
@@ -117,7 +117,15 @@ namespace Client
             thread.Start();
             Log.AddLog("[COMPONENT] Начато получение MAC-адреса...");
             macadr = GetMACAddress();
-            //label1.Text = macadr;
+            InitLists();
+            GetComponets();
+            if (Settings.AutoConnect) InitializeSocket();
+
+        }
+
+        private void InitLists()
+        {
+            //----RAM----
             rams.Columns.Add("BankLabel");
             rams.Columns.Add("Capacity");
             rams.Columns.Add("DataWidth");
@@ -134,13 +142,12 @@ namespace Client
             rams.Columns.Add("Speed");
             rams.Columns.Add("Status");
             rams.Columns.Add("Version");
-
+            //----Prod----
             Programs.Columns.Add("DisplayName");
             Programs.Columns.Add("DisplayVersion");
             Programs.Columns.Add("InstallDate");
             Programs.Columns.Add("Publisher");
             Programs.Columns.Add("IdentifyingNumber");
-            GetComponets();
         }
 
         private void GetComponets()
@@ -152,9 +159,8 @@ namespace Client
             if (!GetGPU()) return;
             if (!GetBoard()) return;
             if (!GetRAM()) return;
-            //if (!GetProducts()) return;
             Log.AddLog("[COMPONENT] Компоненты получены!");
-            InitializeSocket();
+            
         }
 
         private bool GetProducts()
@@ -421,12 +427,11 @@ namespace Client
         {
             try
             {
-                Log.AddLog("[SESSION] Ожидание приема...");
                 AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
                 sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, sock);
                 Log.AddLog("[SESSION] Ожидание приема...");
             }
-            catch (Exception ex)
+            catch (SocketException ex)
             {
                 Log.AddLog("[ERROR] Не удалось установить режим приема: " + ex.Message.ToString());
                 InitializeSocket();
@@ -438,9 +443,12 @@ namespace Client
             Log.AddLog("[RECEIVE] Начат прием сообщения.");
             Socket sock = (Socket)ar.AsyncState;
             stream.Position = 0;
+            int nBytesRec = 0;
             try
             {
-                int nBytesRec = sock.EndReceive(ar);
+                //if (sock.) MessageBox.Show("");
+                //if (sock.)
+                nBytesRec = sock.EndReceive(ar);
                 if (nBytesRec > 0)
                 {
                     int irc = reader.ReadInt32();
@@ -448,6 +456,7 @@ namespace Client
                     {
                         #region Авторизация
                         case IRC_QUERIES.REQ_AUTH:
+                            Log.AddLog("[RECEIVE] Принят запрос ключа авторизации.");
                             stream.Position = 0;
                             writer.Write(IRC_QUERIES.REQ_AUTH);
                             writer.Write(Dns.GetHostName());
@@ -455,10 +464,12 @@ namespace Client
                             writer.Write(macadr);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             sock.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE] Ключ отправлен.");
                             break;
                         #endregion
                         #region OC
                         case IRC_QUERIES.OPSYS:
+                            Log.AddLog("[RECEIVE][OS] Принят запрос.");
                             stream.Position = 0;
                             if (OperationSistem.Name == String.Empty || OperationSistem.CDVersion == String.Empty)
                             {
@@ -478,10 +489,12 @@ namespace Client
                             writer.Write(OperationSistem.SerialNumber);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][OS] Ответ отправлен.");
                             break;
                         #endregion
                         #region CPU
                         case IRC_QUERIES.CPUUNIT:
+                            Log.AddLog("[RECEIVE][CPU] Принят запрос.");
                             stream.Position = 0;
                             if (CPUUNIT.Name == String.Empty || CPUUNIT.NumberOfCores == 0)
                             {
@@ -509,10 +522,12 @@ namespace Client
                             writer.Write(CPUUNIT.StatusInfo.ToString());
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][CPU] Ответ отправлен.");
                             break;
                         #endregion
                         #region GPU
                         case IRC_QUERIES.GPUUNIT:
+                            Log.AddLog("[RECEIVE][GPU] Принят запрос.");
                             stream.Position = 0;
                             if (GPUUNIT.Name == String.Empty || GPUUNIT.Description == String.Empty)
                             {
@@ -539,10 +554,12 @@ namespace Client
                             writer.Write(GPUUNIT.VideoProcessor);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][GPU] Ответ отправлен.");
                             break;
                         #endregion
                         #region Board
                         case IRC_QUERIES.Board:
+                            Log.AddLog("[RECEIVE][BOARD] Принят запрос.");
                             stream.Position = 0;
                             if (Board.Name == String.Empty || Board.Description == String.Empty)
                             {
@@ -564,10 +581,12 @@ namespace Client
                             writer.Write(Board.SerialNumber);
                             writer.Write(IRC_QUERIES.EndOfMessage);//9
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][BOARD] Ответ отправлен.");
                             break;
                         #endregion
                         #region RAM
                         case IRC_QUERIES.RAM:
+                            Log.AddLog("[RECEIVE][RAM] Принят запрос.");
                             stream.Position = 0;
                             if (rams.Rows.Count == 0)
                             {
@@ -586,16 +605,19 @@ namespace Client
                                     writer.Write(rams.Rows[i][k].ToString());
                                 }
                             }
-                            writer.Write(IRC_QUERIES.EndOfMessage);//9
+                            writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][RAM] Ответ отправлен.");
                             break;
                         #endregion
                         #region Products
                         case IRC_QUERIES.Products:
+                            Log.AddLog("[RECEIVE][PROD] Принят запрос.");
                             stream.Position = 0;
                             writer.Write(IRC_QUERIES.Products);
                             if (Programs.Rows.Count != 0)
                             {
+                                Log.AddLog("[RECEIVE][PROD] Отправка данных...");
                                 for (int k = 0; k < Programs.Columns.Count; k++)
                                 {
                                     writer.Write(Programs.Rows[0][k].ToString());
@@ -607,9 +629,11 @@ namespace Client
                             }
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE][PROD] Ответ отправлен.");
                             break;
                         #endregion
                         case IRC_QUERIES.ProductBL:
+                            Log.AddLog("[RECEIVE][PRODBL] Принят запрос.");
                             string tmp = reader.ReadString();
                             if (tmp.Contains("<Names>"))
                             {
@@ -624,10 +648,12 @@ namespace Client
                                             if (tmp.Contains(IRC_QUERIES.EndOfMessage))
                                             {
                                                 if (!GetProducts()) return;
+                                                Log.AddLog("[RECEIVE][PRODBL] Списки получены.");
                                                 stream.Position = 0;
                                                 writer.Write(IRC_QUERIES.ProductBL);
                                                 socket.Send(m_byBuff);
                                                 SetupRecieveCallback(sock);
+                                                Log.AddLog("[RECEIVE][PRODBL] Ответ отправлен.");
                                                 return;
                                             }
                                             BlackPublish.Add(tmp);
@@ -640,16 +666,17 @@ namespace Client
                         default:
                             break;
                     }
-                    Log.AddLog("[RECEIVE] Сообщение принято.");
+                    //Log.AddLog("[RECEIVE] Сообщение принято.");
                     SetupRecieveCallback(sock);
                 }
                 else
                 {
+                    Log.AddLog("[SESSION] Прекращение сессии.");
                     sock.Shutdown(SocketShutdown.Both);
                     sock.Close();
                 }
             }
-            catch (Exception ex)
+            catch (SocketException ex)
             {
                 Log.AddLog("[ERROR] Не удалось принять сообщение: " + ex.Message.ToString());
             }

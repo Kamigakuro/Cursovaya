@@ -23,11 +23,15 @@ namespace Client
                 writer.Start();
             }
         }
+        public object locker = new object();
         public void AddLog(string text)
         {
-            DateTime now = DateTime.Now;
-            string message = String.Format("[{0}] - {1}\n", now, text);
-            Messages.Add(message);
+            lock (locker)
+            {
+                DateTime now = DateTime.Now;
+                string message = String.Format("[{0}] - {1}\n", now, text);
+                Messages.Add(message);
+            }
         }
         private void WriteMessage()
         {

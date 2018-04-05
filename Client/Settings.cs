@@ -19,6 +19,9 @@ namespace Client
         public static bool LocalWorking = true;
         public static int BufferSize = 0;
         public static int ReconnectTime = 1000;
+        public static bool AutoRun = false;
+        public static bool AutoConnect = true;
+        public static int LogTimer = 1000;
         public bool CheckSettingsFile()
         {
             if (File.Exists(@"preferences.xml")) return true;
@@ -39,6 +42,21 @@ namespace Client
                 document.Load("preferences.xml");
                 XmlNode element = document.CreateElement("MainPreferences");
                 document.DocumentElement.AppendChild(element);
+
+                XmlNode subElementz = document.CreateElement("RunOnStart");
+                subElementz.InnerText = "False";
+                element.AppendChild(subElementz);
+                subElementz = document.CreateElement("ConnectOnProgramStart");
+                subElementz.InnerText = "True";
+                element.AppendChild(subElementz);
+                subElementz = document.CreateElement("ReconnectTime");
+                subElementz.InnerText = "1000";
+                element.AppendChild(subElementz);
+                subElementz = document.CreateElement("TimerLogUpdate");
+                subElementz.InnerText = "1000";
+                element.AppendChild(subElementz);
+
+
                 element = document.CreateElement("SocketPreferences");
                 document.DocumentElement.AppendChild(element);
 
@@ -96,6 +114,10 @@ namespace Client
                         else if (element.Name == "MaxBufferSize") BufferSize = Int32.Parse(element.Value);
                         else if (element.Name == "LocalWorking") LocalWorking = Boolean.Parse(element.Value);
                         else if (element.Name == "ExternalServerIP") ExternalAdressStr = element.Value;
+                        else if (element.Name == "RunOnStart") AutoRun = Boolean.Parse(element.Value);
+                        else if (element.Name == "ConnectOnProgramStart") AutoConnect = Boolean.Parse(element.Value);
+                        else if (element.Name == "ReconnectTime") ReconnectTime = Int32.Parse(element.Value);
+                        else if (element.Name == "TimerLogUpdate") LogTimer = Int32.Parse(element.Value);
                     }
                 }
                 node = node.NextNode;
@@ -129,6 +151,10 @@ namespace Client
                         else if (element.Name == "MaxBufferSize") element.Value = BufferSize.ToString();
                         else if (element.Name == "LocalWorking") element.Value = LocalWorking.ToString();
                         else if (element.Name == "ExternalServerIP") element.Value = ExternalAdressStr;
+                        else if (element.Name == "RunOnStart") element.Value = AutoRun.ToString();
+                        else if (element.Name == "ConnectOnProgramStart") element.Value = AutoConnect.ToString();
+                        else if (element.Name == "ReconnectTime") element.Value = ReconnectTime.ToString();
+                        else if (element.Name == "TimerLogUpdate") element.Value = LogTimer.ToString();
                     }
                 }
                 node = node.NextNode;
