@@ -671,9 +671,11 @@ namespace Client
                 }
                 else
                 {
-                    Log.AddLog("[SESSION] Прекращение сессии.");
-                    sock.Shutdown(SocketShutdown.Both);
-                    sock.Close();
+                    Log.AddLog("[SESSION] Потеряно соединение с сервером. Попытка переподключения...");
+                    socket.Disconnect(true);
+                    socket.BeginConnect(Settings.ServerIP, new AsyncCallback(OnConnect), socket);
+                    //sock.Shutdown(SocketShutdown.Both);
+                    //sock.Close();
                 }
             }
             catch (SocketException ex)

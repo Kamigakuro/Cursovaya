@@ -26,14 +26,16 @@ namespace Server
         public DataTable Products = new DataTable("Products");
         public int Clientid = -1;
         private SSocket Main;
+        private Server _Form;
         public Socket Sock
         {
             get { return m_sock; }
         }
-        public SocketClient(Socket sock, SSocket main)
+        public SocketClient(Socket sock, SSocket main, Server form)
         {
             m_sock = sock;
             Main = main;
+            _Form = form;
             RAM.Columns.Add("BankLabel");
             RAM.Columns.Add("Capacity");
             RAM.Columns.Add("DataWidth");
@@ -82,9 +84,9 @@ namespace Server
                 nBytesRec = m_sock.EndReceive(ar);
                 if (nBytesRec < 1)
                 {
-                    //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", client.Sock.RemoteEndPoint) });
+                    _Form.Invoke(new Server.AddMessageToConsole(_Form.AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", Sock.RemoteEndPoint) });
                     logger.AddMessage("[CLIENT] " + String.Format("Клиент [{0}] отключен.", m_sock.RemoteEndPoint));
-                    //Server.Invoke(new Server.DeleteClientFromList(Server.DeleteClient), new object[] { this });      
+                    _Form.Invoke(new Server.DeleteClientFromList(_Form.DeleteClient), new object[] { this });      
                     m_sock.Close();
                     SSocket.m_aryClients.Remove(this);
                     return;

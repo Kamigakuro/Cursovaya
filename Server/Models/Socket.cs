@@ -110,6 +110,7 @@ namespace Server
             Reciver.Join();
             foreach (SocketClient client in m_aryClients)
             {
+                client.Sock.Shutdown(SocketShutdown.Both);
                 client.Sock.Close();
                 m_aryClients.Remove(client);
             }
@@ -148,7 +149,7 @@ namespace Server
                 {
                     foreach (Socket sockClient in ConnectionPool.ToArray())
                     {
-                        SocketClient client = new SocketClient(sockClient, this);
+                        SocketClient client = new SocketClient(sockClient, this, server);
                         m_aryClients.Add(client);
                         byte[] m_byBuff = new byte[1024]; // размер буфера
                         MemoryStream stream = new MemoryStream(m_byBuff);
@@ -214,7 +215,7 @@ namespace Server
                                         client.Clientid = id;
                                         client.time = DateTime.Now;
                                         CheckNewClient(clientname, client.Sock.RemoteEndPoint.ToString(), id);
-                                        //server.Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
+                                        server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
                                         writer.Write(IRC_QUERIES.OPSYS);
                                         client.Sock.Send(m_byBuff);
@@ -229,7 +230,7 @@ namespace Server
                                         client.name = clientname;
                                         client.time = DateTime.Now;
                                         CheckNewClient(clientname, client.Sock.RemoteEndPoint.ToString(), id);
-                                        //        Invoke(new AddNewClientDelegate(AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
+                                        server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
                                         writer.Write(IRC_QUERIES.OPSYS);
                                         client.Sock.Send(m_byBuff);

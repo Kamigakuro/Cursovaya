@@ -140,7 +140,7 @@ namespace Server
         }
 
         //private delegate void DeleteClientFromList(SocketClient client);
-        private void DeleteClient(SocketClient client)
+        public void DeleteClient(SocketClient client)
         {
             string ip = client.Sock.RemoteEndPoint.ToString();
             int id = client.Clientid;

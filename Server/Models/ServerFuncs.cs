@@ -125,20 +125,6 @@ namespace Server
                     label10.Text = aryLocalAddr + ":" + nPortListen + " (" + localip + ")";
                 }
             }
-   
-            /*try
-            {
-                listener = new Socket(aryLocalAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                listener.Bind(new IPEndPoint(IPAddress.Any, nPortListen));
-                listener.Listen(100);
-                listener.BeginAccept(new AsyncCallback(OnConnectRequest), listener);
-            }
-            catch (Exception e)
-            {
-                //MessageBox.Show(e.ToString());
-                string mess = String.Format("Ошибка при попытке получить локальный адрес: {0}", e.Message);
-                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-            }*/
         }
         public void CheckAdresses(IPAddress BeginIP, IPAddress EndIP)
         {
