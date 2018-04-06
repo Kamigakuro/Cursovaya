@@ -108,29 +108,7 @@ namespace Server
         public delegate void GetClientsList();
         public void GetAllClients()
         {
-            //if (DB.SqlConnection != ConnectionState.Open) return;
-            dataGridView2.Rows.Clear();
-            string sql = "SELECT * FROM systems";
-            DataTable reader = DB.SendTQuery(sql);
-            if (reader.Rows.Count > 0)
-            {
-                foreach (DataRow row in reader.Rows)
-                {
-                    if (!row.Field<bool>(3))
-                    {
-                        string mess = String.Format("Не подтвержденный клиент - {0}({1})!", row.Field<string>(1), row.Field<int>(0));
-                        string db = String.Format("UPDATE systems SET isConfirm = True WHERE id = {0}", row.Field<int>(0));
-                        ErrorsListForm.AddQuery(mess, QueryElement.QueryType.ClientWarning, db);
-                    }
-                    dataGridView2.Rows.Add(row.Field<int>(0), row.Field<string>(1), row.Field<string>(2), row.Field<bool>(3), "Удалить");
-                }
-            }
-            else
-            {
-
-            }
-            reader.Clear();
-            reader.Dispose();
+            
         }
 
         public delegate void AddMessageToConsole(string text);
@@ -262,6 +240,39 @@ namespace Server
                 s = s + client.Clientid + "\t" + client.macadr + "\n";
             }
             MessageBox.Show(s);
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            dataGridView2.Rows.Clear();
+            string sql = "SELECT * FROM systems";
+            DataTable reader = DB.SendTQuery(sql);
+            foreach (QueryElement query in ErrorsListForm.link)
+            {
+                if (query.GetQType() == QueryElement.QueryType.ClientWarning)
+                {
+                    ErrorsListForm.link.Remove(query);
+                }
+            }
+            if (reader.Rows.Count > 0)
+            {
+                foreach (DataRow row in reader.Rows)
+                {
+                    if (!row.Field<bool>(3))
+                    {
+                        string mess = String.Format("Не подтвержденный клиент - {0}({1})!", row.Field<string>(1), row.Field<int>(0));
+                        string db = String.Format("UPDATE systems SET isConfirm = True WHERE id = {0}", row.Field<int>(0));
+                        ErrorsListForm.AddQuery(mess, QueryElement.QueryType.ClientWarning, db);
+                    }
+                    dataGridView2.Rows.Add(row.Field<int>(0), row.Field<string>(1), row.Field<string>(2), row.Field<bool>(3), "Удалить");
+                }
+            }
+            else
+            {
+
+            }
+            reader.Clear();
+            reader.Dispose();
         }
     }
 

@@ -98,6 +98,9 @@ namespace Server
             Main.ReciveArray.Add(this);
             //return byReturn;
         }
+
+        
+
         public void Reconnect()
         {
             try
