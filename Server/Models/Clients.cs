@@ -21,12 +21,15 @@ namespace Server
         public string[] CPUUNIT = new string[15];
         public string[] GPUUNIT = new string[14];
         public string[] Board = new string[9];
-        System.Net.EndPoint endpoint;
+        public System.Net.EndPoint endpoint;
         public DataTable RAM = new DataTable("RAM");
         public DataTable Products = new DataTable("Products");
         public int Clientid = -1;
+        private bool RecieveUpped = false;
         private SSocket Main;
         private Server _Form;
+        public bool Logged = false;
+        public bool Spawned = false;
         public Socket Sock
         {
             get { return m_sock; }
@@ -63,36 +66,41 @@ namespace Server
         }
         public void SetupRecieveCallback(SSocket main)
         {
+            if (RecieveUpped) return;
             try
             {
+                if (m_sock == null) return;
                 AsyncCallback recieveData = new AsyncCallback(GetRecievedData);
+                m_byBuff = new byte[m_byBuff.Length];
                 m_sock.BeginReceive(m_byBuff, 0, m_byBuff.Length, SocketFlags.None, recieveData, this);
+                RecieveUpped = true;
             }
             catch (Exception ex) {
-                //MessageBox.Show(String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message));
+                m_byBuff = null;
                 string mess = String.Format("Не удалось подключить функцию получения собщений! {0}", ex.Message);
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-
+                Main.RemoveClient(this);
             }
         }
         public void GetRecievedData(IAsyncResult ar)
         {
+            RecieveUpped = false;
             int nBytesRec = 0;
             //SockError = SocketError.Success;
             try
             {
                 nBytesRec = m_sock.EndReceive(ar);
-                if (nBytesRec < 1)
-                {
-                    _Form.Invoke(new Server.AddMessageToConsole(_Form.AddNewConsoleMessage), new object[] { String.Format("Клиент [{0}] отключен.", Sock.RemoteEndPoint) });
-                    logger.AddMessage("[CLIENT] " + String.Format("Клиент [{0}] отключен.", m_sock.RemoteEndPoint));
-                    _Form.Invoke(new Server.DeleteClientFromList(_Form.DeleteClient), new object[] { this });      
-                    m_sock.Close();
-                    SSocket.m_aryClients.Remove(this);
-                    return;
-                }
             }
-            catch { }
+            catch {
+               // Main.RemoveClient(this);
+                //return;
+            }
+            if (nBytesRec < 1)
+            {
+                m_byBuff = new byte[0];
+                Main.ReciveArray.Add(this);
+                return;
+            }
             byte[] byReturn = new byte[nBytesRec];
             Array.Copy(m_byBuff, byReturn, nBytesRec);
             Main.ReciveArray.Add(this);
@@ -108,6 +116,37 @@ namespace Server
             catch(Exception e)
             {
                 MessageBox.Show(e.ToString());
+            }
+        }
+        bool SocketConnected()
+        {
+            if (m_sock == null) return false;
+            bool part1 = m_sock.Poll(1000, SelectMode.SelectRead);
+            bool part2 = (m_sock.Available == 0);
+            if (part1 && part2)
+                return false;
+            else
+                return true;
+        }
+        public bool SendMessage(byte[] buffer)
+        {
+            if (SocketConnected())
+            {
+                try
+                {
+                    m_sock.Send(buffer);
+                    return true;
+                }
+                catch (SocketException e)
+                {
+                    string mess = String.Format("Не удалось выполнить отправку сообщения! {0}", e.Message);
+                    ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
     }

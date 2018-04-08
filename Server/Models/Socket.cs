@@ -17,6 +17,11 @@ namespace Server
     {
         public delegate void ConnectedClient(string name, string ip, int id);
         public static event ConnectedClient CheckNewClient;
+
+        public delegate void DeleteClient(int id);
+        public static event DeleteClient DeleteClientFrom;
+
+        private Thread Ping;
         /// <summary>
         /// Поток обработки соединений
         /// </summary>
@@ -48,13 +53,6 @@ namespace Server
         public static ArrayList m_aryClients = new ArrayList();
         static string EndofMessage = "<EOF>";
         public static MySQLCon DB = new MySQLCon();
-        public System.Windows.Forms.DataGrid ClientTable = new System.Windows.Forms.DataGrid();
-        private DataColumn cid = new DataColumn("##", typeof(int));
-        private DataColumn cname = new DataColumn("Имя", typeof(string));
-        private DataColumn cipadr = new DataColumn("IP адрес", typeof(string));
-        private DataColumn ctime = new DataColumn("Время соединения", typeof(string));
-        private DataColumn cinfobtn = new DataColumn("      ", typeof(string));
-        //FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
 
         Server server;
         Log logger = new Log();
@@ -67,6 +65,8 @@ namespace Server
             server = srv;
 
             //ClientTable.Columns.Add();
+            Ping = new Thread(PingClients);
+            Ping.Name = "Ping Clients";
             Connections = new Thread(OnNewConnection);
             Connections.Name = "Connection Process";
             Reciver = new Thread(OnRecievedData);
@@ -75,6 +75,7 @@ namespace Server
             RecieveThreadWork = true;
             Connections.Start();
             Reciver.Start();
+            Ping.Start();
         }
         /// <summary>
         /// Включение прослушивания сокетом по порту
@@ -123,6 +124,29 @@ namespace Server
                 listener.Dispose();
             }
         }
+
+        public void PingClients()
+        {
+            while (true)
+            {
+                foreach (SocketClient client in m_aryClients.ToArray())
+                {
+                    if (client.Logged && client.Spawned)
+                    {
+                        try
+                        {
+                            byte[] buffer = new byte[256];
+                            if (!client.SendMessage(buffer)) RemoveClient(client);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+                Thread.Sleep(6000);
+            }
+        }
         /// <summary>
         /// Обработчик событий при получении каких-либо данных
         /// </summary>
@@ -159,7 +183,7 @@ namespace Server
                         stream.Position = 0;
                         writer.Write(IRC_QUERIES.REQ_AUTH);
                         writer.Write(EndofMessage);
-                        client.Sock.Send(m_byBuff);
+                        if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                         client.SetupRecieveCallback(this);
                         ConnectionPool.Remove(sockClient);
                     }
@@ -177,6 +201,7 @@ namespace Server
             {
                 foreach (SocketClient client in ReciveArray.ToArray())
                 {
+                    ReciveArray.Remove(client);
                     if (client == null) continue;
                     if (client.m_byBuff == null) continue;
                     if (client.m_byBuff.Length > 0)
@@ -193,7 +218,7 @@ namespace Server
                         }
                         catch (Exception e)
                         {
-                            
+
                             //Invoke(new AddMessageToConsole(AddNewConsoleMessage), new object[] { String.Format("Принят битый пакет от: [{0}].", client.Sock.RemoteEndPoint) });
                             string mess = String.Format("Принят битый пакет от: {0}. {1}", client.Sock.RemoteEndPoint, e.ToString());
                             logger.AddMessage("[CLIENT]" + mess);
@@ -219,7 +244,8 @@ namespace Server
                                         //server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
                                         writer.Write(IRC_QUERIES.CheckVersion);
-                                        client.Sock.Send(m_byBuff);
+                                        client.Logged = true;
+                                        if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                         break;
                                     }
                                     else
@@ -234,7 +260,8 @@ namespace Server
                                         //server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
                                         writer.Write(IRC_QUERIES.CheckVersion);
-                                        client.Sock.Send(m_byBuff);
+                                        client.Logged = true;
+                                        if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                         break;
                                     }
                                 }
@@ -252,7 +279,7 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.CPUUNIT);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 CheckMySQLInformation(client.Clientid, client, 0);
                                 break;
                             #endregion
@@ -267,7 +294,7 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.GPUUNIT);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 CheckMySQLInformation(client.Clientid, client, 1);
                                 break;
                             #endregion
@@ -282,7 +309,7 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.Board);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 CheckMySQLInformation(client.Clientid, client, 2);
                                 break;
                             #endregion
@@ -297,7 +324,7 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.RAM);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 CheckMySQLInformation(client.Clientid, client, 3);
                                 break;
                             #endregion
@@ -322,30 +349,35 @@ namespace Server
                                 writer.Write("<Publishers>");
                                 foreach (string str in SettingsClass.BlackPublish) writer.Write(str.Substring(10));
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 CheckMySQLInformation(client.Clientid, client, 4);
                                 break;
                             #endregion
                             #region Products
                             case IRC_QUERIES.Products:
                                 object[] arrayr = new object[5];
+                                bool stop = false;
                                 for (int i = 0; i < 5; i++)
                                 {
+                                    //if (stop) break;
                                     string rd = read.ReadString();
                                     if (rd == EndofMessage)
                                     {
                                         CheckMySQLInformation(client.Clientid, client, 5);
-                                        FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
+                                        client.Spawned = true;
+                                        //FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
                                         client.SetupRecieveCallback(this);
-                                        return;
+                                        stop = true;
+                                        break;
                                     }
                                     arrayr[i] = rd;
                                 }
+                                if (stop) break;
                                 client.Products.Rows.Add(arrayr);
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.Products);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 break;
                             #endregion
                             #region Белый список приложений
@@ -353,7 +385,7 @@ namespace Server
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.Products);
                                 writer.Write(EndofMessage);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 break;
                             #endregion
                             #region Проверка версии клиента
@@ -365,16 +397,28 @@ namespace Server
                                 }
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.OPSYS);
-                                client.Sock.Send(m_byBuff);
+                                if (!client.SendMessage(m_byBuff)) RemoveClient(client);
                                 break;
                             #endregion
+                            case 7848:
+                                FTD.FTD.CheckHash(client.m_byBuff, client.Sock);
+                                client.Spawned = true;
+                                break;
                             case IRC_QUERIES.ERROR_IRC:
                                 break;
                             default:
                                 break;
                         }
-                        ReciveArray.Remove(client);
-                        client.SetupRecieveCallback(this);
+                        try
+                        {
+                            client.SetupRecieveCallback(this);
+                        }
+                        catch
+                        { }
+                    }
+                    else
+                    {
+                        RemoveClient(client);
                     }
                 }
                 Thread.Sleep(50);
@@ -806,5 +850,12 @@ namespace Server
             }
         }
 
+        public void RemoveClient(SocketClient client)
+        {
+            logger.AddMessage("[CLIENT] " + String.Format("Клиент [{0}] отключен.", client.endpoint.ToString()));
+            DeleteClientFrom(client.Clientid);
+            client.Sock.Close();
+            m_aryClients.Remove(client);
+        }
     }
 }

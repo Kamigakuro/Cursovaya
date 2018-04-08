@@ -25,23 +25,30 @@ namespace Server
         public Server()
         {
             InitializeComponent();
+            //-----Белый список программ-----
             if (settings.CheckProductList()) settings.LoadProductList();
             else
             {
                 settings.CreateProductList();
                 settings.LoadProductList();
             }
-            DeleteClientFromList del;
-            del = DeleteClient;
+            //-------------------------------
+
+            //DeleteClientFromList del;
+            //del = DeleteClient;
             TextBoxLog = this.textBox1;
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+
             InitializeMySQL();
+            //---------Ивенты---------------
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.UpdateAllClients += this.GetAllClients;
             SSocket.CheckNewClient += this.AddNewClient;
+            SSocket.DeleteClientFrom += this.DeleteClient;
+            //------------------------------
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start();
             
@@ -117,20 +124,18 @@ namespace Server
         }
 
         //private delegate void DeleteClientFromList(SocketClient client);
-        public void DeleteClient(SocketClient client)
+        public void DeleteClient(int id)
         {
-            string ip = client.Sock.RemoteEndPoint.ToString();
-            int id = client.Clientid;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if (row.Cells[0].Value.Equals(id))
                 {
-                    dataGridView1.Rows.RemoveAt(row.Index);
-
+                    //dataGridView1.Rows.RemoveAt(row.Index);
+                    dataGridView1.Invoke(new Action(() => dataGridView1.Rows.RemoveAt(row.Index)));
                     break;
                 }
             }
-            label6.Text = Convert.ToString(SSocket.m_aryClients.Count);
+            label6.Invoke(new Action(() => label6.Text = Convert.ToString(SSocket.m_aryClients.Count)));
         }
 
         private void OnApplicationExit(object sender, EventArgs e)

@@ -35,8 +35,8 @@ namespace Server
                 settings.LoadSettings();
             }
             login = new Login();
-            if (login.ShowDialog() == DialogResult.Cancel) Application.Exit();
-            else Application.Run(new Server());
+            if (login.ShowDialog() == DialogResult.OK) Application.Run(new Server());
+            else Application.Exit();
         }
 
         public static class MINIDUMP_TYPE

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
@@ -112,6 +111,7 @@ namespace Client
         {
             // InitializeComponent();
             Log.AddLog("[THREAD] Запущен процесс получения внешнего IP-адреса...");
+            System.Windows.Forms.Application.ApplicationExit += new EventHandler(OnApplicationExit);
             Thread thread = new Thread(getExternalIp);
             thread.Start();
             Log.AddLog("[COMPONENT] Начато получение MAC-адреса...");
@@ -471,7 +471,7 @@ namespace Client
                             Log.AddLog("[RECEIVE] Принят запрос версии.");
                             stream.Position = 0;
                             writer.Write(IRC_QUERIES.ClientVersion);
-                            writer.Write(Application.ProductVersion);
+                            writer.Write(System.Windows.Forms.Application.ProductVersion);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             sock.Send(m_byBuff);
                             Log.AddLog("[RECEIVE] Версия отправлен.");
@@ -696,7 +696,7 @@ namespace Client
             catch (SocketException ex)
             {
                 Log.AddLog("[ERROR] Не удалось принять сообщение: " + ex.Message.ToString());
-                Application.Restart();
+                System.Windows.Forms.Application.Restart();
             }
         }
 
@@ -713,6 +713,20 @@ namespace Client
             }
             Log.AddLog("[COMPONENT] MAC-адрес получен: " + macAddress);
             return macAddress;
+        }
+
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            try
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Blocking = true;
+                socket.Close();
+            }
+            catch
+            {
+
+            }
         }
 
     }

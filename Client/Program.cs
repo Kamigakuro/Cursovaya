@@ -35,6 +35,7 @@ namespace Client
             Main main = new Main();
             Application.Run();
         }
+
         public static class MINIDUMP_TYPE
         {
             public const int MiniDumpNormal = 0x00000000;
