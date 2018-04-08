@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-//using System.Drawing;
-//using System.Linq;
-//using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Net.Sockets;
@@ -14,9 +10,12 @@ using System.IO;
 using System.Management;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using System.Data;
+using FTD;
 
 namespace Client
 {
+
     struct OperationSistem
     {
         public static string Name = String.Empty;
@@ -76,9 +75,8 @@ namespace Client
         public static string SerialNumber = String.Empty;
     }
 
-    public partial class Client : Form
+    public class Main
     {
-
         private Socket socket;
         EventLogger Log = new EventLogger();
         static byte[] m_byBuff = new byte[Settings.BufferSize];
@@ -107,11 +105,12 @@ namespace Client
             public const int RAM = 7; // Оперативная память
             public const int Products = 8; // Программы
             public const int ProductBL = 9;
+            public const int ClientVersion = 10;
         }
 
-        public Client()
+        public Main()
         {
-            InitializeComponent();
+            // InitializeComponent();
             Log.AddLog("[THREAD] Запущен процесс получения внешнего IP-адреса...");
             Thread thread = new Thread(getExternalIp);
             thread.Start();
@@ -160,7 +159,7 @@ namespace Client
             if (!GetBoard()) return;
             if (!GetRAM()) return;
             Log.AddLog("[COMPONENT] Компоненты получены!");
-            
+
         }
 
         private bool GetProducts()
@@ -236,7 +235,7 @@ namespace Client
                 if (queryObj["Status"] != null) s[14] = queryObj["Status"].ToString();
                 if (queryObj["Version"] != null) s[15] = queryObj["Version"].ToString();
 
-                rams.Rows.Add(s);      
+                rams.Rows.Add(s);
             }
             Log.AddLog("[COMPONENT] RAM получено.");
             return true;
@@ -294,7 +293,7 @@ namespace Client
         private bool GetOperationSystem()
         {
             Log.AddLog("[COMPONENT] Сбор данных ОС...");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher( @"root\CIMV2", "SELECT * FROM CIM_OperatingSystem");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_OperatingSystem");
             ManagementObjectCollection colItems = searcher.Get();
             object vers = String.Empty, name = String.Empty, pack = String.Empty, istdate = String.Empty, NumberOfProcesses = 0, NumberOfUsers = 0, serial = String.Empty;
             foreach (ManagementObject item in colItems)
@@ -467,6 +466,17 @@ namespace Client
                             Log.AddLog("[RECEIVE] Ключ отправлен.");
                             break;
                         #endregion
+                        #region Версия клиента
+                        case IRC_QUERIES.ClientVersion:
+                            Log.AddLog("[RECEIVE] Принят запрос версии.");
+                            stream.Position = 0;
+                            writer.Write(IRC_QUERIES.ClientVersion);
+                            writer.Write(Application.ProductVersion);
+                            writer.Write(IRC_QUERIES.EndOfMessage);
+                            sock.Send(m_byBuff);
+                            Log.AddLog("[RECEIVE] Версия отправлен.");
+                            break;
+                        #endregion
                         #region OC
                         case IRC_QUERIES.OPSYS:
                             Log.AddLog("[RECEIVE][OS] Принят запрос.");
@@ -632,6 +642,7 @@ namespace Client
                             Log.AddLog("[RECEIVE][PROD] Ответ отправлен.");
                             break;
                         #endregion
+                        #region Белый список приложений
                         case IRC_QUERIES.ProductBL:
                             Log.AddLog("[RECEIVE][PRODBL] Принят запрос.");
                             string tmp = reader.ReadString();
@@ -656,12 +667,16 @@ namespace Client
                                                 Log.AddLog("[RECEIVE][PRODBL] Ответ отправлен.");
                                                 return;
                                             }
-                                            BlackPublish.Add(tmp);
+                                            BlackPublish.Add(tmp.Trim());
                                         }
                                     }
-                                    BlackNames.Add(tmp.Trim());        
+                                    BlackNames.Add(tmp.Trim());
                                 }
                             }
+                            break;
+                        #endregion
+                        case 7848:
+                            FTD.FTD.AcceptFile(m_byBuff, sock);
                             break;
                         default:
                             break;
@@ -681,6 +696,7 @@ namespace Client
             catch (SocketException ex)
             {
                 Log.AddLog("[ERROR] Не удалось принять сообщение: " + ex.Message.ToString());
+                Application.Restart();
             }
         }
 
@@ -697,10 +713,6 @@ namespace Client
             }
             Log.AddLog("[COMPONENT] MAC-адрес получен: " + macAddress);
             return macAddress;
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            InitializeSocket();
         }
 
     }

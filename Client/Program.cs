@@ -32,9 +32,8 @@ namespace Client
             }
             else settings.LoadSettings();
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Client());
+            Main main = new Main();
+            Application.Run();
         }
         public static class MINIDUMP_TYPE
         {

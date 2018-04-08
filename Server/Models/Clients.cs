@@ -13,7 +13,7 @@ namespace Server
     {
         private Socket m_sock;
         Log logger = new Log();
-        public byte[] m_byBuff = new byte[1024];
+        public byte[] m_byBuff = new byte[SettingsClass.SBufferSize];
         public string macadr = String.Empty;
         public string name = String.Empty;
         public DateTime time = new DateTime();
@@ -98,9 +98,6 @@ namespace Server
             Main.ReciveArray.Add(this);
             //return byReturn;
         }
-
-        
-
         public void Reconnect()
         {
             try

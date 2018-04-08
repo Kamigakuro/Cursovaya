@@ -25,7 +25,6 @@ namespace Server
         public Server()
         {
             InitializeComponent();
-
             if (settings.CheckProductList()) settings.LoadProductList();
             else
             {
@@ -136,18 +135,19 @@ namespace Server
 
         private void OnApplicationExit(object sender, EventArgs e)
         {
-            TimerThread.Abort();
-            ErrorsListForm.AddQueryHandle -= this.UpdateQueryCounts;
-            ErrorsListForm.RemoveQueryHandle -= this.UpdateQueryCounts;
-            try
-            {
-                socket.ShutDown();
-            }
-            catch (Exception es)
-            {
-                MessageBox.Show(es.ToString());
-            }
-            DB.CloseConnection();
+                TimerThread.Abort();
+                ErrorsListForm.AddQueryHandle -= this.UpdateQueryCounts;
+                ErrorsListForm.RemoveQueryHandle -= this.UpdateQueryCounts;
+                try
+                {
+                    socket.ShutDown();
+                }
+                catch (Exception es)
+                {
+                    MessageBox.Show(es.ToString());
+                }
+                DB.CloseConnection();
+            
         }
 
         bool cancelevent = true;
@@ -159,7 +159,10 @@ namespace Server
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
             cancelevent = false;
-            Application.Exit();
+            Login login = new Login();
+            login.ShowDialog();
+            if (login.DialogResult == DialogResult.OK)
+                Application.Exit();
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -171,7 +174,7 @@ namespace Server
                 {
                     if (client.Clientid == Convert.ToInt32(senderGrid.Rows[e.RowIndex].Cells[0].Value))
                     {
-                        AboutClientForm f2 = new AboutClientForm(client.OperationSistem, client.CPUUNIT, client.RAM);
+                        AboutClientForm f2 = new AboutClientForm(client.OperationSistem, client.CPUUNIT, client.RAM, client.Board, client.GPUUNIT, client.Products);
                         f2.Show();
                         break;
                     }

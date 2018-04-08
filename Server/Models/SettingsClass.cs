@@ -21,6 +21,8 @@ namespace Server
         public static int MaxClients;
         public static List<string> BlackPublish = new List<string>();
         public static List<string> BlackNames = new List<string>();
+        public static string ClientVersion;
+        public static string oldVersion;
 
         public SettingsClass()
         {
@@ -46,6 +48,8 @@ namespace Server
                         else if (element.Name == "DBUser") DB_USER = element.Value;
                         else if (element.Name == "DBPass") DB_PASS = element.Value;
                         else if (element.Name == "DBBase") DB_BASE = element.Value;
+                        else if (element.Name == "Version") oldVersion = element.Value;
+                        else if (element.Name == "ClientVersion") ClientVersion = element.Value;
                     }
                 }
                 node = node.NextNode;
@@ -71,6 +75,8 @@ namespace Server
                         else if (element.Name == "DBUser") element.Value = DB_USER;
                         else if (element.Name == "DBPass") element.Value = DB_PASS;
                         else if (element.Name == "DBBase") element.Value = DB_BASE;
+                        else if (element.Name == "ClientVersion") element.Value = ClientVersion;
+                        else if (element.Name == "Version") element.Value = System.Windows.Forms.Application.ProductVersion;
                     }
                 }
                 node = node.NextNode;
@@ -90,13 +96,19 @@ namespace Server
             textWritter.WriteStartElement("root");//root
             textWritter.WriteEndElement();//root
             textWritter.Close();//writer
-
+            
             if (File.Exists("preferences.xml"))
             {
                 XmlDocument document = new XmlDocument();
                 document.Load("preferences.xml");
                 XmlNode element = document.CreateElement("MainPreferences");
                 document.DocumentElement.AppendChild(element);
+
+                XmlNode subElementz = document.CreateElement("Version");
+                subElementz.InnerText = System.Windows.Forms.Application.ProductVersion;
+                element.AppendChild(subElementz);
+
+
                 element = document.CreateElement("SocketPreferences");
                 document.DocumentElement.AppendChild(element);
 
@@ -114,7 +126,7 @@ namespace Server
                 element.AppendChild(subElement1);
 
 
-                element = document.CreateElement("DataBasePrefences");
+                element = document.CreateElement("DataBasePreferences");
                 document.DocumentElement.AppendChild(element);
 
                 subElement1 = document.CreateElement("DBHost");
@@ -130,9 +142,23 @@ namespace Server
                 subElement1.InnerText = "root";
                 element.AppendChild(subElement1);
 
+
+                element = document.CreateElement("ClientPreferenses");
+                document.DocumentElement.AppendChild(element);
+
+                subElement1 = document.CreateElement("ClientVersion");
+                subElement1.InnerText = "1.0.0.0";
+                element.AppendChild(subElement1);
+
                 document.Save("preferences.xml");
             }
 
+        }
+        public void ReBuildSettings()
+        {
+            LoadSettings();
+            CreateSettingsFile();
+            SaveSettings();
         }
         public bool CheckProductList()
         {

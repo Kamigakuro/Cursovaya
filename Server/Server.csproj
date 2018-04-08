@@ -50,6 +50,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FTD">
+      <HintPath>..\FTD\bin\Debug\FTD.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>K:\MyProg\Server\Server\bin\Debug\MySql.Data.dll</HintPath>
     </Reference>
@@ -104,6 +107,12 @@
     <Compile Include="Forms\ErrorsListForm.Designer.cs">
       <DependentUpon>ErrorsListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\MySQLCon.cs" />
     <Compile Include="Models\QueryElement.cs" />
@@ -132,6 +141,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ErrorsListForm.resx">
       <DependentUpon>ErrorsListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

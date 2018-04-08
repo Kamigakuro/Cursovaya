@@ -9,7 +9,7 @@ namespace Server
     {
         public Log()
         {
-
+            
         }
         public void AddMessage(string message)
         {

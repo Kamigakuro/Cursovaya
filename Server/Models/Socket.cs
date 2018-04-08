@@ -9,6 +9,7 @@ using System.Collections;
 using System.Data;
 using MySql.Data.MySqlClient;
 using System.Threading;
+using FTD;
 
 namespace Server
 {
@@ -47,13 +48,13 @@ namespace Server
         public static ArrayList m_aryClients = new ArrayList();
         static string EndofMessage = "<EOF>";
         public static MySQLCon DB = new MySQLCon();
-        private int CheckCount = 0;
         public System.Windows.Forms.DataGrid ClientTable = new System.Windows.Forms.DataGrid();
         private DataColumn cid = new DataColumn("##", typeof(int));
         private DataColumn cname = new DataColumn("Имя", typeof(string));
         private DataColumn cipadr = new DataColumn("IP адрес", typeof(string));
         private DataColumn ctime = new DataColumn("Время соединения", typeof(string));
         private DataColumn cinfobtn = new DataColumn("      ", typeof(string));
+        //FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
 
         Server server;
         Log logger = new Log();
@@ -215,9 +216,9 @@ namespace Server
                                         client.Clientid = id;
                                         client.time = DateTime.Now;
                                         CheckNewClient(clientname, client.Sock.RemoteEndPoint.ToString(), id);
-                                        server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
+                                        //server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
-                                        writer.Write(IRC_QUERIES.OPSYS);
+                                        writer.Write(IRC_QUERIES.CheckVersion);
                                         client.Sock.Send(m_byBuff);
                                         break;
                                     }
@@ -230,9 +231,9 @@ namespace Server
                                         client.name = clientname;
                                         client.time = DateTime.Now;
                                         CheckNewClient(clientname, client.Sock.RemoteEndPoint.ToString(), id);
-                                        server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
+                                        //server.Invoke(new Server.AddNewClientDelegate(server.AddNewClient), new object[] { clientname, client.Sock.RemoteEndPoint.ToString(), id });
                                         stream.Position = 0;
-                                        writer.Write(IRC_QUERIES.OPSYS);
+                                        writer.Write(IRC_QUERIES.CheckVersion);
                                         client.Sock.Send(m_byBuff);
                                         break;
                                     }
@@ -244,9 +245,9 @@ namespace Server
                             case IRC_QUERIES.OPSYS:
                                 for (int i = 0; i < 7; i++)
                                 {
-                                    string rd = read.ReadString();
-                                    if (rd == EndofMessage) break;
-                                    client.OperationSistem[i] = rd;
+                                    string rds = read.ReadString();
+                                    if (rds == EndofMessage) break;
+                                    client.OperationSistem[i] = rds;
                                 }
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.CPUUNIT);
@@ -334,6 +335,7 @@ namespace Server
                                     if (rd == EndofMessage)
                                     {
                                         CheckMySQLInformation(client.Clientid, client, 5);
+                                        FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
                                         client.SetupRecieveCallback(this);
                                         return;
                                     }
@@ -346,12 +348,26 @@ namespace Server
                                 client.Sock.Send(m_byBuff);
                                 break;
                             #endregion
+                            #region Белый список приложений
                             case IRC_QUERIES.ProductBL:
                                 stream.Position = 0;
                                 writer.Write(IRC_QUERIES.Products);
                                 writer.Write(EndofMessage);
                                 client.Sock.Send(m_byBuff);
                                 break;
+                            #endregion
+                            #region Проверка версии клиента
+                            case IRC_QUERIES.CheckVersion:
+                                string rdr = read.ReadString();
+                                if (rdr != SettingsClass.ClientVersion)
+                                {
+                                    ErrorsListForm.AddQuery("Версия клиента " + client.name + " не совпадает с актуальной версией!\tВерсия клиента: " + rdr + " Актуальная: " + SettingsClass.ClientVersion, client, QueryElement.QueryType.ClientError);
+                                }
+                                stream.Position = 0;
+                                writer.Write(IRC_QUERIES.OPSYS);
+                                client.Sock.Send(m_byBuff);
+                                break;
+                            #endregion
                             case IRC_QUERIES.ERROR_IRC:
                                 break;
                             default:

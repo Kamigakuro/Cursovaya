@@ -15,6 +15,8 @@ namespace Server
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
+        /// 
+        public static Login login;
         [STAThread]
         static void Main()
         {
@@ -22,13 +24,19 @@ namespace Server
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             SettingsClass settings = new SettingsClass();
-            if (settings.CheckSettingsFile()) settings.LoadSettings();
+            if (settings.CheckSettingsFile())
+            {
+                settings.LoadSettings();
+                if (SettingsClass.oldVersion != Application.ProductVersion) settings.ReBuildSettings();
+            }
             else
             {
                 settings.CreateSettingsFile();
                 settings.LoadSettings();
             }
-            Application.Run(new Server());
+            login = new Login();
+            if (login.ShowDialog() == DialogResult.Cancel) Application.Exit();
+            else Application.Run(new Server());
         }
 
         public static class MINIDUMP_TYPE
