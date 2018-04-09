@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client
@@ -62,9 +59,7 @@ namespace Client
         }
         private static void CreateMiniDump()
         {
-            string data = DateTime.Now.ToString();
-            data = String.Format("{0}_ClientCrashDump.dmp", data);
-            using (FileStream fs = new FileStream(data, FileMode.Create))
+            using (FileStream fs = new FileStream("ClientCrashDump.dmp", FileMode.Create))
             {
                 using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
                 {
