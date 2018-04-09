@@ -365,7 +365,7 @@ namespace Server
                                     {
                                         CheckMySQLInformation(client.Clientid, client, 5);
                                         client.Spawned = true;
-                                        //FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
+                                        FTD.FTD.SendFile("test.bin", client.Sock, "test", "bins\\");
                                         client.SetupRecieveCallback(this);
                                         stop = true;
                                         break;
