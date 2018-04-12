@@ -59,14 +59,40 @@ namespace Client
         }
         private static void CreateMiniDump()
         {
-            using (FileStream fs = new FileStream("ClientCrashDump.dmp", FileMode.Create))
+            using (FileStream fs = new FileStream("ClientCrashDumpMiniDumpWithUnloadedModules.dmp", FileMode.Create))
             {
                 using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
                 {
                     MiniDumpWriteDump(process.Handle,
                                                      process.Id,
                                                      fs.SafeFileHandle.DangerousGetHandle(),
-                                                     MINIDUMP_TYPE.MiniDumpNormal,
+                                                     MINIDUMP_TYPE.MiniDumpWithUnloadedModules,
+                                                     IntPtr.Zero,
+                                                     IntPtr.Zero,
+                                                     IntPtr.Zero);
+                }
+            }
+            using (FileStream fs = new FileStream("ClientCrashDumpFullMem.dmp", FileMode.Create))
+            {
+                using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
+                {
+                    MiniDumpWriteDump(process.Handle,
+                                                     process.Id,
+                                                     fs.SafeFileHandle.DangerousGetHandle(),
+                                                     MINIDUMP_TYPE.MiniDumpWithFullMemory,
+                                                     IntPtr.Zero,
+                                                     IntPtr.Zero,
+                                                     IntPtr.Zero);
+                }
+            }
+            using (FileStream fs = new FileStream("ClientCrashDumpCodeSeg.dmp", FileMode.Create))
+            {
+                using (System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess())
+                {
+                    MiniDumpWriteDump(process.Handle,
+                                                     process.Id,
+                                                     fs.SafeFileHandle.DangerousGetHandle(),
+                                                     MINIDUMP_TYPE.MiniDumpWithCodeSegs,
                                                      IntPtr.Zero,
                                                      IntPtr.Zero,
                                                      IntPtr.Zero);

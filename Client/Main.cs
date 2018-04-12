@@ -307,21 +307,21 @@ namespace Client
                 }
                 catch { return false; }
                 //if (temp == null) continue;
-                if (OperationSistem.Version == String.Empty) OperationSistem.Version = vers.ToString();
-                if (OperationSistem.CDVersion == String.Empty) OperationSistem.CDVersion = pack.ToString();
-                if (OperationSistem.Name == String.Empty)
+                if (vers != null) OperationSistem.Version = vers.ToString();
+                if (pack != null) OperationSistem.CDVersion = pack.ToString();
+                if (name !=null)
                 {
                     OperationSistem.Name = name.ToString();
                     OperationSistem.Name = OperationSistem.Name.Substring(0, OperationSistem.Name.IndexOf('|'));
                 }
-                if (OperationSistem.InstallDate == String.Empty)
+                if (istdate != null)
                 {
                     OperationSistem.InstallDate = istdate.ToString();
                     OperationSistem.InstallDate = OperationSistem.InstallDate.Substring(0, OperationSistem.InstallDate.IndexOf('.'));
                 }
                 if (OperationSistem.NumberOfProcesses == 0) OperationSistem.NumberOfProcesses = Convert.ToInt32(NumberOfProcesses);
                 if (OperationSistem.NumberOfUsers == 0) OperationSistem.NumberOfUsers = Convert.ToInt32(NumberOfUsers.ToString());
-                if (OperationSistem.SerialNumber == String.Empty) OperationSistem.SerialNumber = serial.ToString();
+                if (serial != null) OperationSistem.SerialNumber = serial.ToString();
 
                 item.Dispose();
             }
