@@ -95,10 +95,19 @@ namespace Server
         private void IntializeSocket()
         {
             //socket = new SSocket();
-            const int nPortListen = 7777;
-            IPAddress.TryParse(GetExternalIp(), out IPAddress aryLocalAddr);
-            if (aryLocalAddr == null || aryLocalAddr == IPAddress.None) aryLocalAddr = GetLocalIP();
-            if (aryLocalAddr == null)
+
+            IPAddress aryLocalAddr;
+            if (!SettingsClass.LocalWork)
+            {
+                IPAddress.TryParse(GetExternalIp(), out aryLocalAddr);
+            }
+            else
+            {
+                aryLocalAddr = GetLocalIP();
+            }
+           // IPAddress.TryParse(GetExternalIp(), out IPAddress aryLocalAddr);
+           // if (aryLocalAddr == null || aryLocalAddr == IPAddress.None) aryLocalAddr = GetLocalIP();
+            if (aryLocalAddr == null || aryLocalAddr == IPAddress.None)
             {
                 string mess = String.Format("Невозможно получить адрес сервера.");
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
@@ -120,10 +129,10 @@ namespace Server
                 }
                 else
                 {
-                    string localip = "" + GetLocalIP().ToString();
+                    string localip = "" + aryLocalAddr.ToString();
                     label4.Text = "Подключено";
                     label4.ForeColor = Color.Green;
-                    label10.Text = aryLocalAddr + ":" + nPortListen + " (" + localip + ")";
+                    label10.Text = aryLocalAddr.ToString() + ":" + SettingsClass.SPort + " (" + localip + ")";
                 }
             }
         }

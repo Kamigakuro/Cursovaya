@@ -14,13 +14,21 @@ namespace Client
 
     struct OperationSistem
     {
-        public static string Name = String.Empty;
-        public static string Version = String.Empty;
-        public static string CDVersion = String.Empty;
+        public static string CodeSet = String.Empty;
+        public static string CSDVersion = String.Empty;
+        public static string Debug = String.Empty;
+        public static string FreePhysicalMemory = String.Empty;
+        public static string FreeSpaceInPagingFiles = String.Empty;
+        public static string FreeVirtualMemory = String.Empty;
         public static string InstallDate = String.Empty;
-        public static int NumberOfProcesses = 0;
-        public static int NumberOfUsers = 0;
+        public static string Name = String.Empty;
+        public static string NumberOfLicensedUsers = String.Empty;
+        public static string NumberOfUsers = String.Empty;
+        public static string OperatingSystemSKU = String.Empty;
+        public static string OSArchitecture = String.Empty;
+        public static string RegisteredUser = String.Empty;
         public static string SerialNumber = String.Empty;
+        public static string Version = String.Empty;
     }
     struct CPUUNIT
     {
@@ -292,38 +300,25 @@ namespace Client
             Log.AddLog("[COMPONENT] Сбор данных ОС...");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\CIMV2", "SELECT * FROM CIM_OperatingSystem");
             ManagementObjectCollection colItems = searcher.Get();
-            object vers = String.Empty, name = String.Empty, pack = String.Empty, istdate = String.Empty, NumberOfProcesses = 0, NumberOfUsers = 0, serial = String.Empty;
-            foreach (ManagementObject item in colItems)
-            {
-                try
-                {
-                    vers = item["Version"];
-                    name = item["Name"];
-                    pack = item["CSDVersion"];
-                    istdate = item["InstallDate"];
-                    NumberOfProcesses = item["NumberOfProcesses"];
-                    NumberOfUsers = item["NumberOfUsers"];
-                    serial = item["SerialNumber"];
-                }
-                catch { return false; }
-                //if (temp == null) continue;
-                if (vers != null) OperationSistem.Version = vers.ToString();
-                if (pack != null) OperationSistem.CDVersion = pack.ToString();
-                if (name !=null)
-                {
-                    OperationSistem.Name = name.ToString();
-                    OperationSistem.Name = OperationSistem.Name.Substring(0, OperationSistem.Name.IndexOf('|'));
-                }
-                if (istdate != null)
-                {
-                    OperationSistem.InstallDate = istdate.ToString();
-                    OperationSistem.InstallDate = OperationSistem.InstallDate.Substring(0, OperationSistem.InstallDate.IndexOf('.'));
-                }
-                if (OperationSistem.NumberOfProcesses == 0) OperationSistem.NumberOfProcesses = Convert.ToInt32(NumberOfProcesses);
-                if (OperationSistem.NumberOfUsers == 0) OperationSistem.NumberOfUsers = Convert.ToInt32(NumberOfUsers.ToString());
-                if (serial != null) OperationSistem.SerialNumber = serial.ToString();
+            //object vers = String.Empty, name = String.Empty, pack = String.Empty, istdate = String.Empty, NumberOfProcesses = 0, NumberOfUsers = 0, serial = String.Empty;
 
-                item.Dispose();
+            foreach (ManagementObject queryObj in colItems)
+            {
+                if (queryObj["CodeSet"] != null) OperationSistem.CodeSet = queryObj["CodeSet"].ToString();
+                if (queryObj["CSDVersion"] != null) OperationSistem.CSDVersion = queryObj["CSDVersion"].ToString();
+                if (queryObj["Debug"] != null) OperationSistem.Debug = queryObj["Debug"].ToString();
+                if (queryObj["FreePhysicalMemory"] != null) OperationSistem.FreePhysicalMemory = queryObj["FreePhysicalMemory"].ToString();
+                if (queryObj["FreeSpaceInPagingFiles"] != null) OperationSistem.FreeSpaceInPagingFiles = queryObj["FreeSpaceInPagingFiles"].ToString();
+                if (queryObj["FreeVirtualMemory"] != null) OperationSistem.FreeVirtualMemory = queryObj["FreeVirtualMemory"].ToString();
+                if (queryObj["InstallDate"] != null) OperationSistem.InstallDate = queryObj["InstallDate"].ToString();
+                if (queryObj["Name"] != null) OperationSistem.Name = queryObj["Name"].ToString();
+                if (queryObj["NumberOfLicensedUsers"] != null) OperationSistem.NumberOfLicensedUsers = queryObj["NumberOfLicensedUsers"].ToString();
+                if (queryObj["NumberOfUsers"] != null) OperationSistem.NumberOfUsers = queryObj["NumberOfUsers"].ToString();
+                if (queryObj["OperatingSystemSKU"] != null) OperationSistem.OperatingSystemSKU = queryObj["OperatingSystemSKU"].ToString();
+                if (queryObj["OSArchitecture"] != null) OperationSistem.OSArchitecture = queryObj["OSArchitecture"].ToString();
+                if (queryObj["RegisteredUser"] != null) OperationSistem.RegisteredUser = queryObj["RegisteredUser"].ToString();
+                if (queryObj["SerialNumber"] != null) OperationSistem.SerialNumber = queryObj["SerialNumber"].ToString();
+                if (queryObj["Version"] != null) OperationSistem.Version = queryObj["Version"].ToString();
             }
             Log.AddLog("[COMPONENT] Данные ОС получены.");
             return true;
@@ -478,7 +473,7 @@ namespace Client
                         case IRC_QUERIES.OPSYS:
                             Log.AddLog("[RECEIVE][OS] Принят запрос.");
                             stream.Position = 0;
-                            if (OperationSistem.Name == String.Empty || OperationSistem.CDVersion == String.Empty)
+                            if (OperationSistem.Name == String.Empty || OperationSistem.NumberOfUsers == String.Empty)
                             {
                                 writer.Write(IRC_QUERIES.ERROR_IRC);
                                 writer.Write(IRC_QUERIES.ERRONCLIENTSIDE);
@@ -487,13 +482,21 @@ namespace Client
                                 break;
                             }
                             writer.Write(IRC_QUERIES.OPSYS);
-                            writer.Write(OperationSistem.Name);
-                            writer.Write(OperationSistem.Version);
-                            writer.Write(OperationSistem.CDVersion);
+                            writer.Write(OperationSistem.CodeSet);
+                            writer.Write(OperationSistem.CSDVersion);
+                            writer.Write(OperationSistem.Debug);
+                            writer.Write(OperationSistem.FreePhysicalMemory);
+                            writer.Write(OperationSistem.FreeSpaceInPagingFiles.ToString());
+                            writer.Write(OperationSistem.FreeVirtualMemory.ToString());
                             writer.Write(OperationSistem.InstallDate);
-                            writer.Write(OperationSistem.NumberOfProcesses.ToString());
-                            writer.Write(OperationSistem.NumberOfUsers.ToString());
+                            writer.Write(OperationSistem.Name);
+                            writer.Write(OperationSistem.NumberOfLicensedUsers);
+                            writer.Write(OperationSistem.NumberOfUsers);
+                            writer.Write(OperationSistem.OperatingSystemSKU);
+                            writer.Write(OperationSistem.OSArchitecture);
+                            writer.Write(OperationSistem.RegisteredUser);
                             writer.Write(OperationSistem.SerialNumber);
+                            writer.Write(OperationSistem.Version);
                             writer.Write(IRC_QUERIES.EndOfMessage);
                             socket.Send(m_byBuff);
                             Log.AddLog("[RECEIVE][OS] Ответ отправлен.");

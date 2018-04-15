@@ -270,7 +270,7 @@ namespace Server
                             #endregion
                             #region ОС
                             case IRC_QUERIES.OPSYS:
-                                for (int i = 0; i < 7; i++)
+                                for (int i = 0; i < 15; i++)
                                 {
                                     string rds = read.ReadString();
                                     if (rds == EndofMessage) break;
@@ -405,6 +405,7 @@ namespace Server
                                 client.Spawned = true;
                                 break;
                             case IRC_QUERIES.ERROR_IRC:
+                                ErrorsListForm.AddQuery("Клиент " + client.name + " сообщил о врутренней ошибке на своей стороне.", client, QueryElement.QueryType.ClientError);
                                 break;
                             default:
                                 break;
@@ -456,24 +457,36 @@ namespace Server
                         {
                             foreach (DataRow row in dataReader.Rows)
                             {
-                                string s = row.Field<string>(1);
-                                if (s != client.OperationSistem[0])
+                                string s = row.Field<string>(8);
+                                if (s != client.OperationSistem[7])
                                 {
-                                    ErrorsListForm.AddQuery("Несовпадение значений!\tБыло: " + s + " Стало: " + client.OperationSistem[0], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Name = '{0}' WHERE systemid = {1}", client.OperationSistem[0], id));
+                                    ErrorsListForm.AddQuery("Несовпадение значений!\tБыло: " + s + " Стало: " + client.OperationSistem[7], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Name = '{0}' WHERE systemid = {1}", client.OperationSistem[7], id));
                                 }
-                                if (row.Field<string>(2) != client.OperationSistem[1]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений Version!\tБыло: " + row.Field<string>(2) + " Стало: " + client.OperationSistem[1], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Version = '{0}' WHERE systemid = {1}", client.OperationSistem[1], id)); }
-                                if (row.Field<string>(3) != client.OperationSistem[2]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений CDVersion!\tБыло: " + row.Field<string>(3) + " Стало: " + client.OperationSistem[2], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET CDVersion = '{0}' WHERE systemid = {1}", client.OperationSistem[2], id)); }
-                                if (row.Field<string>(4) != client.OperationSistem[3]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений InstallDate!\tБыло: " + row.Field<string>(4) + " Стало: " + client.OperationSistem[3], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET InstallDate = '{0}' WHERE systemid = {1}", client.OperationSistem[3], id)); }
-                                if (row.Field<string>(5) != client.OperationSistem[4]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений NumberOfProcesses!\tБыло: " + row.Field<string>(5) + " Стало: " + client.OperationSistem[4], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfProcesses = '{0}' WHERE systemid = {1}", client.OperationSistem[4], id)); }
-                                if (row.Field<string>(6) != client.OperationSistem[5]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений NumberOfUsers!\tБыло: " + row.Field<string>(6) + " Стало: " + client.OperationSistem[5], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfUsers = '{0}' WHERE systemid = {1}", client.OperationSistem[5], id)); }
-                                if (row.Field<string>(7) != client.OperationSistem[6]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений SerialNumber!\tБыло: " + row.Field<string>(7) + " Стало: " + client.OperationSistem[6], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET SerialNumber = '{0}' WHERE systemid = {1}", client.OperationSistem[6], id)); }
+                                if (row.Field<string>(1) != client.OperationSistem[0]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений CodeSet!\tБыло: " + row.Field<string>(1) + " Стало: " + client.OperationSistem[0], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET CodeSet = '{0}' WHERE systemid = {1}", client.OperationSistem[0], id)); }
+                                if (row.Field<string>(2) != client.OperationSistem[1]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений CSDVersion!\tБыло: " + row.Field<string>(2) + " Стало: " + client.OperationSistem[1], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET CSDVersion = '{0}' WHERE systemid = {1}", client.OperationSistem[1], id)); }
+                                if (row.Field<string>(3) != client.OperationSistem[2]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений Debug!\tБыло: " + row.Field<string>(3) + " Стало: " + client.OperationSistem[2], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Debug = '{0}' WHERE systemid = {1}", client.OperationSistem[2], id)); }
+                                if (row.Field<string>(4) != client.OperationSistem[3]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений FreePhysicalMemory!\tБыло: " + row.Field<string>(4) + " Стало: " + client.OperationSistem[3], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET FreePhysicalMemory = '{0}' WHERE systemid = {1}", client.OperationSistem[3], id)); }
+                                if (row.Field<string>(5) != client.OperationSistem[4]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений FreeSpaceInPagingFiles!\tБыло: " + row.Field<string>(5) + " Стало: " + client.OperationSistem[4], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET FreeSpaceInPagingFiles = '{0}' WHERE systemid = {1}", client.OperationSistem[4], id)); }
+                                if (row.Field<string>(6) != client.OperationSistem[5]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений FreeVirtualMemory!\tБыло: " + row.Field<string>(6) + " Стало: " + client.OperationSistem[5], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET FreeVirtualMemory = '{0}' WHERE systemid = {1}", client.OperationSistem[5], id)); }
+                                if (row.Field<string>(7) != client.OperationSistem[6]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений InstallDate!\tБыло: " + row.Field<string>(7) + " Стало: " + client.OperationSistem[6], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET InstallDate = '{0}' WHERE systemid = {1}", client.OperationSistem[6], id)); }
+                                if (row.Field<string>(9) != client.OperationSistem[8]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений NumberOfLicensedUsers!\tБыло: " + row.Field<string>(9) + " Стало: " + client.OperationSistem[8], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfLicensedUsers = '{0}' WHERE systemid = {1}", client.OperationSistem[8], id)); }
+                                if (row.Field<string>(10) != client.OperationSistem[9]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений NumberOfUsers!\tБыло: " + row.Field<string>(10) + " Стало: " + client.OperationSistem[9], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET NumberOfUsers = '{0}' WHERE systemid = {1}", client.OperationSistem[9], id)); }
+                                if (row.Field<string>(11) != client.OperationSistem[10]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений OperatingSystemSKU!\tБыло: " + row.Field<string>(11) + " Стало: " + client.OperationSistem[10], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET OperatingSystemSKU = '{0}' WHERE systemid = {1}", client.OperationSistem[10], id)); }
+                                if (row.Field<string>(12) != client.OperationSistem[11]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений OSArchitecture!\tБыло: " + row.Field<string>(12) + " Стало: " + client.OperationSistem[11], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET OSArchitecture = '{0}' WHERE systemid = {1}", client.OperationSistem[11], id)); }
+                                if (row.Field<string>(13) != client.OperationSistem[12]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений RegisteredUser!\tБыло: " + row.Field<string>(13) + " Стало: " + client.OperationSistem[12], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET RegisteredUser = '{0}' WHERE systemid = {1}", client.OperationSistem[12], id)); }
+                                if (row.Field<string>(14) != client.OperationSistem[13]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений SerialNumber!\tБыло: " + row.Field<string>(14) + " Стало: " + client.OperationSistem[13], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET SerialNumber = '{0}' WHERE systemid = {1}", client.OperationSistem[13], id)); }
+                                if (row.Field<string>(15) != client.OperationSistem[14]) { ErrorsListForm.AddQuery("operationsys: Несовпадение значений Version!\tБыло: " + row.Field<string>(15) + " Стало: " + client.OperationSistem[14], client, QueryElement.QueryType.DBError, String.Format("UPDATE operationsys SET Version = '{0}' WHERE systemid = {1}", client.OperationSistem[14], id)); }
                             }
                         }
                         else
                         {
                             dataReader.Clear();
                             dataReader.Dispose();
-                            sql = String.Format("INSERT INTO operationsys(Name, Version, CDVersion, InstallDate, NumberOfProcesses, NumberOfUsers, SerialNumber, systemid) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}')",
+                            sql = String.Format("INSERT INTO operationsys(CodeSet, " +
+                                "CSDVersion, Debug, FreePhysicalMemory, FreeSpaceInPagingFiles, FreeVirtualMemory, " +
+                                "InstallDate, Name, NumberOfLicensedUsers, NumberOfUsers, OperatingSystemSKU, RegisteredUser, OSArchitecture," +
+                                "SerialNumber, Version, systemid)" +
+                                " VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}')",
                                 client.OperationSistem[0],
                                 client.OperationSistem[1],
                                  client.OperationSistem[2],
@@ -481,6 +494,14 @@ namespace Server
                                    client.OperationSistem[4],
                                     client.OperationSistem[5],
                                      client.OperationSistem[6],
+                                     client.OperationSistem[7],
+                                     client.OperationSistem[8],
+                                     client.OperationSistem[9],
+                                     client.OperationSistem[10],
+                                     client.OperationSistem[11],
+                                     client.OperationSistem[12],
+                                     client.OperationSistem[13],
+                                     client.OperationSistem[14],
                                      id);
                             try
                             {

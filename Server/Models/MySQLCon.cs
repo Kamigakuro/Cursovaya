@@ -223,8 +223,8 @@ namespace Server
                 }
                 if (!Tables.Contains("operationsys"))
                 {
-                    com.Dispose();
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Version VARCHAR(30), CDVersion VARCHAR(30), InstallDate VARCHAR(30), NumberOfProcesses VARCHAR(4), NumberOfUsers VARCHAR(2), SerialNumber VARCHAR(30), systemid INT NOT NULL)");
+                    com.Dispose();                                                                                                                                                                                                                                                                         
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, CodeSet VARCHAR(20), CSDVersion VARCHAR(30), Debug VARCHAR(10), FreePhysicalMemory VARCHAR(30), FreeSpaceInPagingFiles VARCHAR(30), FreeVirtualMemory VARCHAR(30), InstallDate VARCHAR(30), Name VARCHAR(60), NumberOfLicensedUsers VARCHAR(4), NumberOfUsers VARCHAR(4), OperatingSystemSKU VARCHAR(20), OSArchitecture VARCHAR(4),RegisteredUser VARCHAR(7), SerialNumber VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
                     com = new MySqlCommand(command, MainHandle);
                     com.ExecuteNonQuery();
                     MyDataReader.Close();

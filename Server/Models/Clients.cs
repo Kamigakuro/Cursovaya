@@ -17,7 +17,7 @@ namespace Server
         public string macadr = String.Empty;
         public string name = String.Empty;
         public DateTime time = new DateTime();
-        public string[] OperationSistem = new string[7];
+        public string[] OperationSistem = new string[15];
         public string[] CPUUNIT = new string[15];
         public string[] GPUUNIT = new string[14];
         public string[] Board = new string[9];
