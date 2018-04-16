@@ -18,7 +18,7 @@ namespace Server
     public partial class Server : Form
     {
         Thread TimerThread;
-        public MySQLCon DB = new MySQLCon();
+        public MySQLCon DB = new MySQLCon("137.74.4.167","user10870", "user10870","0lwHqEJe4X75");
         public SettingsClass settings = new SettingsClass();
         public static TextBox TextBoxLog;
         public delegate void DeleteClientFromList(SocketClient client);
@@ -33,14 +33,10 @@ namespace Server
                 settings.LoadProductList();
             }
             //-------------------------------
-
-            //DeleteClientFromList del;
-            //del = DeleteClient;
             TextBoxLog = this.textBox1;
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
-
             InitializeMySQL();
             //---------Ивенты---------------
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
@@ -122,7 +118,22 @@ namespace Server
         {
             textBox1.AppendText(">> " + text + "\n");
         }
+        private void InitializeMySQL()
+        {
+            DB.OpenConnection();
+            if (DB.SqlConnection == ConnectionState.Open)
+            {
+                dbStatusLabel.Text = "Подключено ";
+                dbStatusLabel.ForeColor = Color.Green;
+                DB.CheckBaseIntegrity("user10870");
 
+            }
+            else
+            {
+                dbStatusLabel.Text = "Отключено";
+                dbStatusLabel.ForeColor = Color.Red;
+            }
+        }
         //private delegate void DeleteClientFromList(SocketClient client);
         public void DeleteClient(int id)
         {

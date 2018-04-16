@@ -13,6 +13,22 @@ using FTD;
 
 namespace Server
 {
+    public struct IRC_QUERIES
+    {
+        public const int REQ_AUTH = 1;
+        const int RES_AUTH = 2;
+        const int TEST = 8888;
+        public const int ERROR_IRC = 0;
+        public const int OPSYS = 3;
+        public const int CPUUNIT = 4;
+        public const int GPUUNIT = 5;
+        public const int Board = 6;
+        public const int RAM = 7;
+        public const int Products = 8;
+        public const int ProductBL = 9;
+        public const int CheckVersion = 10;
+        public const int ERRONCLIENTSIDE = 9999;
+    }
     public class SSocket
     {
         public delegate void ConnectedClient(string name, string ip, int id);
@@ -52,7 +68,7 @@ namespace Server
         /// </summary>
         public static ArrayList m_aryClients = new ArrayList();
         static string EndofMessage = "<EOF>";
-        public static MySQLCon DB = new MySQLCon();
+        public static MySQLCon DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
 
         Server server;
         Log logger = new Log();
@@ -63,14 +79,9 @@ namespace Server
         public SSocket(Server srv)
         {
             server = srv;
-
-            //ClientTable.Columns.Add();
-            Ping = new Thread(PingClients);
-            Ping.Name = "Ping Clients";
-            Connections = new Thread(OnNewConnection);
-            Connections.Name = "Connection Process";
-            Reciver = new Thread(OnRecievedData);
-            Reciver.Name = "Recieving Process";
+            Ping = new Thread(PingClients); { Ping.Name = "Ping Clients"; }
+            Connections = new Thread(OnNewConnection); { Connections.Name = "Connection Process"; }
+            Reciver = new Thread(OnRecievedData); { Reciver.Name = "Recieving Process"; }           
             ConnectionThreadWork = true;
             RecieveThreadWork = true;
             Connections.Start();
@@ -124,7 +135,6 @@ namespace Server
                 listener.Dispose();
             }
         }
-
         public void PingClients()
         {
             while (true)
@@ -870,7 +880,6 @@ namespace Server
                 ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
             }
         }
-
         public void RemoveClient(SocketClient client)
         {
             logger.AddMessage("[CLIENT] " + String.Format("Клиент [{0}] отключен.", client.endpoint.ToString()));

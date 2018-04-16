@@ -15,44 +15,9 @@ using System.Windows.Forms;
 
 namespace Server
 {
-    public struct IRC_QUERIES
-    {
-        public const int REQ_AUTH = 1;
-        const int RES_AUTH = 2;
-        const int TEST = 8888;
-        public const int ERROR_IRC = 0;
-        public const int OPSYS = 3;
-        public const int CPUUNIT = 4;
-        public const int GPUUNIT = 5;
-        public const int Board = 6;
-        public const int RAM = 7;
-        public const int Products = 8;
-        public const int ProductBL = 9;
-        public const int CheckVersion = 10;
-        public const int ERRONCLIENTSIDE = 9999;
-    }
     public partial class Server
     {
-        public SSocket socket;
-        /// <summary>
-        /// Соединение с базой данных
-        /// </summary>
-        private void InitializeMySQL()
-        {
-            DB.OpenConnection("user10870", "0lwHqEJe4X75", "user10870", "137.74.4.167");
-            if (DB.SqlConnection == ConnectionState.Open)
-            {
-                dbStatusLabel.Text = "Подключено ";
-                dbStatusLabel.ForeColor = Color.Green;
-                DB.CheckBaseIntegrity("user10870");
-
-            }
-            else
-            {
-                dbStatusLabel.Text = "Отключено";
-                dbStatusLabel.ForeColor = Color.Red;
-            }
-        }
+        public SSocket socket;        
         /// <summary>
         /// Получение внешнего IP-адреса
         /// </summary>

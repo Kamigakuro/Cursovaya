@@ -12,6 +12,10 @@ namespace Server
     public class MySQLCon
     {
         private static MySqlConnection MainHandle;
+        private string DB_HOST;
+        private string DB_USER;
+        private string DB_BASE;
+        private string DB_PASS;
         private ArrayList ConnectionPool = new ArrayList();
         public MySqlConnection GetHandle { get { return MainHandle; } }
         /// <summary>
@@ -28,7 +32,7 @@ namespace Server
         /// <param name="DB_PASS">Пароль</param>
         /// <param name="DB_BASE">Название базы</param>
         /// <param name="DB_HOST">Адрес подключения</param>
-        public void OpenConnection(string DB_USER, string DB_PASS, string DB_BASE, string DB_HOST)
+        public void OpenConnection()
         {
             MainHandle = new MySqlConnection("Database=" + DB_BASE + ";Data Source=" + DB_HOST + ";User Id=" + DB_USER + ";Password=" + DB_PASS + ";charset = utf8");
             try
@@ -137,38 +141,6 @@ namespace Server
             lHandle.Dispose();
             return reader;
         }
-        /*
-        public MySqlDataReader SendTQuery(string command)
-        {
-            MySqlDataReader reader;
-            while (ConnectionPool.Count > 10) { Thread.Sleep(100); }
-            MySqlConnection lHandle = new MySqlConnection("Database=" + SettingsClass.DB_BASE + ";Data Source=" + SettingsClass.DB_HOST + ";User Id=" + SettingsClass.DB_USER + ";Password=" + SettingsClass.DB_PASS + ";charset = utf8");
-            ConnectionPool.Add(lHandle);
-            
-            try { lHandle.Open(); }
-            catch (MySqlException e)
-            {
-                string mess = String.Format("Не удалось установить соединение с базой данных! {0}", e.Message);
-                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-                return null;
-            }
-            try
-            {
-                MySqlCommand com = new MySqlCommand(command, lHandle);
-                reader = com.ExecuteReader();
-            }
-            catch (MySqlException me)
-            {
-                string mess = String.Format("Ошибка при выполнении запроса в БД. ({0}). {1}", command, me.ToString());
-                ErrorsListForm.AddQuery(mess, QueryElement.QueryType.SysError);
-                lHandle.Close();
-                lHandle.Dispose();
-                reader = null;
-            }
-            //localHandle.Close();
-            return reader;
-        }
-        */
         /// <summary>
         /// Закрытие подключения к базе данных
         /// </summary>
@@ -272,6 +244,13 @@ namespace Server
                 //if (!Tables.Contains("system")) { }
             }
             // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать
+        }
+        public MySQLCon(string DB_HOST, string DB_USER, string DB_BASE, string DB_PASS)
+        {
+            this.DB_HOST = DB_HOST;
+            this.DB_USER = DB_USER;
+            this.DB_BASE = DB_BASE;
+            this.DB_PASS = DB_PASS;
         }
 
     }

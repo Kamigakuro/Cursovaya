@@ -16,6 +16,12 @@ namespace Server
         /// Главная точка входа для приложения.
         /// </summary>
         /// 
+        static bool IsSingleInstance()
+        {
+            bool flag;
+            Mutex mutex = new Mutex(true, "MY_UNIQUE_MUTEX_NAME", out flag);
+            return flag;
+        }
         public static Login login;
         [STAThread]
         static void Main()
@@ -24,6 +30,11 @@ namespace Server
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             SettingsClass settings = new SettingsClass();
+            if (!IsSingleInstance())
+            {
+                MessageBox.Show("Сервер уже запущен!", "Server");
+                Application.Exit();
+            }
             if (settings.CheckSettingsFile())
             {
                 settings.LoadSettings();
@@ -38,7 +49,6 @@ namespace Server
             if (login.ShowDialog() == DialogResult.OK) Application.Run(new Server());
             else Application.Exit();
         }
-
         public static class MINIDUMP_TYPE
         {
             public const int MiniDumpNormal = 0x00000000;
