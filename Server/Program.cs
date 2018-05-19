@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Reflection;
 
 namespace Server
 {

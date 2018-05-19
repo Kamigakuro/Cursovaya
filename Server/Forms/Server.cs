@@ -18,7 +18,7 @@ namespace Server
     public partial class Server : Form
     {
         Thread TimerThread;
-        public MySQLCon DB = new MySQLCon("137.74.4.167","user10870", "user10870","0lwHqEJe4X75");
+        public MySQLCon DB;
         public SettingsClass settings = new SettingsClass();
         public static TextBox TextBoxLog;
         public delegate void DeleteClientFromList(SocketClient client);
@@ -36,18 +36,20 @@ namespace Server
             TextBoxLog = this.textBox1;
             notifyIcon1.Click += NotifyIcon1_Click;
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
-            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
-            InitializeMySQL();
             //---------Ивенты---------------
             ErrorsListForm.AddQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.RemoveQueryHandle += this.UpdateQueryCounts;
             ErrorsListForm.UpdateAllClients += this.GetAllClients;
             SSocket.CheckNewClient += this.AddNewClient;
             SSocket.DeleteClientFrom += this.DeleteClient;
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             //------------------------------
+
+            DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
+            InitializeMySQL();
             TimerThread = new Thread(UpdateTimer);
             TimerThread.Start();
-            
+
         }
         public delegate void UpdateTimeEx();
         public void UpdateTime()
@@ -84,9 +86,13 @@ namespace Server
 
         public void UpdateQueryCounts()
         {
-            dberrorslabel.BeginInvoke((MethodInvoker)(() => dberrorslabel.Text = ErrorsListForm.DBErrors.ToString()));
-            syserorslabel.BeginInvoke((MethodInvoker)(() => syserorslabel.Text = ErrorsListForm.SysErrors.ToString()));
-            clienterrorlabel.BeginInvoke((MethodInvoker)(() => clienterrorlabel.Text = ErrorsListForm.ClientErrors.ToString()));
+            try
+            {
+                dberrorslabel.BeginInvoke((MethodInvoker)(() => dberrorslabel.Text = ErrorsListForm.DBErrors.ToString()));
+                syserorslabel.BeginInvoke((MethodInvoker)(() => syserorslabel.Text = ErrorsListForm.SysErrors.ToString()));
+                clienterrorlabel.BeginInvoke((MethodInvoker)(() => clienterrorlabel.Text = ErrorsListForm.ClientErrors.ToString()));
+            }
+            catch { }
             if (ErrorsListForm.link.Count == 0) ErrorsListForm.ErrorsCounter = 0;
         }
         private void NotifyIcon1_Click(object sender, EventArgs e)
@@ -102,10 +108,7 @@ namespace Server
         public void AddNewClient(string name, string ip, int id)
         {
             label6.Invoke(new Action(() => label6.Text = Convert.ToString(SSocket.m_aryClients.Count)));
-            //label6.Text = Convert.ToString(socket.m_aryClients.Count);
             dataGridView1.Invoke(new Action(() => dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее")));
-            //dataGridView1.Rows.Add(id, name, ip, "00:00", "Подробнее");
-            //AddNewConsoleMessage(String.Format("Подключен новый клиент: [{0}] {1}", name, ip));
         }
         public delegate void GetClientsList();
         public void GetAllClients()
@@ -134,7 +137,6 @@ namespace Server
                 dbStatusLabel.ForeColor = Color.Red;
             }
         }
-        //private delegate void DeleteClientFromList(SocketClient client);
         public void DeleteClient(int id)
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -148,7 +150,6 @@ namespace Server
             }
             label6.Invoke(new Action(() => label6.Text = Convert.ToString(SSocket.m_aryClients.Count)));
         }
-
         private void OnApplicationExit(object sender, EventArgs e)
         {
                 TimerThread.Abort();
@@ -165,7 +166,6 @@ namespace Server
                 DB.CloseConnection();
             
         }
-
         bool cancelevent = true;
         private void Server_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -180,7 +180,6 @@ namespace Server
             if (login.DialogResult == DialogResult.OK)
                 Application.Exit();
         }
-
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
@@ -224,7 +223,6 @@ namespace Server
         {
 
         }
-
         private void querylist_Click(object sender, EventArgs e)
         {
             if (ErrorsListForm.link != null && ErrorsListForm.link.Count == 0) { MessageBox.Show("Очередь пуста!"); return; }
@@ -263,6 +261,7 @@ namespace Server
 
         private void button3_Click_1(object sender, EventArgs e)
         {
+            if (DB.SqlConnection != ConnectionState.Open) return;
             dataGridView2.Rows.Clear();
             string sql = "SELECT * FROM systems";
             DataTable reader = DB.SendTQuery(sql);
