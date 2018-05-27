@@ -125,7 +125,7 @@ namespace Server
                             {
                                 if (!String.IsNullOrEmpty(node.Value.GetQuery()))
                                 {
-                                    MySQLCon DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
+                                    MySQLCon DB = new MySQLCon();
                                     DB.SendNonQuery(node.Value.GetQuery());
                                     node.Value.Dispose();
                                     node.Value = null;
@@ -148,7 +148,7 @@ namespace Server
                             {
                                 if (!String.IsNullOrEmpty(node.Value.GetQuery()))
                                 {
-                                    MySQLCon DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
+                                    MySQLCon DB = new MySQLCon();
                                     DB.SendNonQuery(node.Value.GetQuery());
                                     node.Value.Dispose();
                                     node.Value = null;

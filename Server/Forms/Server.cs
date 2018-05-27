@@ -22,6 +22,8 @@ namespace Server
         public SettingsClass settings = new SettingsClass();
         public static TextBox TextBoxLog;
         public delegate void DeleteClientFromList(SocketClient client);
+
+        private bool UpdateClientTablePool = false;
         public Server()
         {
             InitializeComponent();
@@ -45,9 +47,12 @@ namespace Server
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             //------------------------------
 
-            DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
+            DB = new MySQLCon();
             InitializeMySQL();
             TimerThread = new Thread(UpdateTimer);
+            TimerThread.Name = "Update Clients Timer";
+            TimerThread.IsBackground = true;
+            UpdateClientTablePool = true;
             TimerThread.Start();
 
         }
@@ -73,7 +78,7 @@ namespace Server
         }
         private void UpdateTimer()
         {
-            while (true)
+            while (UpdateClientTablePool)
             {
                 try
                 {
@@ -128,7 +133,7 @@ namespace Server
             {
                 dbStatusLabel.Text = "Подключено ";
                 dbStatusLabel.ForeColor = Color.Green;
-                DB.CheckBaseIntegrity("user10870");
+                DB.CheckBaseIntegrity(SettingsClass.DB_USER);
 
             }
             else
@@ -152,18 +157,19 @@ namespace Server
         }
         private void OnApplicationExit(object sender, EventArgs e)
         {
-                TimerThread.Abort();
-                ErrorsListForm.AddQueryHandle -= this.UpdateQueryCounts;
-                ErrorsListForm.RemoveQueryHandle -= this.UpdateQueryCounts;
-                try
-                {
-                    socket.ShutDown();
-                }
-                catch (Exception es)
-                {
-                    MessageBox.Show(es.ToString());
-                }
-                DB.CloseConnection();
+            UpdateClientTablePool = false;
+            ErrorsListForm.AddQueryHandle -= this.UpdateQueryCounts;
+            ErrorsListForm.RemoveQueryHandle -= this.UpdateQueryCounts;
+            SettingsClass.SaveSettings();
+            try
+            {
+                socket.ShutDown();
+            }
+            catch (Exception es)
+            {
+                MessageBox.Show(es.ToString());
+            }
+            DB.CloseConnection();
             
         }
         bool cancelevent = true;

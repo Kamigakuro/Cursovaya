@@ -68,7 +68,8 @@ namespace Server
         /// </summary>
         public static ArrayList m_aryClients = new ArrayList();
         static string EndofMessage = "<EOF>";
-        public static MySQLCon DB = new MySQLCon("137.74.4.167", "user10870", "user10870", "0lwHqEJe4X75");
+
+        public static MySQLCon DB = new MySQLCon();
 
         Server server;
         Log logger = new Log();
@@ -137,7 +138,7 @@ namespace Server
         }
         public void PingClients()
         {
-            while (true)
+            while (RecieveThreadWork)
             {
                 foreach (SocketClient client in m_aryClients.ToArray())
                 {

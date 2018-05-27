@@ -196,7 +196,7 @@ namespace Server
                 if (!Tables.Contains("operationsys"))
                 {
                     com.Dispose();                                                                                                                                                                                                                                                                         
-                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, CodeSet VARCHAR(20), CSDVersion VARCHAR(30), Debug VARCHAR(10), FreePhysicalMemory VARCHAR(30), FreeSpaceInPagingFiles VARCHAR(30), FreeVirtualMemory VARCHAR(30), InstallDate VARCHAR(30), Name VARCHAR(60), NumberOfLicensedUsers VARCHAR(4), NumberOfUsers VARCHAR(4), OperatingSystemSKU VARCHAR(20), OSArchitecture VARCHAR(4),RegisteredUser VARCHAR(7), SerialNumber VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
+                    string command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, CodeSet VARCHAR(20), CSDVersion VARCHAR(30), Debug VARCHAR(10), FreePhysicalMemory VARCHAR(30), FreeSpaceInPagingFiles VARCHAR(30), FreeVirtualMemory VARCHAR(30), InstallDate VARCHAR(30), Name VARCHAR(60), NumberOfLicensedUsers VARCHAR(4), NumberOfUsers VARCHAR(4), OperatingSystemSKU VARCHAR(20), OSArchitecture VARCHAR(8),RegisteredUser VARCHAR(7), SerialNumber VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
                     com = new MySqlCommand(command, MainHandle);
                     com.ExecuteNonQuery();
                     MyDataReader.Close();
@@ -243,14 +243,52 @@ namespace Server
                 }
                 //if (!Tables.Contains("system")) { }
             }
+            else
+            {
+                MyDataReader.Close();
+                CreateTables();
+            }
             // Тут надо сделать типа сообщения об отсутсвии таблиц и  предложить по новой создать
         }
-        public MySQLCon(string DB_HOST, string DB_USER, string DB_BASE, string DB_PASS)
+
+        private void CreateTables()
         {
-            this.DB_HOST = DB_HOST;
-            this.DB_USER = DB_USER;
-            this.DB_BASE = DB_BASE;
-            this.DB_PASS = DB_PASS;
+            string command = String.Format("CREATE TABLE IF NOT EXISTS systems (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30), mac VARCHAR(50), isConfirm BOOLEAN)");
+            MySqlCommand com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS operationsys (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, CodeSet VARCHAR(20), CSDVersion VARCHAR(30), Debug VARCHAR(10), FreePhysicalMemory VARCHAR(30), FreeSpaceInPagingFiles VARCHAR(30), FreeVirtualMemory VARCHAR(30), InstallDate VARCHAR(30), Name VARCHAR(60), NumberOfLicensedUsers VARCHAR(4), NumberOfUsers VARCHAR(4), OperatingSystemSKU VARCHAR(20), OSArchitecture VARCHAR(8),RegisteredUser VARCHAR(7), SerialNumber VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();       
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS cpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), L2CacheSize VARCHAR(30), L3CacheSize VARCHAR(30), MaxClockSpeed VARCHAR(30), NumberOfCores VARCHAR(30), NumberOfLogicalProcessors VARCHAR(30), ProcessorId VARCHAR(30), ProcessorType VARCHAR(30), Revision VARCHAR(30), Role VARCHAR(30), SocketDesignation VARCHAR(30), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();        
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS gpuunit (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), DeviceID VARCHAR(30), AdapterRAM VARCHAR(30), Availability VARCHAR(30), Caption VARCHAR(30), CurrentRefreshRate VARCHAR(30), CurrentScanMode VARCHAR(30), DriverDate VARCHAR(30), DriverVersion VARCHAR(30), MaxRefreshRate VARCHAR(30), MinRefreshRate VARCHAR(30), Monochrome VARCHAR(30), VideoProcessor VARCHAR(30), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();   
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS boards (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(60), Description VARCHAR(60), HostingBoard VARCHAR(30), HotSwappable VARCHAR(30), Manufacturer VARCHAR(30), Model VARCHAR(30), OtherIdentifyingInfo VARCHAR(30), Product VARCHAR(30), SerialNumber VARCHAR(30), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS rams (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, BankLabel VARCHAR(30), Capacity VARCHAR(30), DataWidth VARCHAR(30), Description VARCHAR(60), DeviceLocator VARCHAR(30), FormFactor VARCHAR(30), MemoryType VARCHAR(30), Model VARCHAR(30), Name VARCHAR(60), OtherIdentifyingInfo VARCHAR(30), PartNumber VARCHAR(30), PositionInRow VARCHAR(30), SerialNumber VARCHAR(30), Speed VARCHAR(30), Status VARCHAR(30), Version VARCHAR(30), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();    
+            com.Dispose();
+            command = String.Format("CREATE TABLE IF NOT EXISTS products (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DisplayName VARCHAR(60), DisplayVersion VARCHAR(60), InstallDate VARCHAR(30), Publisher VARCHAR(60), IdentifyingNumber VARCHAR(60), systemid INT NOT NULL)");
+            com = new MySqlCommand(command, MainHandle);
+            com.ExecuteNonQuery();
+            com.Dispose();
+
+        }
+        public MySQLCon()
+        {
+            this.DB_HOST = SettingsClass.DB_HOST;
+            this.DB_USER = SettingsClass.DB_USER;
+            this.DB_BASE = SettingsClass.DB_BASE;
+            this.DB_PASS = SettingsClass.DB_PASS;
         }
 
     }

@@ -56,7 +56,7 @@ namespace Server
             }
             return true;
         }
-        public bool SaveSettings()
+        public static bool SaveSettings()
         {
             XDocument doc = XDocument.Load("preferences.xml");
             XNode node = doc.Root.FirstNode;
