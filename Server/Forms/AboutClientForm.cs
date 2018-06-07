@@ -22,9 +22,9 @@ namespace Server
             //-----------------------------------------
             
             //---------------ОС------------------------
-            OperSys.Text = OperationSistem[0];
-            OSVers.Text = OperationSistem[1] + " " + OperationSistem[2];
-            OSInstDate.Text = OperationSistem[3];
+            OperSys.Text = OperationSistem[7];
+            OSVers.Text = OperationSistem[1] + " " + OperationSistem[14];
+            OSInstDate.Text = OperationSistem[6];
             //-----------------------------------------
 
             //---------------RAM-----------------------

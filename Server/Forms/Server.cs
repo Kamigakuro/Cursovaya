@@ -8,6 +8,7 @@ using System.Drawing;
 //using System.IO;
 //using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -246,6 +247,45 @@ namespace Server
         {
             IPAddress.TryParse(textBox2.Text, out IPAddress BeginIP);
             IPAddress.TryParse(textBox3.Text, out IPAddress EndnIP);
+            dataGridView3.Rows.Clear();
+            List<IPAddress> iplist = IPAddressesRange(BeginIP, EndnIP);
+            int count = 0;
+            foreach ( IPAddress ip in iplist)
+            {
+                Ping pingSender = new Ping();
+                IPAddress address = ip;
+                PingReply reply = pingSender.Send(address, 200);
+                count++;
+                if (reply.Status == IPStatus.Success)
+                {
+                    int row = dataGridView3.Rows.Add(count, ip.ToString(), "Активно");
+                    dataGridView3.Rows[row].DefaultCellStyle.BackColor = Color.Green;
+                }
+                else
+                {
+                    int row = dataGridView3.Rows.Add(count, ip.ToString(), "Не активно");
+                    dataGridView3.Rows[row].DefaultCellStyle.BackColor = Color.LightBlue;
+                }
+            }
+
+        }
+
+        private static List<IPAddress> IPAddressesRange(IPAddress firstIPAddress, IPAddress lastIPAddress)
+        {
+            var firstIPAddressAsBytesArray = firstIPAddress.GetAddressBytes();
+            var lastIPAddressAsBytesArray = lastIPAddress.GetAddressBytes();
+            Array.Reverse(firstIPAddressAsBytesArray);
+            Array.Reverse(lastIPAddressAsBytesArray);
+            var firstIPAddressAsInt = BitConverter.ToInt32(firstIPAddressAsBytesArray, 0);
+            var lastIPAddressAsInt = BitConverter.ToInt32(lastIPAddressAsBytesArray, 0);
+            var ipAddressesInTheRange = new List<IPAddress>();
+            for (var i = firstIPAddressAsInt; i <= lastIPAddressAsInt; i++)
+            {
+                var bytes = BitConverter.GetBytes(i);
+                var newIp = new IPAddress(new[] { bytes[3], bytes[2], bytes[1], bytes[0] });
+                ipAddressesInTheRange.Add(newIp);
+            }
+            return ipAddressesInTheRange;
         }
 
         private void button2_Click(object sender, EventArgs e)

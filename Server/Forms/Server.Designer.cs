@@ -77,15 +77,15 @@
             this.delbutton = new System.Windows.Forms.DataGridViewButtonColumn();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.num = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tableip = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tablestate = new System.Windows.Forms.DataGridViewImageColumn();
             this.button1 = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.num = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tableip = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tablestate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.DataGridStrip.SuspendLayout();
@@ -497,24 +497,6 @@
             this.dataGridView3.Size = new System.Drawing.Size(540, 486);
             this.dataGridView3.TabIndex = 5;
             // 
-            // num
-            // 
-            this.num.HeaderText = "##";
-            this.num.Name = "num";
-            this.num.ReadOnly = true;
-            // 
-            // tableip
-            // 
-            this.tableip.HeaderText = "IP";
-            this.tableip.Name = "tableip";
-            this.tableip.ReadOnly = true;
-            // 
-            // tablestate
-            // 
-            this.tablestate.HeaderText = "State";
-            this.tablestate.Name = "tablestate";
-            this.tablestate.ReadOnly = true;
-            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(258, 2);
@@ -566,6 +548,26 @@
             this.button2.Text = "Настройки";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // num
+            // 
+            this.num.HeaderText = "##";
+            this.num.Name = "num";
+            this.num.ReadOnly = true;
+            // 
+            // tableip
+            // 
+            this.tableip.HeaderText = "IP";
+            this.tableip.Name = "tableip";
+            this.tableip.ReadOnly = true;
+            // 
+            // tablestate
+            // 
+            this.tablestate.HeaderText = "State";
+            this.tablestate.Name = "tablestate";
+            this.tablestate.ReadOnly = true;
+            this.tablestate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.tablestate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Server
             // 
@@ -659,12 +661,12 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.DataGridView dataGridView3;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn num;
-        private System.Windows.Forms.DataGridViewTextBoxColumn tableip;
-        private System.Windows.Forms.DataGridViewImageColumn tablestate;
         private System.Windows.Forms.Button button2;
         public System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn num;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tableip;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tablestate;
     }
 }
 
